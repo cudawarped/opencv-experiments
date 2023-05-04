@@ -1,0 +1,435 @@
+<img class="aligncenter size-full wp-image-195" src="https://jamesbowley.co.uk/wp-content/uploads/2017/01/opencv_cuda_intel2.jpg" alt="" width="559" height="125">
+
+Because the pre-built <a href="https://github.com/opencv/opencv/releases/tag/4.5.0" target="_blank" rel="noopener noreferrer">Windows libraries</a> available for <a href="https://opencv.org/opencv-4-5-0.html" target="_blank" rel="noopener noreferrer">OpenCV 4.5.0</a> do not include the <a href="https://docs.opencv.org/4.5.0/d1/d1e/group__cuda.html" target="_blank" rel="noopener noreferrer">CUDA modules</a>, or support for the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>, <a href="https://developer.nvidia.com/cudnn" target="_blank" rel="noopener noreferrer">Nvidia cuDNN</a>, <a href="https://software.intel.com/en-us/media-sdk" target="_blank" rel="noopener noreferrer">Intel Media SDK</a> or Intel's <a href="https://software.intel.com/en-us/intel-mkl" target="_blank" rel="noopener noreferrer">Math Kernel Libraries (MKL)</a> or <a href="https://software.intel.com/en-us/intel-tbb" target="_blank" rel="noopener noreferrer">Intel Threaded Building Blocks (TBB)</a> performance libraries, I have included the build instructions, below for anyone who is interested. If you just need the Windows libraries then go to <a href="https://jamesbowley.co.uk/downloads/#OpenCV4.5.0">Download OpenCV 4.5.0 with CUDA 11.1</a>. To get an indication of the performance boost from calling the OpenCV CUDA functions with these libraries see the <a href="https://jamesbowley.co.uk/opencv-3-4-gpu-cuda-performance-comparison-nvidia-vs-intel/">OpenCV 3.4 GPU CUDA Performance Comparisson (nvidia vs intel)</a>.
+
+The guide below details instructions on compiling the 64 bit version of OpenCV 4.5.0 shared libraries with Visual Studio 2019, <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew" target="_blank" rel="noopener noreferrer">CUDA 11.1</a>, and optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>, <a href="https://developer.nvidia.com/cudnn" target="_blank" rel="noopener noreferrer">Nvidia cuDNN</a>, <a href="https://software.intel.com/en-us/media-sdk" target="_blank" rel="noopener noreferrer">Intel Media SDK</a>, <a href="https://software.intel.com/en-us/intel-mkl" target="_blank" rel="noopener noreferrer">Intel Math Kernel Libraries (MKL)</a>, <a href="https://software.intel.com/en-us/intel-tbb" target="_blank" rel="noopener noreferrer">Intel Threaded Building Blocks (TBB)</a> and Python bindings for accessing OpenCV CUDA modules from within Python.
+
+The main topics covered are given below. Although most of the sections can be read in isolation I recommend reading the <a href="#pre_build_checklist">pre-build checklist</a> first to check whether you will benefit from and/or need to compile OpenCV with CUDA support.
+<ul>
+ 	<li><a href="#pre_build_checklist">Pre-build Checklist</a></li>
+ 	<li><a href="#prerequisites">Prerequisites</a></li>
+ 	<li><a href="#visual_studio_cmake">Generating OpenCV build files with CMake</a>
+<ul>
+ 	<li><a href="#visual_studio_cmake_cmd">Building OpenCV 4.5.0 with CUDA and Intel MKL + TBB, with Visual Studio solution files from the command prompt (cmd)</a></li>
+ 	<li><a href="#ninja">Decreasing the build time with Ninja</a></li>
+ 	<li><a href="#gui">Adding additional configuration options with the CMake GUI</a></li>
+ 	<li><a href="#python_bindings">Including Python bindings</a>
+<ul>
+ 	<li><a href="#python37">Python 3.7 in the base conda environment</a></li>
+ 	<li><a href="#python38">Python 3.8 in a seperate conda environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+ 	<li><a href="#troubleshooting">Troubleshooting common configuration/build errors</a></li>
+ 	<li><a href="#cuda_performance">Verifying OpenCV is CUDA accelerated</a></li>
+ 	<li><a href="#compute-capability">Choosing the compute-capability</a>
+<ul>
+ 	<li><a href="#ptx">CMake command line options to control cubin/PTX content of the OpenCV shared library</a></li>
+</ul>
+</li>
+</ul>
+<a id="pre_build_checklist"></a>
+<h3>Pre-build Checklist</h3>
+<strong>Before continuing there are a few things to be aware of:</strong>
+<ol>
+ 	<li>This guide is for OpenCV 4.5.0.  Whilst the instructions should also work on newer versions, this is not guaranteed so please only ask questions related to the stable 4.5.0 release on this page.</li>
+ 	<li>You can download all the pre-built binaries described in this guide from the <a href="https://jamesbowley.co.uk/downloads/">downloads page</a>. Unless you want to;
+<ul>
+ 	<li>build for another version of Visual Studio; and/or</li>
+ 	<li>include non-free algorithms; and/or</li>
+ 	<li>generate CUDA binaries compatible with devices of specific compute capability see <a href="#compute-capability">Choosing the compute-capability</a>; and/or</li>
+ 	<li>build bindings for python versions other than to 3.8;</li>
+</ul>
+or just want to build OpenCV from scratch, you may find they are all you need.</li>
+ 	<li>If you have already tried to build and are having issues check out the <a href="#troubleshooting">troubleshooting guide</a>.</li>
+ 	<li>Thanks to <a href="https://github.com/cv3d" rel="noopener noreferrer" target="_blank">Hamdi Sahloul</a>, since August 2018 the CUDA modules can now be called directly from Python, to include this support see the <a href="#python_bindings">including Python bindings</a> section.</li>
+ 	<li>The procedure outlined has been tested on Visual Studio Community 2019 (16.7.5).</li>
+ 	<li>The OpenCV <a href="https://docs.opencv.org/4.4.0/d6/d0f/group__dnn.html" target="_blank" rel="noopener noreferrer">DNN</a> modules are now CUDA accelerated. To target you need to install <a href="https://developer.nvidia.com/cudnn" target="_blank" rel="noopener noreferrer">cuDNN</a> (see the <a href="#prerequisites">below</a> for instructions) before building.
+<strong>Note:</strong>
+<ul>
+ 	<li>If you want to use your application on a different machine you will need to ensure that the cudnn64_8.dll is installed on that machine, either in a location on the system/user path or in the same directory as your application.</li>
+ 	<li>Installing cuDNN will automatically cause OpenCV to be built with the CUDA DNN backend, therefore if you have cuDNN installed but do not wish to build OpenCV with the CUDA backend (making it dependant on cuDNN) you will need to disable the module with -DOPENCV_DNN_CUDA=OFF.</li>
+</ul>
+</li>
+ 	<li>If you have built OpenCV with CUDA support then to use those libraries and/or redistribute applications built with them on any machines without the CUDA toolkit installed, you will need to ensure those machines have,
+<ul>
+ 	<li>an Nvidia capable GPU with driver version of 456.38 or later (see <a href="https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html" target="_blank" rel="noopener noreferrer">this</a> for a full list of CUDA Toolkit versions and their required drivers), and</li>
+ 	<li>the CUDA dll's (cublas64_11.dll, nppc64_11.dll etc.) placed somewhere on the system or user path, or in the same directory as the executable. These can be located in the following directory.
+<pre><code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin</code></pre>
+</li>
+</ul>
+</li>
+ 	<li>The latest version of Intel TBB uses a shared library, therefore if you build with Intel TBB you need to add
+<pre><code>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\redist\intel64_win\tbb\vc_mt</code></pre>
+to your path variable, and make sure you redistribute tbb.dll with any of your applications.</li>
+ 	<li>Depending on the hardware the build time can be over 3 hours. If this is an issue you can speed this up by generating the build files with <a href="#ninja">ninja</a> and/or targeting a specific CUDA <a href="#compute-capability">compute capability</a>.</li>
+</ol>
+<a id="prerequisites"></a>
+<h3>Prerequisites</h3>
+There are a couple of components you need to download and/or install before you can get started, you first need to:
+<ol>
+ 	<li>Install <a href="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&amp;rel=16" target="_blank" rel="noopener noreferrer">Visual Studio 2019</a>, selecting the "Desktop development with C++" workload shown in the image below. If you already have an installation ensure that the correct workload is installed and that you have updated to the latest version (16.7.5 is used in this guide).
+<img class="alignnone size-full wp-image-674" src="https://jamesbowley.co.uk/wp-content/uploads/2020/01/vs2019_install_options.png" alt="" width="899" height="523"></li>
+ 	<li>Download the source files for both OpenCV and OpenCV contrib, available on GitHub. Either clone the git repos <a href="https://github.com/opencv/opencv" target="_blank" rel="noopener noreferrer">OpenCV</a> and <a href="https://github.com/opencv/opencv_contrib" target="_blank" rel="noopener noreferrer">OpenCV Contrib</a> making sure to checkout the 4.5.0 tag or download these archives <a href="https://github.com/opencv/opencv/archive/4.5.0.zip" target="_blank" rel="noopener noreferrer">OpenCV 4.5.0</a> and <a href="https://github.com/opencv/opencv_contrib/archive/4.5.0.zip" target="_blank" rel="noopener noreferrer">OpenCV Contrib 4.5.0</a> containing all the source file.
+<strong>Note: I have seen lots of guides including instructions to download and use git to get the source files, however this is a completely unnecessary step. If you are a developer and you don't already have git installed and configured then, I would assume there is a good reason for this and I would not advise installing just to build OpenCV.</strong></li>
+ 	<li>Install <a href="https://cmake.org/" target="_blank" rel="noopener noreferrer">CMake</a> - Version <a href="https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-win64-x64.msi" target="_blank" rel="noopener noreferrer">3.18.4</a> is used in the guide.</li>
+ 	<li>Install <a href="https://developer.nvidia.com/cuda-downloads" target="_blank" rel="noopener noreferrer">The CUDA 11.1 Toolkit</a>.  Note: If your system path is too long, CUDA will not add the path to its binaries <code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin</code> during installation.  If you receive a warning about this at the end of the installation process do not forget to manually add the path to your system path, otherwise opencv_world450.dll will fail to load.</li>
+ 	<li>Optional - To <strong>decode</strong> video on the GPU with <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>
+<ul>
+ 	<li>
+            Register and <a href="https://developer.nvidia.com/nvidia-video-codec-sdk#Download" target="_blank" rel="noopener noreferrer">download</a> the Video Codec SDK.</li>
+ 	<li>
+            Extract and copy the contents of the <strong>Interface</strong> to the <strong>include</strong> and the <strong>Lib</strong> to the <strong>lib</strong> directory inside your CUDA installation.  For CUDA 11.1 your CUDA installation directory is
+<pre><code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1</code></pre>
+</li>
+</ul>
+Video Codec SDK 10 is used in this guide.
+<strong>Note:</strong> Before building you may want to ensure that your GPU has decoding support by refering to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>.</li>
+ 	<li>Optional - To use the DNN CUDA backend:
+<ul>
+ 	<li>Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> cuDNN.</li>
+ 	<li>
+                Extract and copy the <strong>bin</strong>, <strong>include</strong> and <strong>lib</strong> directories to your CUDA installation.  For CUDA 11.1 your CUDA installation directory is
+<pre><code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1</code></pre>
+</li>
+</ul>
+cuDNN v8.0.4.30 is used in this guide.</li>
+ 	<li>Optional - To accelerate video decoding on Intel CPU's with <a href="https://en.wikipedia.org/wiki/Intel_Quick_Sync_Video" target="_blank" rel="noopener noreferrer">Quick Sync</a> register and <a href="https://software.intel.com/en-us/media-sdk/choose-download/client" target="_blank" rel="noopener noreferrer">download</a> and install <a href="https://software.intel.com/en-us/media-sdk" target="_blank" rel="noopener noreferrer">Intel Media SDK</a>.</li>
+Media SDK 2020 R1 is used in this guide.
+ 	<li>Optional - To accelerate specific OpenCV operations install both the Intel MKL and TBB by registering for <a href="https://registrationcenter.intel.com/en/forms/?productid=2558&amp;licensetype=2" target="_blank" rel="noopener noreferrer">community licensing</a>, and downloading for free. MKL version 2019 Update 5 (2019.0.5.068) and TBB version 2019 Update 8 (2019.0.5.068) are used in this guide, later versions of MKL do not currently compile out of the box (see <a href="https://github.com/opencv/opencv/issues/17870" target="_blank" rel="noopener noreferrer">this issue</a> on github) and I also cannot guarantee that earlier versions will work correctly either.</li>
+ 	<li>Optional – To call OpenCV CUDA routines from python, install the x64 bit version of <a href="https://www.anaconda.com/distribution/#download-section" target="_blank" rel="noopener noreferrer">Anaconda3</a>, making sure to tick “Register Anaconda as my default Python ..”. This guide has been tested against Anaconda with Python 3.7, installed in the default location for a single user and Python 3.8 installed in its own conda environment.</li>
+</ol>
+<a id="visual_studio_cmake"></a>
+<h3>Generating OpenCV build files with CMake</h3>
+Before you can build OpenCV you have to generate the build files with CMake. There are two ways to do this, from the command prompt or with the CMake GUI, however by far the quickest and easiest way to proceed is to use the command prompt to generate the base configuration. Then if you want to add any additional configuration options, you can open up the build directory in the CMake GUI as described <a href="#gui">here</a>.
+
+In addition there are several ways to build OpenCV using Visual Studio. For simplicity only two methods are discussed here:
+<ol>
+ 	<li><a href="#visual_studio_cmake_cmd">Building OpenCV with Visual Studio solution files.</a></li>
+ 	<li><a href="#ninja">Building OpenCV with the ninja build system to reduce the build time.</a></li>
+</ol>
+Finally instructions are included for building and using the <a href="#python_bindings">Python bindings</a> to access the OpenCV CUDA modules.
+<a id="visual_studio_cmake_cmd"></a>
+<h4>Building OpenCV 4.5.0 with CUDA and Intel MKL + TBB, with Visual Studio solution files from the command prompt (cmd)</h4>
+The following steps will build the opencv_world450.dll using NVIDIA's recommended settings for future hardware compatibility. This does however have two drawbacks, first the build can take several hours to complete and second, the shared library will be at least 1.09GB depending on the configuration that you choose below. To find out how to reduce both the compilation time and size of opencv_world450.dll read <a href="#compute-capability">choosing the compute-capability</a> first and then continue as below. If you wish to build the Python bindings and/or use the Ninja build system then see section <a href="#python_bindings">including python bindings</a> and/or <a href="#ninja">decreasing the build time with Ninja</a> respectively before proceeding.
+<ol>
+ 	<li>Open up the command prompt (windows key + r, then type cmd and press enter).</li>
+ 	<li>Ignore this step if you are not building with Intel MKL + TBB. Enter the below
+<pre><code>"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.5.281\windows\mkl\bin\mklvars.bat" intel64</code>
+<code>"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\tbb\bin\tbbvars.bat" intel64</code></pre>
+to temporarily set the environmental variables for locating your MKL and TBB installations.</li>
+ 	<li>Set the location of the source files and build directory, by entering the text shown below, first setting PATH_TO_OPENCV_SOURCE to the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.) and PATH_TO_OPENCV_CONTRIB_MODULES to the <strong>modules</strong> directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">contrib repo</a> (the directory containing cudaarithm, cudabgsegm, etc).
+<pre><code>set "openCvSource=PATH_TO_OPENCV_SOURCE"</code>
+<code>set "openCVExtraModules=PATH_TO_OPENCV_CONTRIB_MODULES"</code>
+<code>set "openCvBuild=%openCvSource%\build"</code>
+<code>set "buildType=Release"</code>
+<code>set "generator=Visual Studio 16 2019"</code></pre>
+</li>
+ 	<li> Copy the below to the command prompt.  This is the base configuration and will build opencv_world440.dll with CUDA including and the corresponding tests and examples. Additionally if the Nvidia Video Codec SDK, cuDNN or the Intel Media SDK are installed the corresponding modules will automatically be included.
+<pre><code>"C:\Program Files\CMake\bin\cmake.exe" -B"%openCvBuild%/" -H"%openCvSource%/" -G"%generator%" -DCMAKE_BUILD_TYPE=%buildType% -DOPENCV_EXTRA_MODULES_PATH="%openCVExtraModules%/" ^
+-DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON ^
+-DBUILD_opencv_world=ON ^
+-DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.1" -DCUDA_FAST_MATH=ON -DWITH_CUBLAS=ON -DCUDA_ARCH_PTX=8.6 -DWITH_NVCUVID=ON ^
+-DWITH_OPENGL=ON ^
+-DWITH_MFX=ON </code></pre>
+Then append the following commands as required, and press enter to run CMake:
+<ul>
+ 	<li>Remove all optional CUDA modules.  This is useful if you only want to use the CUDA backend for the DNN module and will significantly reduce compilation time and size of the opencv_world450.dll.
+<pre><code>-DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF</code></pre>
+</li>
+ 	<li>Include Intel MLK without multithreading support and dependence on tbb.dll
+<pre><code>-DWITH_MKL=ON</code></pre>
+</li>
+ 	<li>Make Intel MKL multi-threaded by adding the following to <code>-DWITH_MKL=ON</code>.
+<strong>Note:</strong> This will make opencv_world450.dll dependant on tbb.dll.
+<pre><code>-DMKL_USE_MULTITHREAD=ON -DMKL_WITH_TBB=ON</code></pre>
+</li>
+ 	<li>Include Intel TBB - recommended for DNN inference on the CPU.
+<strong>Note:</strong> As above this will make opencv_world450.dll dependant on tbb.dll.
+<pre><code>-DWITH_TBB=ON</code></pre>
+</li>
+ 	<li>Include non free modules.
+<pre><code>-DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_rgbd=OFF</code></pre>
+</li>
+</ul>
+</li>
+ 	<li>If you want to make any configuration changes before building, then you can do so now through the CMake <a href="#gui">GUI</a>.</li>
+ 	<li>The OpenCV.sln solution file should now be in your PATH_TO_OPENCV_SOURCE/build directory. To build OpenCV you have two options depending on you preference you can:
+<ul>
+ 	<li>Build directly from the command line by simply entering the following (swaping Release for Debug to build a release version)
+<pre><code>"C:\Program Files\CMake\bin\cmake.exe" --build %openCvBuild% --target INSTALL --config Debug</code></pre>
+</li>
+ 	<li>Build through Visual Studio GUI by opening up the OpenCV.sln in Visual Studio, selecting your Configuration, clicking on <strong>Solution Explorer</strong>, expanding <strong>CMakeTargets</strong>, right clicking on <strong>INSTALL</strong> and clicking <strong>Build</strong>.<img class="alignnone size-full wp-image-225" src="https://jamesbowley.co.uk/wp-content/uploads/2017/01/cmake_install.png" alt="" width="220" height="158"></li>
+</ul>
+Either approach will both build the library and copy the necessary redistributable parts to the install directory, <strong>PATH_TO_OPENCV_SOURCE/build/install</strong> in this example. All that is required now to run any programs compiled against these libs is to add the directory containing opencv_world450.dll (and tbb.dll if you have built with Intel TBB) to you path environmental variable.</li>
+</ol>
+If everything was successful, congratulations, you now have OpenCV built with CUDA. To quickly verify that the CUDA modules are working and check if there is any performance benefit on your specific hardware see <a href="#cuda_performance">below</a>
+<a id="ninja"></a>
+<h4>Decreasing the build time with Ninja</h4>
+The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins on an  i7-8700) by utilizing the ninja build system instead of directly generating Visual Studio solution files. The only difference you may notice is that Ninja will only produce one configuration at a time, either a Debug or Release, therefore the <code>buildType</code> must be set before calling CMake. In the <a href="#visual_studio_cmake_cmd">section</a> above the configuration was set to Release, to change it to Debug simply replace Release with Debug as shown below
+<pre><code>set "buildType=Debug"</code></pre>
+Using ninja only requires two extra configuration steps:
+<ol>
+ 	<li>Configuring Visual Studio Development tools by entering the following into the command prompt before entering the CMake command (changing Community to either Professional or Enterprise if necessary)
+<pre><code>"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"</code></pre>
+</li>
+ 	<li>Changing the generator from "Visual Studio 16 2019" to ninja
+<pre><code>set "generator=Ninja"</code></pre>
+</li>
+</ol>
+For example entering the following into the command prompt will generate ninja build files to build OpenCV with CUDA 11.1 and Python bindings
+<pre><code>"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"</code>
+<code>set "openCvSource=PATH_TO_OPENCV_SOURCE"</code>
+<code>set "openCVExtraModules=PATH_TO_OPENCV_CONTRIB_MODULES"</code>
+<code>set "openCvBuild=%openCvSource%\build"</code>
+<code>set "buildType=Release"</code>
+<code>set "generator=Ninja"</code>
+<code>set "pathToAnaconda=PATH_TO_ANACONDA3"</code>
+<code>set "pyVer=37"</code>
+<code>"C:\Program Files\CMake\bin\cmake.exe" -B"%openCvBuild%/" -H"%openCvSource%/" -G"%generator%" -DCMAKE_BUILD_TYPE=%buildType% -DOPENCV_EXTRA_MODULES_PATH="%openCVExtraModules%/" ^
+-DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON ^
+-DBUILD_opencv_world=ON ^
+-DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.1" -DCUDA_FAST_MATH=ON -DWITH_CUBLAS=ON -DCUDA_ARCH_PTX=8.6 -DWITH_NVCUVID=ON ^
+-DWITH_OPENGL=ON ^
+-DWITH_MFX=ON ^
+-DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=%pathToAnaconda%/include -DPYTHON3_LIBRARY=%pathToAnaconda%/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=%pathToAnaconda%/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=%pathToAnaconda%/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=%pathToAnaconda%/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</code></pre>
+The build can then be started in the same way as before dropping the --config option as
+<pre><code>"C:\Program Files\CMake\bin\cmake.exe" --build %openCvBuild% --target install</code></pre>
+<a id="gui"></a>
+<h4>Adding additional configuration options with the CMake GUI</h4>
+Once you have generated the base Visual Studio solution file from the command prompt the easiest way to make any aditional configuration changes is through the CMake GUI. To do this:
+<ol>
+ 	<li>Fire up the CMake GUI.</li>
+ 	<li>Making sure that the <strong>Grouped</strong> checkbox is ticked, click on the <strong>browse build</strong> button<img src="https://jamesbowley.co.uk/wp-content/uploads/2019/01/cmake_grouped.png" alt="" class="alignnone size-full wp-image-744" width="390" height="110">
+
+and navigate to your PATH_TO_OPENCV_SOURCE/build directory. If you have selected the correct directory the main CMake window should resemble the below.
+
+<img src="https://jamesbowley.co.uk/wp-content/uploads/2020/01/opencv_4_2_0_cmake_gui.png" alt="" class="alignnone size-full wp-image-744" width="284" height="453"></li>
+ 	<li>Now any additional configuration changes can be made by just expanding any of the grouped items and ticking or unticking the values displayed. Once you are happy just press <strong>Configure</strong>,<img class="alignnone size-full wp-image-476" src="https://jamesbowley.co.uk/wp-content/uploads/2020/01/configure_generate_vs2019.png" alt="" width="475" height="61">
+
+if the bottom window displays <strong>configuration successful</strong> press <strong>Generate</strong>, and you should see
+
+<img class="alignnone size-full wp-image-477" src="https://jamesbowley.co.uk/wp-content/uploads/2018/01/generation_successful-1.png" alt="" width="494" height="88">
+
+Now you can open up the Visual Studio solution file and proceed as before.</li>
+ 	<li><strong>Troubleshooting:</strong>
+<ul>
+ 	<li>Make sure you have the latest version of Visual Studio 2019 (&gt;= 16.7.5)</li>
+ 	<li>Not all options are compatible with each other and the configuration step may fail as a result. If so examine the error messages given in the bottom window and look for a solution.</li>
+ 	<li>If the build is failing after making changes to the base configuration, I would advise you to remove the build directory and start again making sure that you can at least build the base Visual Studio solution files produces from the command line</li>
+</ul>
+</li>
+</ol>
+<a id="python_bindings"></a>
+<h4>Including Python bindings</h4>
+Building and installing python support is incredibly simple, the instructions below are for python 3.7 and 3.8 however they can easily be adapted for other versions of python aswell.  If you have downloaded the pre-built binaries from <a href="https://jamesbowley.co.uk/downloads/#OpenCV4.5.0">here</a> then you can simply follow steps 5)-7) after first setting <code>%openCvBuild%</code> to the directory which you have extracted the pre-built binaries to.  That is <code>set "%openCvBuild%=EXTRACTED_DIR"</code> where EXTRACTED_DIR contains both the <code>install</code> and <code>lib</code> directories.
+<a id="python37"></a>
+<strong>Python 3.7 in the base conda environment</strong>
+Below are instructions on how to build OpenCV with python bindings in the base anaconda environment, which in our case uses python 3.7 as we installed anaconda with that version.
+<ol>
+ 	<li>Open up the windows command prompt and enter
+<pre><code>set "pathToAnaconda=PATH_TO_ANACONDA3"</code></pre>
+<pre><code>set "pyVer=37"</code></pre>
+ensuring the PATH_TO_ANACONDA3 only uses forward slashes (/) as path seperators and points to the Anaconda3 directory, e.g. <code>C:/Users/mbironi/Anaconda3/</code>.</li>
+ 	<li>Follow the instructions from <a href="#visual_studio_cmake_cmd">above</a> to build your desired configuration, appending the below to the CMake configuration before running CMake.
+<pre><code>-DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=%pathToAnaconda%/include -DPYTHON3_LIBRARY=%pathToAnaconda%/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=%pathToAnaconda%/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=%pathToAnaconda%/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=%pathToAnaconda%/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</code></pre>
+</li>
+ 	<li>Make sure you build release, python bindings cannot by default be generated for a debug configuration, that is unless you have specificaly built or downloaded a debug version of python.  That said you can easily generate a debug build by modifying the contents of <code>pyconfig.h</code>, changing
+<pre><code>pragma comment(lib,"python37_d.lib")</code></pre>
+to
+<pre><code>pragma comment(lib,"python37.lib")</code></pre>
+and
+<pre><code>#       define Py_DEBUG</code></pre>
+to
+<pre><code>//#       define Py_DEBUG</code></pre>
+The default location of <code>pyconfig.h</code> in Anaconda3 is <code>%USERPROFILE%\Anaconda3\include\pyconfig.h</code>.  However the version you are compiling against may differ, to check the location simply open up CMake in the build directory as detailed in <a href="#gui">Adding additional configuration options with CMake GUI</a> and check the entries under <strong>PYTHON3_INCLUDE_DIR</strong> shown below.
+
+<img class="alignnone size-full wp-image-476" src="https://jamesbowley.co.uk/wp-content/uploads/2019/09/cmake_python3.png" alt="" width="684" height="123"></li>
+ 	<li>
+        Verify that the cmake output detailing the modules to be built includes <strong>python3</strong> and if not look for errors in the output preceding the below.
+<pre>--   OpenCV modules:
+--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dpm face features2d flann fuzzy hfs highgui img_hash imgcodecs imgproc line_descriptor ml objdetect optflow phase_unwrapping photo plot python2 <strong>python3</strong> quality reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab world xfeatures2d ximgproc xobjdetect xphoto</pre>
+</li>
+ 	<li>In the current version of OpenCV (4.5.0), once generated the bindings (<code>cv2.cp37-win_amd64.pyd</code>) are copied to the site-packages directory, in our case
+<pre><code>"%USERPROFILE%\Anaconda3\Lib\site-packages\"</code></pre>
+To verify this and ensure that there are no historic installations of OpenCV either through pip or conda before continuing type the following
+<pre><code>dir "%USERPROFILE%\Anaconda3\Lib\site-packages\cv2*"</code></pre>
+and inspect the output
+<pre><code><strong>17/04/2019  10:11    &lt;DIR&gt;         cv2</strong>
+12/10/2020  14:56        11,968,000 cv2.cp37-win_amd64.pyd</code></pre>
+You need to ensure that the date of the bindings copied to your installation of python (12/10/2020  14:56 in the above case) corresponds to the date and time of the build.  Additionaly you must make sure that there are no other entries.  In the above example the additional ouput showing a <code>cv2</code> directory implies that there is an existing installation of OpenCV, either through pip or a previous build.  This needs to be removed before continuing, with the method of removeal depending on how it was installed.
+
+If for some the above returns
+<pre><code>File Not Found</code></pre>
+first the verify that the python bindings have been built by entering
+<pre><code>dir "%openCvBuild%\lib\python3\cv2.cp37-win_amd64.pyd"</code></pre>
+or
+<pre><code>dir "%openCvBuild%\lib\python3\[Debug|Release]\cv2.cp37-win_amd64.pyd"</code></pre>
+if you built using from within Visual Studio, and then confirming that the following file exists
+<pre><code></code>12/10/2020  14:56        11,968,000 cv2.cp37-win_amd64.pyd</pre>
+If the file has been found then this can be manually copied accross using the following which again assumes you have python 3.7 installed through Anaconda in the default location for a single user.
+<pre><code>copy "%openCvBuild%\lib\python3\cv2.cp37-win_amd64.pyd" "%USERPROFILE%\Anaconda3\Lib\site-packages\cv2.cp37-win_amd64.pyd"</code></pre>
+or
+<pre><code>copy "%openCvBuild%\lib\python3\[Debug|Release]\cv2.cp37-win_amd64.pyd" "%USERPROFILE%\Anaconda3\Lib\site-packages\cv2.cp37-win_amd64.pyd"</code></pre>
+if you built using from within Visual Studio.
+Alternatively if the above also returns <code>File Not Found</code> then you need to ensure both that the build has completed successfully and that the output from step 4) contains <strong>python3</strong>.</li>
+ 	<li>Include the path to the opencv_world440.dll and opencv_img_hash450.dll shared libraries in your user or system path or temporarily by entering
+<pre><code>set path=%openCvBuild%\install\x64\vc16\bin;%path%</code></pre>
+</li>
+<a id="test_python_bindings"></a>
+ 	<li>Test the freshly compiled python module can be located and loads correctly by entering
+<pre><code>python -c "import cv2; print(f'OpenCV: {cv2.__version__} for python installed and working')"</code></pre>
+and checking the output for
+<pre>OpenCV: 4.5.0 for python installed and working</pre>
+If you do not see the above output then see the troubleshooting section below.</li>
+</ol>
+<a id="python38"></a>
+<strong>Python 3.8 in a seperate conda environment</strong>
+Below are instructions on how to create and then use a seperate anaconda environment to build the OpenCV python bindings for a different version of python.  In this case I have chosen to use a newer version of python than in the base conda environment but any version should work.
+<ol start="0">
+ 	<li>First open up the Anaconda3 command prompt and create a new environment (<code>py38</code>) containing the base anaconda installed packages and python 3.8 instead of python 3.7
+<pre><code>conda create -n py38 anaconda python=3.8</code></pre>
+</li>
+ 	<li>Then either continue in the Anaconda3 or windows command prompt entering the following to point to your new environment
+<pre><code>set "pathToAnaconda=PATH_TO_ANACONDA3_PY38"</code></pre>
+<pre><code>set "pyVer=38"</code></pre>
+ensuring the PATH_TO_ANACONDA3_PY38 only uses forward slashes (/) as path seperators and points to the Anaconda3 directory, e.g. <code>C:/Users/mbironi/Anaconda3/envs/py38/</code>.</li>
+ 	<li>Follow the instructions from <a href="#visual_studio_cmake_cmd">above</a> to build your desired configuration, appending the below to the CMake configuration before running CMake.
+<pre><code>-DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=%pathToAnaconda%/include -DPYTHON3_LIBRARY=%pathToAnaconda%/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=%pathToAnaconda%/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=%pathToAnaconda%/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=%pathToAnaconda%/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</code></pre>
+</li>
+ 	<li>Make sure you build release, python bindings cannot by default be generated for a debug configuration, that is unless you have specificaly built or downloaded a debug version of python.  That said you can easily generate a debug build by modifying the contents of <code>pyconfig.h</code>, changing
+<pre><code>pragma comment(lib,"python38_d.lib")</code></pre>
+to
+<pre><code>pragma comment(lib,"python38.lib")</code></pre>
+and
+<pre><code>#       define Py_DEBUG</code></pre>
+to
+<pre><code>//#       define Py_DEBUG</code></pre>
+The default location of <code>pyconfig.h</code> in the Anaconda3 for the py38 environment is <code>%USERPROFILE%\Anaconda3\envs\py38\include\pyconfig.h</code>.  However the version you are compiling against may differ, to check the location simply open up CMake in the build directory as detailed in <a href="#gui">Adding additional configuration options with CMake GUI</a> and check the entries under <strong>PYTHON3_INCLUDE_DIR</strong>.</li>
+ 	<li>
+        Verify that the cmake output detailing the modules to be built includes <strong>python3</strong> and if not look for errors in the output preceding the below.
+<pre>--   OpenCV modules:
+--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dpm face features2d flann fuzzy hfs highgui img_hash imgcodecs imgproc line_descriptor ml objdetect optflow phase_unwrapping photo plot python2 <strong>python3</strong> quality reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab world xfeatures2d ximgproc xobjdetect xphoto</pre>
+</li>
+ 	<li>In the current version of OpenCV (4.5.0), once generated the bindings (<code>cv2.cp38-win_amd64.pyd</code>) are copied to the site-packages directory, in our case
+<pre><code>"%USERPROFILE%\Anaconda3\envs\py38\Lib\site-packages\"</code></pre>
+To verify this and ensure that there are no historic installations of OpenCV either through pip or conda before continuing type the following
+<pre><code>dir "%USERPROFILE%\Anaconda3\envs\py38\Lib\site-packages\cv2*"</code></pre>
+and inspect the output
+<pre><code><strong>17/04/2019  10:11    &lt;DIR&gt;         cv2</strong>
+12/10/2020  14:56        11,968,000 cv2.cp38-win_amd64.pyd</code></pre>
+You need to ensure that the date of the bindings copied to your installation of python (12/10/2020  14:56 in the above case) corresponds to the date and time of the build.  Additionaly you must make sure that there are no other entries.  In the above example the additional ouput showing a <code>cv2</code> directory implies that there is an existing installation of OpenCV, either through pip or a previous build.  This needs to be removed before continuing, with the method of removeal depending on how it was installed.
+
+If for some the above returns
+<pre><code>File Not Found</code></pre>
+first the verify that the python bindings have been built by entering
+<pre><code>dir "%openCvBuild%\lib\python3\cv2.cp38-win_amd64.pyd"</code></pre>
+or
+<pre><code>dir "%openCvBuild%\lib\python3\[Debug|Release]\cv2.cp38-win_amd64.pyd"</code></pre>
+if you built using from within Visual Studio, and confirming that the following file exists
+<pre><code></code>12/10/2020  14:56        11,968,000 cv2.cp38-win_amd64.pyd</pre>
+If the file has been found then this can be manually copied accross using the following.
+<pre><code>copy "%openCvBuild%\lib\python3\cv2.cp38-win_amd64.pyd" "%USERPROFILE%\Anaconda3\envs\py38\Lib\site-packages\cv2.cp38-win_amd64.pyd"</code></pre>
+or
+<pre><code>copy "%openCvBuild%\lib\python3\[Debug|Release]\cv2.cp38-win_amd64.pyd" "%USERPROFILE%\Anaconda3\envs\py38\Lib\site-packages\cv2.cp38-win_amd64.pyd"</code></pre>
+if you built using from within Visual Studio.
+Alternatively if the above also returns <code>File Not Found</code> then you need to ensure both that the build has completed successfully and that the output from step 4) contains <strong>python3</strong>.</li>
+ 	<li>Include the path to the opencv_world440.dll and opencv_img_hash440.dll shared libraries in your user or system path or temporarily by entering
+<pre><code>set path=%openCvBuild%\install\x64\vc16\bin;%path%</code></pre>
+</li>
+<a id="test_python_bindings"></a>
+ 	<li>Test the freshly compiled python module can be located and loads correctly by entering
+<pre><code>python -c "import cv2; print(f'OpenCV: {cv2.__version__} for python installed and working')"</code></pre>
+and checking the output for
+<pre>OpenCV: 4.5.0 for python installed and working</pre>
+If you do not see the above output then see the troubleshooting section below.</li>
+</ol>
+If there were no errors from the above steps the Python bindings should be installed correctly. To use on a permanent basis don't forget to permanently add the path to the opencv_world450.dll shared library to your user or system path. To quickly verify that the CUDA modules can be called and check if there is any performance benefit on your system continue <a href="#python_performance">below</a>, then to see how to get the most performance from the OpenCV Python CUDA bindings see <a href="https://jamesbowley.co.uk/accelerating-opencv-with-cuda-streams-in-python/">Accelerating OpenCV with CUDA streams in Python</a>.
+
+<strong>Troubleshooting,</strong> if the output from step (7) is:
+<ol>
+ 	<li>
+<pre><code>ModuleNotFoundError: No module named 'cv2'</code></pre>
+You have not copied the bindings to your python distribution, see step (5).</li>
+ 	<li>
+<pre><code>ImportError: ERROR: recursion is detected during loading of "cv2" binary extensions. Check OpenCV installation.</code></pre>
+Ensure that you don't have OpenCV installed though conda and/or pip, and that you don't have another copy of the python bindings in your site-packages directory.</li>
+ 	<li>
+<pre><code>ImportError: DLL load failed: The specified procedure could not be found.</code></pre>
+One of the required dll's is not present on your windows path.  From the feedback I have received it is most likely you have not added the location of either the OpenCV shared libraries (opencv_world450.dll and opencv_img_hash440.dll), the path to the CUDA binaries, or the path to tbb.dll if built with Intel TBB.  This can be quickly checked by entering in the following
+<pre><code>where opencv_world450.dll</code></pre>
+<pre><code>where opencv_img_hash450.dll</code></pre>
+<pre><code>where nppc64_11.dll</code></pre>
+<pre><code>where cudnn64_8.dll</code> &amp; :: if you have built the DNN module with the CUDA backend</pre>
+<pre><code>where tbb.dll</code> &amp; :: if you have built with Intel TBB</pre>
+and checking that you see the path to the dll in each case.  If instead you see
+<pre><code>INFO: Could not find files for the given pattern(s).</code></pre>
+add the paths (step (5) above, step (4) from the <a href="#prerequisites">Prerequisites</a> and step (6) from the <a href="#pre_build_checklist">Pre-build Checklist</a>) and check again.  Once the you can see the paths to the dll's check <a href="#test_python_bindings">step (7)</a>  again.</li>
+ 	<li>
+        If you get any other errors, make sure to check OpenCV is installed correctly by running through the steps in <a href="#cuda_performance">Verifying OpenCV is CUDA accelerated</a>.</li>
+</ol>
+<a id="troubleshooting"></a>
+<h3>Troubleshooting common configuration/build errors</h3>
+<ul>
+ 	<li>
+<pre><code>CUDA : OpenCV requires enabled 'cudev' module from 'opencv_contrib'</code></pre>
+The most common cause of this is that -DOPENCV_EXTRA_MODULES_PATH has been set to the root of the opencv_contrib repo and not the modules directory.  Double check that
+<pre><code>-DOPENCV_EXTRA_MODULES_PATH=<a href="https://github.com/opencv/opencv_contrib/tree/master/modules">OPENCV_CONTRIB/modules</a></code></pre>
+not
+<pre><code>-DOPENCV_EXTRA_MODULES_PATH=<a href="https://github.com/opencv/opencv_contrib/tree/master/">OPENCV_CONTRIB</a></code></pre>
+where OPENCV_CONTRIB is the location of the <a href="https://github.com/opencv/opencv_contrib/tree/master/">opencv_contrib</a> repo on your local machine.</li>
+</ul>
+<a id="cuda_performance"></a>
+<h3>Verifying OpenCV is CUDA accelerated</h3>
+The easiest way to quickly verify that everything is working is to check that one of the inbuilt CUDA performance tests passes. For this I have chosen the <a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3" target="_blank" rel="noopener noreferrer">GEMM</a> test which;
+<ul>
+ 	<li>runs without any external data;</li>
+ 	<li>should be highly optimized on both the GPU and CPU making it "informative" to compare the performance timings later on, and;</li>
+ 	<li>has <a href="https://www.khronos.org/opencl/" target="_blank" rel="noopener noreferrer">OpenCL</a> versions.</li>
+</ul>
+To run the CUDA performance test simply enter the following into the existing command prompt
+<pre><code>"%openCvBuild%\install\x64\vc16\bin\opencv_perf_cudaarithm.exe" --gtest_filter=Sz_Type_Flags_GEMM.GEMM/29</code></pre>
+(where <code>%openCvBuild%</code> is your build directory, or the directory which you extracted the <a href="https://jamesbowley.co.uk/downloads/">downloaded</a> binaries to) the full output is shown below. To verify that everything is working look for the "<span style="color:#00ff00;"> [ PASSED ] </span>1 test" text, shown in the image below.  <strong>Note:</strong> If you have set OPENCV_TEST_DATA_PATH then this will fail the sanity check since CUDA 11.0.
+
+<img src="https://jamesbowley.co.uk/wp-content/uploads/2020/10/4_5_0_cuda_gemm.png" alt="" class="alignnone size-full wp-image-955" width="1149" height="1014">
+
+The above test performed matrix multiplication on a 1024x1024x2 single precision matrix using an RTX 2080 Mobile GPU 100 times, with a mean execution time of 3.36 ms, which can be seen in the following output taken from the image above.
+<pre><code>[ PERFSTAT ]    (samples=100   mean=3.32   median=3.28   min=3.24   stddev=0.1 (3.0%))</code></pre>
+If the test has passed then we can confirm that the above code was successfully run on the GPU using CUDA.
+
+For completeness this result is compared with the performance attainable on the CPU and with that obtained using OpenCl (cv::UMat) on both the CPU and GPU using both the C++ and python interfaces in <a href="https://jamesbowley.co.uk/opencv-mkl-tbb-vs-cublas/">OpenCV MKL/TBB vs cuBLAS</a>.
+
+<a id="compute-capability"></a>
+<h3>Choosing the compute-capability</h3>
+The default command line options given above implement NVIDIA's <a href="https://docs.nvidia.com/cuda/ampere-compatibility-guide/index.html#building-ampere-compatible-apps-using-cuda-11-0" target="_blank" rel="noopener noreferrer">recommended settings</a> for future hardware compatibility. This means that any programs linked against the resulting opencv_world450.dll shared library should work on all GPU's currently supported by CUDA 11.1 and all GPU's released in the future. As mentioned above this comes at a cost, both in terms of compilation time and shared library size. Before discussing the CMake settings which can be used to reduce these costs we need to understand the following concepts:
+<ul>
+ 	<li><strong>Compute-capability</strong> - every GPU has a fixed compute-capability which determines its general specifications and features. In general the more recent the GPU the higher the compute-capability and the more features it will support. This is important because:
+<ul>
+ 	<li>Each version of CUDA supports different compute-capabilities. Usually a new version of CUDA comes out to suppoort a new GPU architecture, in the case of CUDA 11.0, support was added for the Ampere (compute 8.0, with compute 8.6 added in CUDA 11.1) architecture. On the flip side support for compute 3.0 and 3.2 was dropped. Therefore by choosing to build OpenCv with CUDA 11.1 we have limited ourselves to GPU's of compute-capability &gt;=3.5. Notice we have not limited ourselves to compute-capability GPU's &lt;=8.6, the reason for this is discussed in the next section.</li>
+ 	<li>You can build opencv_world450.dll to support one or many different compute-capabilities, depending on your specific requirements.</li>
+</ul>
+</li>
+ 	<li><strong>Supporting a compute-capability</strong> - to support a specific compute-capability you can do either of the following, or a combination of the two:
+<ul>
+ 	<li>Generate architecture-specific cubin files, which are only <a href="https://docs.nvidia.com/cuda/turing-compatibility-guide/index.html#application-compatibility-on-turing" target="_blank" rel="noopener noreferrer">forward-compatible</a> with GPU architectures with the same major version number. This can be controlled by passing CUDA_ARCH_BIN to CMake. For example passing -DCUDA_ARCH_BIN=3.0 to CMake, will result in opencv_world450.dll containing binary code which can only run on compute-capability 3.0, 3.5 and 3.7 devices. Futhermore it will not support any specific features of compute-capability 3.5 (e.g. dynamic parallelism) or 3.7 (e.g. 128 K 32 bit registers). In the case of OpenCV 4.4.0 this will not restrict any functionality of the standard CUDA functions on compute capability 3.5 and 3.7 devices, because they only uses features from compute-capability 3.0 and below. This can be confirmed by a quick search of the <a href="https://github.com/opencv/opencv/search?q=__CUDA_ARCH__&amp;unscoped_q=__CUDA_ARCH__" target="_blank" rel="noopener noreferrer">main</a> and <a href="https://github.com/opencv/opencv_contrib/search?q=__CUDA_ARCH__&amp;unscoped_q=__CUDA_ARCH__" target="_blank" rel="noopener noreferrer">contrib</a> repositories for the __CUDA_ARCH__ flag.</li>
+ 	<li>Generate forward-compatible PTX assembly for a <a href="https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#virtual-architectures" target="_blank" rel="noopener noreferrer">virtual architecture</a>, which is forward-compatable with all GPU architectures of greater than or equal compute-capability. This can be controlled by passing CUDA_ARCH_PTX to CMake. For example by passing -DCUDA_ARCH_PTX=8.6 to CMake, the opencv_world450.dll will contain PTX code for compute-capability 8.6 which can be Just In Time (JIT) compiled to architecture-specific binary code by the CUDA driver, on any future GPU architectures. Because of the default CMake rules when CUDA_ARCH_BIN is not explicitly set it will also contain architecture-specific cubin files for GPU architectures 3.5-8.6.</li>
+</ul>
+</li>
+ 	<li><strong>PTX considerations</strong> - given that PTX code is forward-compatible and cubin binaries are not it would be tempting to only include the former. To understand why this might not be such a great idea, a things to be aware of when generating PTX code:
+<ol>
+ 	<li>As mentioned previously the CUDA driver JIT compiles PTX code at run time and cache's the resulting cubin files so that the compile operation should in theory be a one-time delay, at least until the driver is updated. However if the cache is not large enough JIT compilation will happen <strong>every time</strong>, causing delay every time your program executes.To get an idea of this delay I passed -DCUDA_ARCH_BIN=3.5 and -DCUDA_ARCH_PTX=3.5 to CMake before building OpenCV. I then emptied the cache (default location %appdata%\NVIDIA\ComputeCache\) and ran the GEMM <a href="#cuda_performance">performance example</a> on a GTX 1060 (compute-capability 6.1), to force JIT compilation. I measured an initial delay of <strong>over 3 minutes</strong> as the PTX code was JIT compiled before the program started to execute. Following that, the delay of subsequent executions was around a minute, because the default cache size (256 MB) was not large enough to store all the compiled PTX code. Given my compile options the only solution to remove this delay is to increase the size of the cache by setting the <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#env-vars" target="_blank" rel="noopener noreferrer">CUDA_CACHE_MAXSIZE</a> environmental variable to a number of bytes greater than required. Unfortunately because, "Older binary codes are evicted from the cache to make room for newer binary codes if needed", this is more of a band aid than a solution. This is because the maximum cache size is 4 GB, therefore your PTX compiled code can be evicted at any point in time if other programs on your machine are also JIT compiling from PTX, bringing back the "one-time" only delay.</li>
+ 	<li>For maximum device coverage you should include PTX for the lowest possible GPU architecture you want to support.</li>
+ 	<li>For maximum performance <a href="https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#just-in-time-compilation" target="_blank" rel="noopener noreferrer">NVIDIA</a> recommends including PTX for the highest possible architecture you can.</li>
+</ol>
+</li>
+</ul>
+<a id="ptx"></a>
+<h4>CMake command line options to control cubin/PTX content of the OpenCV shared library</h4>
+Given (1)-(3) above, the command line options that you want to pass to CMake when building OpenCV will depend on your specific requirements. I have given some examples below for various scenarios given a main GPU of compute-capability 6.1:
+<ul>
+ 	<li>Firstly stick with the defaults if compile time and shared library size are not an issue. This offers the greatest amount of flexibility from a development standpoint, avoiding the possibility of needing to recompile OpenCV when you switch GPU.</li>
+ 	<li>If your programs will always be run on your main GPU, just pass -DCUDA_ARCH_BIN=6.1 to CMake to target your architecture only. It should take around an hour to build, depending on your CPU and the resulting shared library should not be larger than 200 MB.</li>
+ 	<li>If you are going to deploy your application, but only to newer GPU's pass -DCUDA_ARCH_BIN=6.1,7.0,8.0,8.6 and -DCUDA_ARCH_PTX=8.6 to CMake for maximum performance and future compatibility.This is advisable because you may not have any control over the size of the JIT cache on the target machine, therefore including cubin's for all compute-capabilities you want to support, is the only way be sure to prevent JIT compilation delay on every invocation of your application.</li>
+ 	<li>If size is really an issue but you don't know which GPU's you want to run your application on then to ensure that your program will run on all current and future supported GPU's pass -DCUDA_ARCH_BIN=6.1 and -DCUDA_ARCH_PTX=3.0 to CMake for maximum coverage.</li>
+</ul>
