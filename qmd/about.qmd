@@ -1,0 +1,12 @@
+---
+title: "About"
+about:
+  template: jolla
+  image: ..\imgs\profile.png
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/cudawarped/opencv-experiments/
+---
+
+Location for storing useful guides and notebooks
