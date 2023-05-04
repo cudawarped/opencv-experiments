@@ -1,0 +1,77 @@
+project:
+  type: website
+  render:
+    - "nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"
+    - nbs\opencv4-cuda-streams.ipynb
+    - "*.html"
+    - "*.qmd"
+
+
+website:
+  title: cudawarped
+  
+  favicon: imgs\cropped-cuda_thread_blocks.webp
+  
+  open-graph: true
+  navbar:
+    background: light
+    logo: imgs\profile_1-e1674474909304.webp
+    search: true
+    left:
+      - text: "About"
+        file: about.qmd
+      #- text: "Home"
+      #  file: index.qmd
+      - text: "OpenCV"
+        file: tutorials.qmd
+      #- text: "How-To"
+      #  file: howto.qmd
+
+  sidebar:
+    - title: "OpenCV"
+      style: "docked"
+      #background: light
+      #contents: auto
+      contents:
+        - tutorials.qmd
+        - text: "Accelerate OpenCV on Windows with CUDA and Python bindings"
+          file: accelerate_opencv_cuda_python.qmd
+        - text: "Accelerating OpenCV with CUDA streams in Python"
+          file: nbs\opencv4-cuda-streams.ipynb
+        - text: "OpenCV CUDA Performance Comparisson"
+          file: opencv_cuda_performance.qmd
+      #  - text: "Import dll load failed while importing cv2"
+      #    file: nbs\ImportError_dll_load_failed_while_importing_cv2.ipynb
+        
+        #- tutorial1.qmd
+        #- tutorial2.qmd
+
+    - title: "How-To"
+      contents:
+        - howto.qmd
+        # navigation items
+
+    - title: "Fundamentals"
+      contents:
+        - fundamentals.qmd
+        # navigation items
+
+    - title: "Reference"
+      contents:
+        - reference.qmd
+        # navigation items
+
+format:
+  html:
+    theme: cosmo
+    page-layout: article
+    grid:
+      sidebar-width: 400px
+    #css: style.css
+     #- custom.scss
+    #navbar: navbar-light
+    #backgroundcolor: red
+    #css: custom.scss
+    toc: false
+    link-external-newwindow: true
+    link-external-icon: false
