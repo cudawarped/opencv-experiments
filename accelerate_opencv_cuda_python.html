@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2023-05-04">
 
-<title>cudawarped - Accelerate OpenCV on Windows with CUDA and Python</title>
+<title>cudawarped - Build OpenCV with CUDA and Python on Windows</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -95,13 +96,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="cudawarped - Accelerate OpenCV on Windows with CUDA and Python">
+<meta property="og:title" content="cudawarped - Build OpenCV with CUDA and Python on Windows">
 <meta property="og:description" content="">
 <meta property="og:image" content="https://cudawarped.github.io/opencv-experiments/imgs/opencv_cuda_intel.webp">
 <meta property="og:site-name" content="cudawarped">
 </head>
 
-<body class="nav-sidebar docked nav-fixed slimcontent">
+<body class="nav-sidebar floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -131,6 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
 </ul>
             <div class="quarto-navbar-tools ms-auto">
+    <a href="https://github.com/cudawarped" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
 </div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -140,16 +142,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./accelerate_opencv_cuda_python.html">Accelerate OpenCV on Windows with CUDA and Python bindings</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./accelerate_opencv_cuda_python.html">Build with CUDA and Python on Windows</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -161,19 +163,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Accelerate OpenCV on Windows with CUDA and Python bindings</span></a>
+ <span class="menu-text">Build with CUDA and Python on Windows</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accelerating OpenCV with CUDA streams in Python</span></a>
+ <span class="menu-text">Accelerate with CUDA streams in Python</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">OpenCV CUDA Performance Comparisson</span></a>
+ <span class="menu-text">CUDA Performance Comparisson</span></a>
   </div>
 </li>
     </ul>
@@ -201,22 +203,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#troubleshooting-python-bindings-installation-issues" id="toc-troubleshooting-python-bindings-installation-issues" class="nav-link" data-scroll-target="#troubleshooting-python-bindings-installation-issues">Troubleshooting Python Bindings Installation issues</a></li>
   <li><a href="#manually-installing-opencv-python-bindings" id="toc-manually-installing-opencv-python-bindings" class="nav-link" data-scroll-target="#manually-installing-opencv-python-bindings">Manually installing OpenCV Python bindings</a></li>
   </ul></li>
-  <li><a href="#choosing-the-a-suitable-cuda-compute-capability" id="toc-choosing-the-a-suitable-cuda-compute-capability" class="nav-link" data-scroll-target="#choosing-the-a-suitable-cuda-compute-capability">Choosing the a suitable CUDA compute capability</a>
+  <li><a href="#choosing-a-suitable-cuda-compute-capability" id="toc-choosing-a-suitable-cuda-compute-capability" class="nav-link" data-scroll-target="#choosing-a-suitable-cuda-compute-capability">Choosing a suitable CUDA compute capability</a>
   <ul class="collapse">
-  <li><a href="#tips" id="toc-tips" class="nav-link" data-scroll-target="#tips">Tips</a>
-  <ul class="collapse">
-  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
-  </ul></li>
+  <li><a href="#cmake-command-line-options-to-control-cubinptx-content-of-the-opencv-shared-library" id="toc-cmake-command-line-options-to-control-cubinptx-content-of-the-opencv-shared-library" class="nav-link" data-scroll-target="#cmake-command-line-options-to-control-cubinptx-content-of-the-opencv-shared-library">CMake command line options to control cubin/PTX content of the OpenCV shared library</a></li>
   </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Accelerate OpenCV on Windows with CUDA and Python</h1>
+<h1 class="title">Build OpenCV with CUDA and Python on Windows</h1>
 </div>
 
 
@@ -224,6 +223,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 4, 2023</p>
+    </div>
+  </div>
   
     
   </div>
@@ -238,8 +243,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="why-manually-build-opencv" class="level1">
 <h1>Why manually build OpenCV?</h1>
-<p>Because the pre-built <a href="https://github.com/opencv/opencv/releases">Windows libraries</a> available for <a href="https://opencv.org/releases">OpenCV</a> do not include the <a href="https://docs.opencv.org/4.x/d1/d1e/group__cuda.html">CUDA modules</a>, or support for the Nvidia <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Video Codec SDK</a> or <a href="https://developer.nvidia.com/cudnn">cuDNN</a>, I have included the build instructions in the guide below for anyone who is interested. The guide includes instructions for compiling the 64 bit version of the OpenCV shared libraries with Visual Studio, <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew">CUDA</a> (optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Nvidia Video Codec SDK</a> and <a href="https://developer.nvidia.com/cudnn">cuDNN</a>), and bindings for accessing the OpenCV CUDA modules from within Python.</p>
-<p>If you just need the Windows libraries or a Python Wheel you may not need to look any futher as I may have provided a pre-buit version which is suitable for your setup. Take a look at <a href="https://github.com/cudawarped/opencv_contrib/releases">OpenCV C++ CUDA Builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV python CUDA wheels</a> to see if this is the case.</p>
+<p>Because the pre-built <a href="https://github.com/opencv/opencv/releases">Windows libraries</a> available for <a href="https://opencv.org/releases">OpenCV</a> do not include the <a href="https://docs.opencv.org/4.x/d1/d1e/group__cuda.html">CUDA modules</a>, or support for the Nvidia <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Video Codec SDK</a> or <a href="https://developer.nvidia.com/cudnn">cuDNN</a>, I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV shared libraries with Visual Studio, <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew">CUDA</a> (optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Nvidia Video Codec SDK</a> and <a href="https://developer.nvidia.com/cudnn">cuDNN</a>), and bindings for accessing the OpenCV CUDA modules from within Python.</p>
+<p>If you just need the Windows libraries or a Python Wheelt take a look at <a href="https://github.com/cudawarped/opencv_contrib/releases">OpenCV C++ CUDA Builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV python CUDA wheels</a> to see if there is a pre-built version suitable for your setup.</p>
 <p>To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in <a href="./opencv_cuda_performance.html">OpenCV CUDA Performance Comparisson (Nvidia vs Intel)</a>.</p>
 </section>
 <section id="pre-build-checklist" class="level1">
@@ -271,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>If your system path is too long, CUDA will not add the path to its shared libraries <code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\vxx.x\bin</code> during installation. If you receive a warning about this at the end of the installation process do not forget to manually add the this to your system or user path.</p>
+<p>If your system path is too long, CUDA will not add the path to its shared libraries <strong>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\vxx.x\bin </strong> during installation. If you receive a warning about this at the end of the installation process do not forget to manually add the this to your system or user path.</p>
 </div>
 </div>
 </div>
@@ -299,7 +304,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The installation directory for CUDA xx.x is <code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\vxx.x</code>.</p>
+<p>The installation directory for CUDA xx.x is <strong>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\vxx.x</strong>.</p>
 </div>
 </div>
 <div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">All python distributions should work however I recommend building and testing against a new install of this compact distribution to avoid any problems caused by existing configurations.</span></div></div>
@@ -309,7 +314,7 @@ Tip
 </section>
 <section id="building-opencv-with-cmake" class="level1 page-columns page-full">
 <h1>Building OpenCV with CMake</h1>
-<div class="page-columns page-full"><p> Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI. Most new users will find the GUI more accessable however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions on using the CMake GUI in this guide.</p><div class="no-row-height column-margin column-container"><span class="">If you have any build issues with OpenCV then you will need to provide the arguments passed to CMake as well as the output from the generation step when asking for assistance so it is a good idea to avoid the CMake gui at this stage.</span></div></div>
+<div class="page-columns page-full"><p> Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI. Most new users will find the GUI more accessable however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions for using the CMake GUI.</p><div class="no-row-height column-margin column-container"><span class="">If you have any build issues with OpenCV then you will need to provide the arguments passed to CMake as well as the output from the generation step when asking for assistance which is another good reason to avoid the CMake GUI if you can.</span></div></div>
 <p>In addition there are several ways to build OpenCV using Visual Studio. For simplicity only two methods are discussed:</p>
 <ol type="1">
 <li><a href="#building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd">Building OpenCV with Visual Studio solution files</a>.</li>
@@ -317,9 +322,14 @@ Tip
 </ol>
 <section id="building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd">Building OpenCV with CUDA using Visual Studio solution files from the command prompt (cmd)</h2>
-<p>The following steps will build the <code>opencv_worldxxx.dll</code> using NVIDIA’s recommended settings for future hardware compatibility. This does however have two drawbacks, first the build can take several hours to complete and second, the shared library can be over 1GB depending on the configuration that you choose. To find out how to reduce both the compilation time and size of <code>opencv_worldxxx.dll</code> read <a href="#choosing-the-cuda-compute-capability">choosing a suitable CUDA compute capability</a> first and then continue as below. Additionally to reduce the build time futher you can use the Ninja build system, see <a href="#decreasing-the-build-time-with-ninja">building OpenCV with the ninja build system to reduce the build time</a></p>
+<p>The following steps will build the opencv_worldxxx.dll using NVIDIA’s recommended settings for future hardware compatibility. This does however have two drawbacks, first the build can take several hours to complete and second, the shared library can be over 1GB depending on the configuration that you choose. To find out how to reduce both the compilation time and size of opencv_worldxxx.dll read <a href="#choosing-the-cuda-compute-capability">choosing a suitable CUDA compute capability</a> first and then continue as below. Additionally to reduce the build time futher you can use the Ninja build system, see <a href="#decreasing-the-build-time-with-ninja">building OpenCV with the ninja build system to reduce the build time</a>.</p>
 <ol type="1">
-<li><p>Open windows command prompt, type <strong>cmd</strong> in the search bar.</p></li>
+<li>Open windows command prompt, type <strong>cmd</strong> in the ~Windows earch bar.</li>
+</ol>
+<div id="python-version-string">
+
+</div>
+<ol start="2" type="1">
 <li><p>Paste the below into to the command prompt and press <strong>Enter</strong>.</p>
 <p></p>
 <p></p>
@@ -329,14 +339,14 @@ Tip
 <ol type="i">
 <li><strong>PATH_TO_OPENCV_SOURCE</strong> is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.),</li>
 <li><strong>PATH_TO_OPENCV_CONTRIB_MODULES</strong> is the path to the <strong>modules</strong> directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),</li>
-<li><strong>PATH_TO_BUILD_DIR</strong> is the path to the directory where the build files should go and</li>
-<li><strong>PATH_TO_PYTHON_DIST</strong> is the directory where miniconda was installed and,</li>
+<li><strong>PATH_TO_BUILD_DIR</strong> is the path to the directory where the build files should go,</li>
+<li><strong>PATH_TO_PYTHON_DIST</strong> is the directory where mambaforge was installed and,</li>
 <li><strong>PYTHON_VERSION</strong> is the concatination of the major and minor version of your python install, e.g.&nbsp;for Python 3.10.10 <strong>PYTHON_VERSION</strong>==310.</li>
 </ol>
-<p>This will build OpenCV and its python bindings with CUDA acceleration including all the corresponding tests and examples for verifcation. Additionally if the Nvidia Video Codec SDK or cuDNN are installed the corresponding modules will automatically be included.</p>
-<p>Expand the tip below for an example of the output you should get in CMake if the configuration step is successful.</p></li>
+<p>This will generate the build files for OpenCV with python bindings with CUDA acceleration including all the corresponding tests and examples for verifcation. Additionally if the Nvidia Video Codec SDK or cuDNN are installed the corresponding modules will automatically be included.</p>
+<p>Expand the tips below for an example of the output you should get in CMake if the configuration step is successful and other useful information.</p></li>
 </ol>
-<div class="no-row-height column-margin column-container"><span class="">An additionaly option you may want to include is <code>-DCUDA_FAST_MATH=ON</code> which compiles the CUDA kernels with the <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions">-use_fast_math</a> option. This will however cause some of the accuracy and performace tests to fail as the floating point results will be slightly less accurate.</span><span class="">To get the python version open the <strong>MiniForge Prompt</strong> from the start menu and type <code>Python -V</code></span><span class="">If you get the following error “CUDA : OpenCV requires enabled ‘cudev’ module from ‘opencv_contrib’” when configuring the build with CMake you have not set <code>OPENCV_EXTRA_MODULES_PATH</code> correctly, most likely you have set it to the root of the <code>opencv_contrib</code> repo and not the modules directory inside the repo.</span></div><div class="callout callout-style-default callout-note callout-titled">
+<div class="no-row-height column-margin column-container"><span class="">An additionaly option you may want to include is <strong>-DCUDA_FAST_MATH=ON</strong> which compiles the CUDA kernels with the <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions">-use_fast_math</a> option. This will however cause some of the accuracy and performace tests to fail as the floating point results will be slightly less accurate.</span><span class="">The default installation directory for mambaforge is <strong>%userprofile%\mambaforge</strong>.</span><span class="">If you get the following error “CUDA : OpenCV requires enabled ‘cudev’ module from ‘opencv_contrib’” when configuring the build with CMake you have not set <strong>OPENCV_EXTRA_MODULES_PATH</strong> correctly, most likely you have set it to the root of the <strong>opencv_contrib</strong> repo and not the modules directory inside the repo.</span></div><div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -498,7 +508,7 @@ Only build cuDNN backend
 <div class="callout-body-container callout-body">
 <p>If you just want to CUDA accelerate the DNN module and are not interested in building the rest of the CUDA modules the following can be added to the above command.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>-DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This will significantly reduce compilation time and size of <code>opencv_worldxxx.dll</code>.</p>
+<p>This will significantly reduce compilation time and size of opencv_worldxxx.dll.</p>
 </div>
 </div>
 </div>
@@ -518,7 +528,7 @@ Build without python bindings
 </div>
 </div>
 </div>
-<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -536,15 +546,15 @@ Verify configuration includes Python bindings before building
 </div>
 </div>
 </div>
-<ol start="2" type="1">
+<ol start="3" type="1">
 <li>The <strong>OpenCV.sln</strong> solution file should now be in your <strong>PATH_TO_BUILD_DIR</strong> directory. To build OpenCV you have two options depending on you preference you can:
 <ol type="i">
 <li><p>Build directly from the command line by simply entering the following (swaping <strong>Release</strong> for <strong>Debug</strong> to build a release version)</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL --config Debug</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Build through Visual Studio GUI by opening up the <strong>OpenCV.sln</strong> in Visual Studio, selecting your Configuration, clicking on <strong>Solution Explorer</strong>, expanding <strong>MakeTargets</strong>, right clicking on <strong>INSTALL</strong> and clicking <strong>Build</strong>.</p>
+<li><p>Build through Visual Studio GUI by opening up the <strong>OpenCV.sln</strong> in Visual Studio, selecting your Configuration, clicking on <strong>Solution Explorer</strong>, expanding <strong>CMakeTargets</strong>, right clicking on <strong>INSTALL</strong> and clicking <strong>Build</strong>.</p>
 <img src="imgs/cmake_visual_studio_install.webp" class="img-fluid" data-fig-align="center" alt="Visual Studio Build Solution"></li>
 </ol>
-Either approach will both build the library, install the Python bindings and copy the necessary redistributable parts to the install directory (<strong>PATH_TO_BUILD_DIR/build/install</strong> in this example). All that is required now to run any programs compiled against these libs is to add the directory containing opencv_worldxxx.dll to you user <strong>path</strong> environmental variable.</li>
+Either approach will both build the library, install the Python bindings and copy the necessary redistributable parts to the install directory (<strong>PATH_TO_BUILD_DIR/build/install</strong>). All that is required now to run any programs compiled against these libs is to add the directory containing opencv_worldxxx.dll to you user <strong>path</strong> environmental variable.</li>
 </ol>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -556,21 +566,21 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>By default you have to build <strong>Release</strong> when generating python bindings, see for instructions on how to build <strong>Debug</strong> see <a href="#generate-python-bindings-for-a-debug-build">generate python bindings for a debug build</a></p>
+<p>By default you have to build <strong>Release</strong> when generating python bindings, for instructions on how to build <strong>Debug</strong> see <a href="#generate-python-bindings-for-a-debug-build">generate python bindings for a debug build</a></p>
 </div>
 </div>
-<p>If everything was successful, congratulations, you now have OpenCV built with CUDA. To quickly verify that the CUDA modules are working and check if there is any performance benefit on your specific hardware see <a href="#cuda_performance">below</a></p>
+<p>If everything was successful, congratulations, you now have OpenCV built with CUDA. To quickly verify that the CUDA modules are working and check if there is any performance benefit on your specific hardware see <a href="#verifying-opencv-is-cuda-accelerated">verifying OpenCV is CUDA accelerated</a>.</p>
 </section>
 <section id="decreasing-the-build-time-with-ninja" class="level2">
 <h2 class="anchored" data-anchor-id="decreasing-the-build-time-with-ninja">Decreasing the build time with Ninja</h2>
-<p>The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins on an i7-8700) by utilizing the Ninja build system instead of directly generating Visual Studio solution files. The only difference you may notice is that Ninja will only produce one configuration at a time, either a <code>Debug</code> or <code>Release</code>, therefore if you don’t want to build <code>Release</code> (the default) the <code>CMAKE_BUILD_TYPE</code> has to be passed to CMake.</p>
+<p>The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins to under an hour on an i7-8700) by utilizing the Ninja build system instead of directly generating Visual Studio solution files. The only difference you may notice is that Ninja will only produce one configuration at a time, either a Debug or Release, therefore if you don’t want to build Release (the default) the <strong>CMAKE_BUILD_TYPE</strong> has to be passed to CMake.</p>
 <p>Ninja is installed by default if the <strong>Desktop development with C++</strong> workload is selected when installing Visual Studio, therefore building with Ninja only requires two extra configuration steps, expand the tip below for an example of the modified command line arguments.:</p>
 <ol type="1">
 <li><p>Configuring Visual Studio Development tools by entering the following into the command prompt before entering the CMake command (changing Community to either Professional or Enterprise if necessary)</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Telling CMake to use <strong>Ninja</strong> instead of Visual Studio, i.e.&nbsp;replacing <code>-G"Visual Studio 17 2022"</code> with <code>-GNinja</code>.</p></li>
+<li><p>Telling CMake to use <strong>Ninja</strong> instead of Visual Studio, i.e.&nbsp;replacing <strong>-G”Visual Studio 17 2022”</strong> with <strong>-GNinja</strong>.</p></li>
 </ol>
-<p>Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant <code>--config</code> argument.</p>
+<p>Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant <strong>–config</strong> argument, i.e.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
@@ -578,13 +588,13 @@ Important
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip
+Full CMake cmd line for building with Ninja
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Example of the full command line for building a <code>Release</code> version of OpenCV with the Ninja build system.</p>
+<p>Example of the full command line for building a Release version of OpenCV with the Ninja build system.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DCUDA_ARCH_PTX=8.6 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -595,11 +605,9 @@ Tip
 </section>
 <section id="verifying-opencv-is-cuda-accelerated" class="level1 page-columns page-full">
 <h1>Verifying OpenCV is CUDA accelerated</h1>
-<p>The easiest way to quickly verify that everything is working is to check that one of the inbuilt CUDA performance tests passes.</p>
-<p>To run the CUDA performance test simply enter the following into the existing command prompt.</p>
-<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">The GEMM test is used in this example but any of the accuracy (<code>opencv_test_cuda*.exe</code>) or performance (<code>opencv_perf_cuda*.exe</code>) tests could have been chosen.</span></div></div>
+<div class="page-columns page-full"><p> The easiest way to quickly verify that everything is working is to check that one of the inbuilt CUDA tests passes. This is demonstrated here using the GEMM acccuracy test which can be run by entering the following into the existing command prompt.</p><div class="no-row-height column-margin column-container"><span class="">The GEMM test is used in this example but any of the accuracy (<strong>opencv_test_cuda*.exe</strong>) or performance (<strong>opencv_perf_cuda*.exe</strong>) tests could have been chosen.</span></div></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>"PATH_TO_BUILD_DIR\bin\opencv_test_cudaarithm.exe" --gtest_filter=CUDA_Arithm/GEMM.Accuracy/0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To verify that everything is working look for the <strong>[ PASSED ] 1 test</strong> text, at the bottom of the test output, an example of which is below.</p>
+<p>To verify that everything is working look for the <strong>[ PASSED ] 1 test</strong> text, at the bottom of the test output, i.e.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[==========] Running 1 test from 1 test case.</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>[----------] Global test environment set-up.</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>[----------] 1 test from CUDA_Arithm/GEMM</span>
@@ -614,176 +622,133 @@ Tip
 </section>
 <section id="python-bindings" class="level1">
 <h1>Python bindings</h1>
-<p>The instructions above will enable you to build a <code>Release</code> version of OpenCV with bindings for python and automatically install them into your <code>PATH_TO_PYTHON_DIST/site-packages\cv2</code> directory. You can then import the OpenCV python module (cv2) as</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>import cv2 as cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The instructions above will enable you to build a <strong>Release</strong> version of OpenCV with bindings for Python and automatically install them into your <strong>PATH_TO_PYTHON_DIST/site-packages</strong> directory. You can then import the OpenCV python module (cv2) as</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>and you should see output similar to the below when interrogating the build information</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>print(cv.getBuildInformation())</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>General configuration for OpenCV 4.7.0-dev =====================================</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  Version control:               4.7.0-251-ge3e1f704a4-dirty</span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv.getBuildInformation())</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>General configuration <span class="cf">for</span> OpenCV <span class="fl">4.7.0</span><span class="op">-</span>dev <span class="op">=====================================</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  Version control:               <span class="fl">4.7.0</span><span class="op">-</span><span class="dv">251</span><span class="op">-</span>ge3e1f704a4<span class="op">-</span>dirty</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  Extra modules:</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    Location (extra):            D:/repos/opencv/contrib/modules</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    Version control (extra):     4.7.0-38-g960b3f68</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    Location (extra):            D:<span class="op">/</span>repos<span class="op">/</span>opencv<span class="op">/</span>contrib<span class="op">/</span>modules</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    Version control (extra):     <span class="fl">4.7.0</span><span class="op">-</span><span class="dv">38</span><span class="op">-</span>g960b3f68</span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  Platform:</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    Timestamp:                   2023-03-21T15:46:23Z</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    Host:                        Windows 10.0.22621 AMD64</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    CMake:                       3.25.1</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    Timestamp:                   <span class="dv">2023</span><span class="op">-</span><span class="dv">0</span><span class="er">3</span><span class="op">-</span><span class="dv">21</span><span class="er">T15</span>:<span class="dv">46</span>:<span class="dv">23</span><span class="er">Z</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    Host:                        Windows <span class="fl">10.0.22621</span> AMD64</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    CMake:                       <span class="fl">3.25.1</span></span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    CMake generator:             Ninja</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    CMake build tool:            D:/bin/ninja/ninja.exe</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    MSVC:                        1934</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    CMake build tool:            D:<span class="op">/</span><span class="bu">bin</span><span class="op">/</span>ninja<span class="op">/</span>ninja.exe</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    MSVC:                        <span class="dv">1934</span></span>
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    Configuration:               Release</span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>That said you may:</p>
 <ol type="1">
-<li>Want to build bindings for a <code>Debug</code> as well or instead of a <code>Release</code> build.</li>
-<li>Encounter errors when trying to import the <code>cv2</code> module in python.</li>
+<li><a href="#generate-python-bindings-for-a-debug-build">Want to build bindings for a <strong>Debug</strong> as well or instead of a <strong>Release</strong> build.</a></li>
+<li><a href="#troubleshooting-python-bindings-installation-issues">Encounter errors when trying to import the cv2 module in Python</a>.</li>
+<li><a href="#manually-installing-opencv-python-bindings">Manually install the Python bindings</a>.</li>
 </ol>
-<p>Both of these scenarios are covered in the next three sections.</p>
 <section id="generate-python-bindings-for-a-debug-build" class="level2">
 <h2 class="anchored" data-anchor-id="generate-python-bindings-for-a-debug-build">Generate Python bindings for a Debug Build</h2>
-<p>Python bindings cannot by default be generated for a <code>Debug</code> configuration, that is unless you have specificaly built or downloaded a debug version of python. That said you can easily generate a <code>Debug</code> build by modifying the contents of <code>PATH_TO_PYTHON_DIST/include/pyconfig.h</code>, changing</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pragma comment(lib,"pythonxx_d.lib")</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Python bindings cannot by default be generated for a Debug configuration, that is unless you have specificaly built or downloaded a debug version of Python. That said you can make a Debug build if you first modify the contents of <strong>PATH_TO_PYTHON_DIST/include/pyconfig.h</strong>, changing</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp code-overflow-wrap code-with-copy"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pragma comment<span class="op">(</span>lib<span class="op">,</span><span class="st">"pythonxx_d.lib"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>to</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode cpp code-overflow-wrap code-with-copy"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pragma comment<span class="op">(</span>lib<span class="op">,</span><span class="st">"pythonxx.lib"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>and</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode cpp code-overflow-wrap code-with-copy"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#       define Py_DEBUG</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>to</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode cpp code-overflow-wrap code-with-copy"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">//#       define Py_DEBUG</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then simply follow the instructions above for <a href="#building-opencv-with-cmake">building with CMake</a>.</p>
 </section>
 <section id="troubleshooting-python-bindings-installation-issues" class="level2">
 <h2 class="anchored" data-anchor-id="troubleshooting-python-bindings-installation-issues">Troubleshooting Python Bindings Installation issues</h2>
-<p>If you are unable to <code>import cv2</code> without errors then check below to see</p>
+<p>If you are unable to <code>import cv2</code> without errors then check below to see if there is a solution to the error you recieve.</p>
 <ol type="1">
-<li><blockquote class="blockquote">
-<p>ModuleNotFoundError: No module named ‘cv2’</p>
-</blockquote>
-<p>The installation of the python bindings has failed, check</p>
+<li><div class="sourceCode" id="cb16"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="pp">ModuleNotFoundError</span>: No module named <span class="st">'cv2'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The installation of the Python bindings has failed, check</p>
 <ol type="i">
-<li>the build was successful, and</li>
-<li><code>-DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</code> was set correctly, and</li>
-<li>if you are still seeing the above error try installing the bindings manually following</li>
+<li>the build was successful,</li>
+<li><strong>-DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</strong> was set correctly, and</li>
+<li>if you are still seeing the above error try <a href="#manually-installing-opencv-python-bindings">manually installing opencv Python bindings</a>.</li>
 </ol></li>
-<li><blockquote class="blockquote">
-<p>ImportError: ERROR: recursion is detected during loading of “cv2” binary extensions. Check OpenCV installation.</p>
-</blockquote>
+</ol>
+<div id="remove-opencv">
+
+</div>
+<ol start="2" type="1">
+<li><div class="sourceCode" id="cb17"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="pp">ImportError</span>: ERROR: recursion <span class="kw">is</span> detected during loading of <span class="st">"cv2"</span> binary extensions. Check OpenCV installation.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The main two reasons for this are:</p>
 <ol type="i">
-<li>You have another installation of OpenCV, either manually installed or through the package manager pip/mamba. This can easily be fixed by first uninstalling any opencv-python distributions from your package manager and then deleting the … directory or …. if they existing</li>
-<li>You have built a <code>Debug</code> configuration. Currently (see issue) when building this configuration the .pyd is not copied into. This can be resolved by creating a .. and copyting the pyd.</li>
+<li><p>You have another installation of OpenCV, either manually installed or through the package manager (pip/mamba etc.). This can easily be fixed by first uninstalling any opencv-python, opencv-contrib-python distributions from your package manager and then deleting the cv2 directory (<strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/</strong>) or bindings file (<strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2.cpxx-win_amd64.pyd</strong>) if they exist.</p></li>
+<li><p>You have built a <strong>Debug</strong> configuration. Currently (https://github.com/opencv/opencv/issues/23568) when building this configuration the cv2.cpxx-win_amd64.pyd shared library is not copied into site-packages-x.x<br>
+directory on installation. This can easily be resolved by creating the <strong>python-x.x</strong> directory and copying the shared library accross so you have <strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/python-x.x/cv2.cpxx-win_amd64.pyd</strong>, where <strong>xx</strong> is the <a href="#python-version-string"><strong>PYTHON_VERSION</strong></a>.</p></li>
 </ol></li>
-<li><blockquote class="blockquote">
-<p>ImportError: DLL load failed: The specified procedure could not be found.</p>
-</blockquote>
-<p>The directory of one or more of the required DLL’s has not been added with <a href="https://docs.python.org/3/library/os.html#os.add_dll_directory">os.add_dll_directory</a>. Whilst the automatic installation of the bindings should have added all the directories containing the dependant DLL’s to <code>config.py</code> its possible that one has been missed or you are using a less common configuration. In these cases you will have to</p>
+<li><div class="sourceCode" id="cb18"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="pp">ImportError</span>: DLL load failed: The specified procedure could <span class="kw">not</span> be found.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The directory of one or more of the required DLL’s has not been added with <a href="https://docs.python.org/3/library/os.html#os.add_dll_directory">os.add_dll_directory()</a>. Whilst the automatic installation of the bindings should have added all the directories containing the dependant DLL’s to <strong>config.py</strong> it’s possible that one has been missed or you are using a less common configuration. In these cases you will have to</p>
 <ol type="i">
 <li>first track down which DLL’s are missing (<a href="nbs/ImportError_dll_load_failed_while_importing_cv2.html">see this guide for assistance</a>) and then</li>
-<li>permanantly add the directory containing them to your installation by modifying the contents of <code>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/config.py</code>.</li>
+<li>permanantly add the directory containing them to your installation by modifying the contents of <strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/config.py</strong>.</li>
 </ol>
-<p>e.g.&nbsp;If you built OpenCV against CUDA 12.1 and your own version of the FFMpeg libraries (<code>-DOPENCV_FFMPEG_USE_FIND_PACKAGE=ON</code>) instead of the provided <code>opencv_videoio_ffmpegxxx_64.dll</code> the contents of <code>config.py</code> should look like</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>BINARIES_PATHS <span class="op">=</span> [</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    os.path.join(<span class="st">'D:/build/opencv/install'</span>, <span class="st">'x64/vc17/bin'</span>),</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    os.path.join(os.getenv(<span class="st">'CUDA_PATH'</span>, <span class="st">'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1'</span>), <span class="st">'bin'</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    os.path.join(`D:<span class="op">/</span>ffmpeg<span class="op">/</span>bin`)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>] <span class="op">+</span> BINARIES_PATHS</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<p>e.g.&nbsp;If you built OpenCV against CUDA 12.1 and your own version of the FFMpeg libraries (<strong>-DOPENCV_FFMPEG_USE_FIND_PACKAGE=ON</strong>) instead of using the provided <strong>opencv_videoio_ffmpegxxx_64.dll</strong> plugin, the contents of <strong>config.py</strong> should look like</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>BINARIES_PATHS <span class="op">=</span> [</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    os.path.join(<span class="st">'D:/build/opencv/install'</span>, <span class="st">'x64/vc17/bin'</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    os.path.join(os.getenv(<span class="st">'CUDA_PATH'</span>, <span class="st">'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1'</span>), <span class="st">'bin'</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    os.path.join(`D:<span class="op">/</span>ffmpeg<span class="op">/</span>bin`)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>] <span class="op">+</span> BINARIES_PATHS</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 </section>
 <section id="manually-installing-opencv-python-bindings" class="level2">
 <h2 class="anchored" data-anchor-id="manually-installing-opencv-python-bindings">Manually installing OpenCV Python bindings</h2>
 <p>If you have downloaded the pre-built binaries or are having issues with the automatic installation then you can manually install the python bindings following the steps below:</p>
 <ol type="1">
-<li><p>Copy</p>
-<blockquote class="blockquote">
-<p>PATH_TO_BUILD_DIR/lib/python3/cv2.cpxx-win_amd64.pyd</p>
-</blockquote>
-<p>to</p>
-<blockquote class="blockquote">
-<p>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2.cpxx-win_amd64.pyd</p>
-</blockquote></li>
+<li><p><a href="#remove-opencv">Remove any pre-existing OpenCV installations</a>.</p></li>
+<li><p>Copy <strong>PATH_TO_BUILD_DIR/lib/python3/cv2.cpxx-win_amd64.pyd</strong> to <strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2.cpxx-win_amd64.pyd</strong></p></li>
 <li><p>Determine the paths to the directories containing any dependant shared libraries (<a href="nbs/ImportError_dll_load_failed_while_importing_cv2.html">see here for assistance</a>).</p></li>
-<li><p>Adding the locations from (2) by calling <code>os.add_dll_directory()</code> for each one before importing the OpenCV python module. e.g.&nbsp;If you have followed the guide exactly this will just be the directories containing the OpenCV and Nvidia shared libaries, which you would add as</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">'C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">vxx.x</span><span class="ch">\\</span><span class="st">bin'</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">'PATH_TO_BUILD_DIR/bin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<li><p>Adding the locations from (3) by calling <strong>os.add_dll_directory()</strong> for each one before importing the OpenCV python module. e.g.&nbsp;If you have followed the guide exactly this will be the directories containing the OpenCV and Nvidia shared libaries, which you would add as</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">'C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">vxx.x</span><span class="ch">\\</span><span class="st">bin'</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">'PATH_TO_BUILD_DIR/bin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>before calling</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 </section>
 </section>
-<section id="choosing-the-a-suitable-cuda-compute-capability" class="level1 page-columns page-full">
-<h1>Choosing the a suitable CUDA compute capability</h1>
-<p>. In this case you simply need to use the below before importing</p>
-<p>From the feedback I have received it is most likely you have not added the location of either the OpenCV shared libraries (opencv_world450.dll and opencv_img_hash440.dll), the path to the CUDA binaries, or the path to tbb.dll if built with Intel TBB. This can be quickly checked by entering in the following</p>
-<section id="tips" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="tips">Tips</h2>
-<p>If you change your CMake arguments and you start getting build errors clean everything</p>
-<p>Remove all optional CUDA modules. This is useful if you only want to use the CUDA backend for the DNN module and will significantly reduce compilation time and size of opencv_worldxxx.dll.</p>
-<pre><code>-DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF</code></pre>
-<pre><code>```{.python .code-overflow-wrap}
-set "openCvSource=PATH_TO_OPENCV_SOURCE"
-set "openCVExtraModules=PATH_TO_OPENCV_CONTRIB_MODULES"
-set "openCvBuild=%openCvSource%\build"
-set "buildType=Release"
-set "generator=Visual Studio 16 2019"
-```</code></pre>
-<section id="troubleshooting" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h3>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If you don’t want to build python bindings then simply remove…</p>
-</div>
-</div>
-<p>different version of python</p>
-<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">I have seen lots of guides including instructions to download and use git to get the source files, however this is a completely unnecessary step. If you are a developer and you don’t already have git installed and configured then I would assume there is a good reason for this and I would not advise installing it just to build OpenCV.</span></div></div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>Before building you may want to ensure that your GPU has decoding support by refering to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a></p>
-</div>
-</div>
-</div>
-<p>where <code>PATH_TO_OPENCV_SOURCE</code> is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc., <code>PATH_TO_OPENCV_CONTRIB_MODULES</code> is the path to the <strong>modules</strong> directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib repo</a> (the directory containing cudaarithm, cudabgsegm, etc), <code>PATH_TO_BUILD_DIR</code> is the path to the directory where the build files should go and <code>PATH_TO_PYTHON_DIST</code> is the directory where miniconda was installed and <code>PYTHON_VERSION</code> is the concatination of the major and minor version of your python install, e.g.&nbsp;for Python 3.10.10 <code>PYTHON_VERSION=310</code>.</p>
-<pre><code>This will build OpenCV with CUDA including and the corresponding tests and examples for verifcation. Additionally if the Nvidia Video Codec SDK or cuDNN are installed the corresponding modules will automatically be included
-
-1. Set the location of the source files and build directory, by entering the text shown below, first setting `PATH_TO_OPENCV_SOURCE` to the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.) and `PATH_TO_OPENCV_CONTRIB_MODULES` to the **modules** directory inside the &lt;a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer"&gt;opencv-contrib repo&lt;/a&gt; (the directory containing cudaarithm, cudabgsegm, etc).
-
-```{.python .code-overflow-wrap}
-set "openCvSource=PATH_TO_OPENCV_SOURCE"
-set "openCVExtraModules=PATH_TO_OPENCV_CONTRIB_MODULES"
-set "openCvBuild=%openCvSource%\build"
-set "buildType=Release"
-set "generator=Visual Studio 16 2019"
-```
-
-```{.python .code-overflow-wrap}
-set "openCvSource=PATH_TO_OPENCV_SOURCE"
-set "openCVExtraModules=PATH_TO_OPENCV_CONTRIB_MODULES"
-set "openCvBuild=%openCvSource%\build"
-set "buildType=Release"
-set "generator=Visual Studio 16 2019"
-```</code></pre>
+<section id="choosing-a-suitable-cuda-compute-capability" class="level1">
+<h1>Choosing a suitable CUDA compute capability</h1>
+<p>The default command line options given above implement NVIDIA’s recommended settings for future hardware compatibility. This means that OpenCV should work on all GPU’s currently supported by the most recent version of CUDA and all GPU’s released in the future. As mentioned above this comes at a cost, both in terms of compilation time and shared library size. Before discussing the CMake settings which can be used to reduce these costs we need to understand the following concepts:</p>
+<ol type="1">
+<li><strong>Compute capability</strong> – every GPU has a fixed compute capability which determines its general specifications and features. In general the more recent the GPU the higher the compute-capability and the more features it will support. This is important because:
+<ul>
+<li>Each version of CUDA supports different compute capabilities. Usually a new version of CUDA comes out to suppoort a new GPU architecture, in the case of CUDA 11.0, support was added for the Ampere (compute 8.0, with compute 8.6 added in CUDA 11.1) architecture. On the flip side support for compute 3.0 and 3.2 was dropped. Therefore by if we chose to build OpenCV with CUDA 11.0 we limit ourselves to GPU’s of compute capability &gt;=3.5. Notice we have not limited ourselves to compute capability GPU’s &lt;=8.6, the reason for this is discussed in the next section.</li>
+<li>You can build OpenCV to support one or many different compute capabilities, depending on your specific requirements.</li>
+</ul></li>
+<li><strong>Supporting a compute capability</strong> - to support a specific compute capability you can do either of the following, or a combination of the two:
+<ul>
+<li>Generate architecture-specific cubin files, which are only forward-compatible with GPU architectures with the same major version number. This can be controlled by passing the <strong>CUDA_ARCH_BIN</strong> flag to CMake. For example passing <strong>-DCUDA_ARCH_BIN=3.0</strong> to CMake, will result in binary code which can only run on compute capability 3.0, 3.5 and 3.7 devices. Futhermore it will not support any specific features of compute capability 3.5 (e.g.&nbsp;dynamic parallelism) or 3.7 (e.g.&nbsp;128 K 32 bit registers). You can detrmine which functions this will affect by searching OpenCV on github for the <a href="https://github.com/search?q=org%3Aopencv+__CUDA_ARCH__&amp;type=code"><strong><strong>CUDA_ARCH</strong></strong></a> flag. Because of the default CMake rules when <strong>CUDA_ARCH_BIN</strong> is not explicitly set it will also contain architecture-specific cubin files for all GPU architectures supported by your CUDA version.</li>
+<li>Generate forward-compatible PTX assembly for a virtual architecture, which is forward-compatable with all GPU architectures of greater than or equal compute-capability. This can be controlled by passing <strong>CUDA_ARCH_PTX</strong> to CMake. e.g.&nbsp;Setting the <strong>-DCUDA_ARCH_PTX=9.0</strong> flag, builds OpenCV containing PTX code for compute capability 9.0 which can be Just In Time (JIT) compiled to architecture-specific binary code by the CUDA driver, on any future GPU architectures.</li>
+</ul></li>
+</ol>
+<ol start="3" type="1">
+<li><strong>PTX considerations</strong> – given that PTX code is forward-compatible and cubin binaries are not it would be tempting to only include the former. To understand why this might not be such a great idea, a things to be aware of when generating PTX code:
+<ul>
+<li>As mentioned previously the CUDA driver JIT compiles PTX code at run time and cache’s the resulting cubin files so that the compile operation should in theory be a one-time delay, at least until the driver is updated. However if the cache is not large enough JIT compilation will happen every time, causing delay every time your program executes.To get an idea of this delay I passed -DCUDA_ARCH_BIN=3.5 and -DCUDA_ARCH_PTX=3.5 to CMake before building OpenCV. I then emptied the cache (default location %appdata%) and ran the GEMM performance example on a GTX 1060 (compute-capability 6.1), to force JIT compilation. I measured an initial delay of over 3 minutes as the PTX code was JIT compiled before the program started to execute. Following that, the delay of subsequent executions was around a minute, because the default cache size (256 MB) was not large enough to store all the compiled PTX code. Given my compile options the only solution to remove this delay is to increase the size of the cache by setting the CUDA_CACHE_MAXSIZE environmental variable to a number of bytes greater than required. Unfortunately because, “Older binary codes are evicted from the cache to make room for newer binary codes if needed”, this is more of a band aid than a solution. This is because the maximum cache size is 4 GB, therefore your PTX compiled code can be evicted at any point in time if other programs on your machine are also JIT compiling from PTX, bringing back the “one-time” only delay.</li>
+<li>For maximum device coverage you should include PTX for the lowest possible GPU architecture you want to support.</li>
+<li>For maximum performance NVIDIA recommends including PTX for the highest possible architecture you can.</li>
+</ul></li>
+</ol>
+<section id="cmake-command-line-options-to-control-cubinptx-content-of-the-opencv-shared-library" class="level2">
+<h2 class="anchored" data-anchor-id="cmake-command-line-options-to-control-cubinptx-content-of-the-opencv-shared-library">CMake command line options to control cubin/PTX content of the OpenCV shared library</h2>
+<p>Given (1)-(3) above, the command line options that you want to pass to CMake when building OpenCV will depend on your specific requirements. I have given some examples below for various scenarios given a main GPU of compute-capability 6.1:</p>
+<ul>
+<li>Firstly stick with the defaults if compile time and shared library size are not an issue. This offers the greatest amount of flexibility from a development standpoint, avoiding the possibility of needing to recompile OpenCV when you switch GPU.</li>
+<li>If your programs will always be run on your main GPU, just pass -DCUDA_ARCH_BIN=6.1 to CMake to target your architecture only. It should take around an hour to build, depending on your CPU and the resulting shared library should not be larger than 200 MB.</li>
+<li>If you are going to deploy your application, but only to newer GPU’s pass -DCUDA_ARCH_BIN=6.1,7.0,8.0,8.6 and -DCUDA_ARCH_PTX=8.6 to CMake for maximum performance and future compatibility.This is advisable because you may not have any control over the size of the JIT cache on the target machine, therefore including cubin’s for all compute-capabilities you want to support, is the only way be sure to prevent JIT compilation delay on every invocation of your application.</li>
+<li>If size is really an issue but you don’t know which GPU’s you want to run your application on then to ensure that your program will run on all current and future supported GPU’s pass -DCUDA_ARCH_BIN=6.1 and -DCUDA_ARCH_PTX=3.0 to CMake for maximum coverage.</li>
+</ul>
 
 
-</section>
 </section>
 </section>
 
