@@ -14,6 +14,9 @@ website:
   
   open-graph: true
   navbar:
+    tools:
+    - icon: github
+      href: https://github.com/cudawarped
     background: light
     logo: imgs\profile_1-e1674474909304.webp
     search: true
@@ -28,17 +31,18 @@ website:
       #  file: howto.qmd
 
   sidebar:
-    - title: "OpenCV"
-      style: "docked"
+    - title: OpenCV
+      style: "floating"
+      type: "dark"
       #background: light
       #contents: auto
       contents:
         - tutorials.qmd
-        - text: "Accelerate OpenCV on Windows with CUDA and Python bindings"
+        - text: "Build with CUDA and Python on Windows"
           file: accelerate_opencv_cuda_python.qmd
-        - text: "Accelerating OpenCV with CUDA streams in Python"
+        - text: "Accelerate with CUDA streams in Python"
           file: nbs\opencv4-cuda-streams.ipynb
-        - text: "OpenCV CUDA Performance Comparisson"
+        - text: "CUDA Performance Comparisson"
           file: opencv_cuda_performance.qmd
       #  - text: "Import dll load failed while importing cv2"
       #    file: nbs\ImportError_dll_load_failed_while_importing_cv2.ipynb
@@ -64,9 +68,10 @@ website:
 format:
   html:
     theme: cosmo
-    page-layout: article
+    page-layout: full
     grid:
-      sidebar-width: 400px
+      sidebar-width: 300px
+      body-width: 1000px
     #css: style.css
      #- custom.scss
     #navbar: navbar-light
