@@ -9,8 +9,9 @@ project:
 
 website:
   title: cudawarped
-  
-  favicon: imgs\cropped-cuda_thread_blocks.webp
+  repo-url: https://github.com/cudawarped/opencv-experiments/
+  repo-actions: [issue]
+  favicon: imgs\profile_1-e1674474909304.webp
   
   open-graph: true
   navbar:
@@ -26,7 +27,7 @@ website:
       #- text: "Home"
       #  file: index.qmd
       - text: "OpenCV"
-        file: tutorials.qmd
+        file: index.qmd
       #- text: "How-To"
       #  file: howto.qmd
 
@@ -37,7 +38,7 @@ website:
       #background: light
       #contents: auto
       contents:
-        - tutorials.qmd
+        - index.qmd
         - text: "Build with CUDA and Python on Windows"
           file: accelerate_opencv_cuda_python.qmd
         - text: "Accelerate with CUDA streams in Python"
