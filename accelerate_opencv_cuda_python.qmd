@@ -2,12 +2,13 @@
 title: "Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows"
 toc: true
 date: 05/12/23
+aliases:
+  - accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html
 #highlight-style: arrow
 #code-block-border-left: true
 #code-block-border-left: "#31BAE9"
 #code-block-border-left: "#76b900"
-aliases:
-  - accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html
+
 ---
 
 ![](imgs/opencv_cuda_intel.webp){fig-align="center"}
