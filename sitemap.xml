@@ -2,50 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/nbs/ImportError_dll_load_failed_while_importing_cv2.html</loc>
-    <lastmod>2023-05-12T17:53:16.694Z</lastmod>
+    <lastmod>2023-05-12T18:52:09.716Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/nbs/opencv4-cuda-streams.html</loc>
-    <lastmod>2023-05-12T17:53:17.557Z</lastmod>
+    <lastmod>2023-05-12T18:52:10.628Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/about.html</loc>
-    <lastmod>2023-05-12T17:53:18.001Z</lastmod>
-  </url>
-  <url>
-    <loc>https://cudawarped.github.io/opencv-experiments/accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html</loc>
-    <lastmod>2023-05-12T17:53:18.218Z</lastmod>
+    <lastmod>2023-05-12T18:52:11.127Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/accelerate_opencv_cuda_python.html</loc>
-    <lastmod>2023-05-12T17:53:18.955Z</lastmod>
+    <lastmod>2023-05-12T18:52:11.984Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/how2.html</loc>
-    <lastmod>2023-05-12T17:53:19.167Z</lastmod>
+    <lastmod>2023-05-12T18:52:12.219Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/howto.html</loc>
-    <lastmod>2023-05-12T17:53:19.392Z</lastmod>
+    <lastmod>2023-05-12T18:52:12.485Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/index.html</loc>
-    <lastmod>2023-05-12T17:53:19.748Z</lastmod>
+    <lastmod>2023-05-12T18:52:12.869Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/opencv_cuda_performance.html</loc>
-    <lastmod>2023-05-12T17:53:20.120Z</lastmod>
+    <lastmod>2023-05-12T18:52:13.278Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/tutorials.html</loc>
-    <lastmod>2023-05-12T17:53:20.446Z</lastmod>
+    <lastmod>2023-05-12T18:52:13.637Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/tutorials1.html</loc>
-    <lastmod>2023-05-12T17:53:20.653Z</lastmod>
+    <lastmod>2023-05-12T18:52:13.873Z</lastmod>
   </url>
   <url>
     <loc>https://cudawarped.github.io/opencv-experiments/tutorials2.html</loc>
-    <lastmod>2023-05-12T17:53:20.854Z</lastmod>
+    <lastmod>2023-05-12T18:52:14.103Z</lastmod>
   </url>
 </urlset>

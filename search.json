@@ -105,13 +105,6 @@
     "text": "Location for storing useful guides and notebooks"
   },
   {
-    "objectID": "accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html",
-    "href": "accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html",
-    "title": "cudawarped",
-    "section": "",
-    "text": "accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings/"
-  },
-  {
     "objectID": "accelerate_opencv_cuda_python.html#building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd",
     "href": "accelerate_opencv_cuda_python.html#building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd",
     "title": "Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows",
