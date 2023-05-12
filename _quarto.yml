@@ -11,7 +11,7 @@ website:
   title: cudawarped
   repo-url: https://github.com/cudawarped/opencv-experiments/
   repo-actions: [issue]
-  favicon: imgs\profile_1-e1674474909304.webp
+  favicon: imgs\favicon-32x32.png
   
   open-graph: true
   navbar:
@@ -43,6 +43,8 @@ website:
           file: accelerate_opencv_cuda_python.qmd
         - text: "Accelerate with CUDA streams in Python"
           file: nbs\opencv4-cuda-streams.ipynb
+        - text: "ImportError: DLL load failed..."
+          file: nbs\ImportError_dll_load_failed_while_importing_cv2.ipynb
         - text: "CUDA Performance Comparisson"
           file: opencv_cuda_performance.qmd
       #  - text: "Import dll load failed while importing cv2"

@@ -1,8 +1,10 @@
 ---
 title: "OpenCV Guides"
-listing: 
+listing:
+  sort: "date desc"
   contents:
-    - "nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"
+    - nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb
     - nbs\opencv4-cuda-streams.ipynb
     - accelerate_opencv_cuda_python.qmd
+    - opencv_cuda_performance.qmd
 ---

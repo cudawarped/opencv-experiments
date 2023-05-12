@@ -4,12 +4,9 @@ about:
   template: jolla
   image: profile.png
   links:
-    - icon: twitter
-      text: twitter
-      href: https://twitter.com
     - icon: github
       text: Github
-      href: https://github.com
+      href: https://github.com/cudawarped/opencv-experiments/
 ---
 
-About this site
+Location for storing useful guides and notebooks
