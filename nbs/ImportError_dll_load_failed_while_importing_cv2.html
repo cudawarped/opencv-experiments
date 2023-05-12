@@ -250,19 +250,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Given that I know the path to OpenCV’s shared libraries is required and I haven’t told python about it, the first thing to try is to add it to pythons DLL search path and see if that solves the problem.</p>
-<div class="cell" data-execution_count="4">
+<div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Ahh the same error, what’s going on.</p>
-<p>In this case I also built OpenCV against the CUDA SDK so there is a good chance its missing DLL’s from there as well. I can try to fix the issue by simply adding the location of the CUDA SDK binaries to the python DLL search path as shown below.</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
+</div>
+<p>Ahh the same error, what’s going on.</p>
+<p>In this case I also built OpenCV against the CUDA SDK so there is a good chance its missing DLL’s from there as well. I can try to fix the issue by simply adding the location of the CUDA SDK binaries to the python DLL search path as shown below.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This appears to have solved the issue, but its a good idea to examine the build information by calling <code>print(cv2.getBuildInformation())</code> just to double check I have loaded the right version of OpenCV.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv2.getBuildInformation())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
