@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2018-02-28">
 
 <title>cudawarped - OpenCV CUDA Performance Comparisson (Nvidia vs Intel)</title>
 <style>
@@ -20,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,7 +65,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./imgs/profile_1-e1674474909304.webp" rel="icon">
+<link href="./imgs/favicon-32x32.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -63,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
 
 <meta property="og:title" content="cudawarped - OpenCV CUDA Performance Comparisson (Nvidia vs Intel)">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://jamesbowley.co.uk/wp-content/uploads/2018/02/gpu_spec-2.png">
+<meta property="og:image" content="https://cudawarped.github.io/opencv-experiments/imgs/gpu_spec-2.webp">
 <meta property="og:site-name" content="cudawarped">
 </head>
 
@@ -139,6 +174,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ImportError: DLL load failed…</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./opencv_cuda_performance.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">CUDA Performance Comparisson</span></a>
   </div>
@@ -148,9 +189,23 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#test-setup" id="toc-test-setup" class="nav-link" data-scroll-target="#test-setup">Test setup</a>
+  <ul class="collapse">
+  <li><a href="#gpu-specifications" id="toc-gpu-specifications" class="nav-link" data-scroll-target="#gpu-specifications">GPU specifications</a></li>
+  </ul></li>
+  <li><a href="#cpu-specifications" id="toc-cpu-specifications" class="nav-link" data-scroll-target="#cpu-specifications">CPU specifications</a></li>
+  <li><a href="#benchmark-results" id="toc-benchmark-results" class="nav-link" data-scroll-target="#benchmark-results">Benchmark results</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -162,6 +217,12 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 28, 2018</p>
+    </div>
+  </div>
   
     
   </div>
@@ -169,82 +230,53 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which OpenCV and/or Computer Vision algorithms, in general, benefit the most from GPU acceleration, and therefore, under what circumstances it might be a good idea to invest in a GPU.
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which OpenCV and/or Computer Vision algorithms, in general, benefit the most from GPU acceleration, and therefore, under what circumstances it might be a good idea to invest in a GPU.</p>
+</section>
+<section id="test-setup" class="level1 page-columns page-full">
+<h1>Test setup</h1>
 <ul>
-<li>
-<a href="#test_setup">Test Setup</a>
-</li>
-<li>
-<a href="#gpu_specs">GPU Specifications</a>
-</li>
-<li>
-<a href="#cpu_specs">CPU Specifications</a>
-</li>
-<li>
-<a href="#results">Benchmark Results</a>
-<ul>
-<li>
-<a href="#average_perf_increase">Average OpenCV GPU Performance Increase</a>
-</li>
-<li>
-<a href="#top_20">Top 20 OpenCV GPU Functions</a>
-</li>
-<li>
-<a href="#bottom_20">Bottom 20 OpenCV GPU Functions</a>
-</li>
-<li>
-<a href="#slowest">20 Slowest OpenCV CPU Functions</a>
-</li>
+<li><p><strong>Software</strong>: OpenCV 3.4 compiled on Visual Studio 2017 with CUDA 9.1, Intel MKL with TBB, and TBB. To generate the CPU results I simply ran the CUDA performance tests with CUDA disabled, so that the fall back CPU functions were called, by changing the following</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PERF_RUN_CUDA</span><span class="op">()</span><span class="pp">  </span><span class="op">:</span>perf<span class="op">::</span>GpuPerf<span class="op">::</span>targetDevice<span class="op">()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>to</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PERF_RUN_CUDA</span><span class="op">()</span><span class="pp">  </span><span class="kw">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>in <a href="https://github.com/opencv/opencv/blob/6d4f66472e14b29b8e1623859cfebfdc67f677c3/modules/ts/include/opencv2/ts/ts_perf.hpp#L228">modules\ts\include\opencv2\ts\ts_perf.hpp</a>.</p>
+<p>The performance tests cover 104 of the OpenCV functions, with each function being tested for a number of different configurations (function arguments). The total number of different CUDA performance configurations/tests which run successfully are 6031, of which only 5300 configurations are supported by both the GPU and CPU.</p></li>
+<li><p><strong>Hardware</strong>: Four different hardware configurations were tested, consisting of 3 laptops and 1 desktop, the CPU/GPU combinations are listed below:</p>
+<ol type="1">
+<li>CPU: <a href="https://ark.intel.com/products/81016/Intel-Core-i5-4210U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-4120U</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gt-730m" rel="noopener" target="_blank">730m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/85212/Intel-Core-i5-5200U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-5200U</a>, GPU: <a href="https://www.geforce.com/hardware/notebook-gpus/geforce-840m" rel="noopener" target="_blank">840m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/88967/Intel-Core-i7-6700HQ-Processor-6M-Cache-up-to-3_50-GHz" rel="noopener" target="_blank">i7-6700HQ</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gtx-980m" rel="noopener" target="_blank">GTX 980m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/88184/Intel-Core-i5-6500-Processor-6M-Cache-up-to-3_60-GHz" rel="noopener" target="_blank">i5-6500</a>, GPU: <a href="https://www.geforce.co.uk/hardware/10series/geforce-gtx-1060/" rel="noopener" target="_blank">GTX 1060</a> (desktop)</li>
+</ol></li>
 </ul>
-</li>
-</ul>
-<a id="test_setup"></a>
-<h5 class="anchored">
-Test Setup
-</h5>
-<ul>
-<li>
-<strong>Software:</strong> OpenCV 3.4 compiled on Visual Studio 2017 with CUDA 9.1, Intel MKL with TBB, and TBB. To generate the CPU results I simply ran the CUDA performance tests with CUDA disabled, so that the fall back CPU functions were called, by changing the following
-<pre><code>#define PERF_RUN_CUDA()  false //::perf::GpuPerf::targetDevice()</code></pre>
-on line 228 of
-<pre><code>modules\ts\include\opencv2\ts\ts_perf.hpp.</code></pre>
-The performance tests cover 104 of the OpenCV functions, with each function being tested for a number of different configurations (function arguments). The total number of different CUDA performance configurations/tests which run successfully are 6031, of which only 5300 configurations are supported by both the GPU and CPU.
-</li>
-<li>
-<strong>Hardware: </strong> Four different hardware configurations were tested, consisting of 3 laptops and 1 desktop, the CPU/GPU combinations are listed below:
-<ol>
-<li>
-CPU: <a href="https://ark.intel.com/products/81016/Intel-Core-i5-4210U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-4120U</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gt-730m" rel="noopener" target="_blank">730m</a> (laptop)
-</li>
-<li>
-CPU: <a href="https://ark.intel.com/products/85212/Intel-Core-i5-5200U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-5200U</a>, GPU: <a href="https://www.geforce.com/hardware/notebook-gpus/geforce-840m" rel="noopener" target="_blank">840m</a> (laptop)
-</li>
-<li>
-CPU: <a href="https://ark.intel.com/products/88967/Intel-Core-i7-6700HQ-Processor-6M-Cache-up-to-3_50-GHz" rel="noopener" target="_blank">i7-6700HQ</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gtx-980m" rel="noopener" target="_blank">GTX 980m</a> (laptop)
-</li>
-<li>
-CPU: <a href="https://ark.intel.com/products/88184/Intel-Core-i5-6500-Processor-6M-Cache-up-to-3_60-GHz" rel="noopener" target="_blank">i5-6500</a>, GPU: <a href="https://www.geforce.co.uk/hardware/10series/geforce-gtx-1060/" rel="noopener" target="_blank">GTX 1060</a> (desktop)
-</li>
-</ol>
-</li>
-</ul>
-<a id="gpu_specs"></a>
-<h5 class="anchored">
-GPU Specifications
-</h5>
+<section id="gpu-specifications" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="gpu-specifications">GPU specifications</h2>
 <p>The GPU’s tested comprise three different micro-architectures, ranging from a low end laptop (730m) to a mid range desktop (GTX 1060) GPU. The full specifications are shown below, where I have also included the maximum theoretical speedup, if the OpenCV function were bandwidth or compute limited. This value is just included to give an indication of what should be possible if architectural improvements, SM count etc. don’t have any impact on performance. In “general” most algorithms will be bandwidth limited implying that the average speed up of the OpenCV functions could be somewhere between these two values. If you are not familiar with this concept then I would recommend watching <a href="http://on-demand.gputechconf.com/gtc/2015/video/S5353.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Best Practices</a>, <a href="http://on-demand.gputechconf.com/gtc/2015/video/S5376.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Beyond Best Practices</a> and <a href="http://on-demand.gputechconf.com/gtc/2016/video/S6181.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Collaborative Access Patterns</a> by <a href="https://www.linkedin.com/in/tscudiero" rel="noopener" target="_blank">Tony Scudiero</a> for a good overview.</p>
-<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=1232846262&amp;single=true" rel="noopener" target="_blank"><img src="https://jamesbowley.co.uk/wp-content/uploads/2018/02/gpu_spec-2.png" alt="" class="alignnone size-full wp-image-580" width="943" height="174"></a></p>
-<a id="cpu_specs"></a>
-<h5 class="anchored">
-CPU Specifications
-</h5>
+<div class="column-screen">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=1232846262&amp;single=true" data-fig-align="center"><img src="imgs/gpu_spec-2.webp" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="cpu-specifications" class="level1 page-columns page-full">
+<h1>CPU specifications</h1>
 <p>The CPU’s tested also comprise three different micro-architectures, ranging from a low end laptop dual core (i5-4120U) to a mid range desktop quad core (i5-6500) CPU. The full specifications are shown below, where I have again included the maximum theoretical speedup depending on whether the OpenCV functions are limited by the CPU bandwidth or clock speed (I could not find any Intel published GFLOPS information).</p>
-<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=921370251&amp;single=true" rel="noopener" target="_blank"><img src="https://jamesbowley.co.uk/wp-content/uploads/2018/02/cpu_spec-2.png" alt="" class="alignnone size-full wp-image-604" width="1187" height="174"></a></p>
-<a id="results"></a>
-<h5 class="anchored">
-Benchmark Results
-</h5>
-<p>The results for all tests are available <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=0&amp;single=true" rel="noopener" target="_blank">here</a>, where you can check if a specific configuration benefits from an improvement in performance when moved to the GPU.</p>
+<div class="column-screen">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=921370251&amp;single=true" data-fig-align="center"><img src="imgs/cpu_spec-2.webp" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="benchmark-results" class="level1">
+<h1>Benchmark results</h1>
+<p>The results for all tests are available <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=0&amp;single=true">here</a>, where you can check if a specific configuration benefits from an improvement in performance when moved to the GPU.</p>
 To get an overall picture of the performance increase which can be achieved from using the CUDA functions over the standard CPU ones, the speedup of each CPU/GPU over the least powerful CPU (i5_4210U), is compared. The below figure shows the speedup averaged over all 5300 tests (All Configs). Because the average speedup is influenced by the number of different configurations tested per OpenCV function, two additional measures are also shown (which only consider one configuration per function) on the below figure:
 <ul>
 <li>
@@ -265,6 +297,7 @@ GPU Max - the average speedup, taken over all OpenCV functions for the configura
 <p>To conclude I would just reiterate that, the benefit you will get from moving your processing to the GPU with OpenCV will depend on the function you call and configuration that you use, in addition to your processing pipeline. That said from, what I have observed, on average the CUDA functions are much much quicker than their CPU counterparts. Please let me know if there are any mistakes in my results and/or analysis.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -518,4 +551,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></div></div></footer></body></html>
+</body></html>

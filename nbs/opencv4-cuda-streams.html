@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../imgs/profile_1-e1674474909304.webp" rel="icon">
+<link href="../imgs/favicon-32x32.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -174,6 +174,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ImportError: DLL load failed…</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">CUDA Performance Comparisson</span></a>
   </div>
@@ -188,10 +194,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
-  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#initialization" id="toc-initialization" class="nav-link" data-scroll-target="#initialization">Initialization</a></li>
-  </ul></li>
   <li><a href="#base-implementations" id="toc-base-implementations" class="nav-link" data-scroll-target="#base-implementations">Base implementations</a>
   <ul class="collapse">
   <li><a href="#cpu" id="toc-cpu" class="nav-link" data-scroll-target="#cpu">CPU</a></li>
@@ -230,10 +234,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#analysis-7" id="toc-analysis-7" class="nav-link" data-scroll-target="#analysis-7">Analysis</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
-  <ul class="collapse">
-  <li><a href="#run-outside-the-notebook" id="toc-run-outside-the-notebook" class="nav-link" data-scroll-target="#run-outside-the-notebook">Run outside the notebook</a></li>
-  </ul></li>
+  <li><a href="#results-and-suggested-optimization-strategies" id="toc-results-and-suggested-optimization-strategies" class="nav-link" data-scroll-target="#results-and-suggested-optimization-strategies">Results and suggested optimization strategies</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -268,15 +269,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Since Aug 2018 the OpenCV CUDA API has been exposed to python. To get the most from this new functionality you need to have a basic understanding of CUDA (most importantly that it is <a href="https://en.wikipedia.org/wiki/Data_parallelism">data</a> not <a href="https://en.wikipedia.org/wiki/Task_parallelism">task</a> parallel) and its interaction with OpenCV. Below I have tried to introduce these topics with an example of how you could optimize a toy video processing pipeline. The actual functions called in the pipeline are not important, they are simply there to simulate a common processing pipeline consisting of work performed on both the host (CPU) and device (GPU).</p>
 <p>This guide is taken from a <a href="https://jupyter.org/">Jupyter Notebook</a> which can be cloned from <a href="https://github.com/cudawarped/opencv-experiments/blob/master/nbs/opencv4-cuda-streams.ipynb">here</a>. The procedure is as follows, following some quick <a href="#initialization">initialization</a>, we start with a <a href="#base-implementation">base</a> implementation on both the <a href="#cpu_naive">CPU</a> and <a href="#gpu_naive">GPU</a> to get a baseline result. We then proceed to incrementally improve the implementation by using the information provided by the <a href="https://developer.nvidia.com/nvidia-visual-profiler">Nvidia Visual Profiler</a>.</p>
 <p>On a laptop RTX 2080 paired with an i7-8700 the final CUDA incarnation resulted in a speed up of ~30x and ~10x over the naive CPU and GPU implementations.</p>
-<p>The motivation is to show that if you can understand a few simple concepts</p>
-<p>The idea is to help uses of the OpenCV CUDA modules get the most performance</p>
-<p>By using Python I hope to show that its possible for even</p>
-<p>The idea is to show t</p>
-<p>By the end of the guide I hope that 1) I will have shown that even when calling OpenCV from Python its possible to fully saturate your GPU and hopefully 2) Demonstrated that even though getting the maximum performance gains when switching from using the host to the GPU</p>
-<p>the OpenCV CUDA modules</p>
-<p>how to get the most performance from the OpenCV</p>
-<section id="initialization" class="level2">
-<h2 class="anchored" data-anchor-id="initialization">Initialization</h2>
+</section>
+<section id="initialization" class="level1">
+<h1>Initialization</h1>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Expand for initialization parameters</summary>
@@ -296,10 +291,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><a id="naive"></a></p>
 </section>
-</section>
 <section id="base-implementations" class="level1 page-columns page-full">
 <h1>Base implementations</h1>
-<p>This implementation simply loops through all the frames in the source video passing them through the video processing pipeline without considering any optimization steps. Because the video is decoded using the CPU the main difference between the CPU and GPU versions is that the frames are uploaded and downloaded to the GPU on every iteration, for details you can expand the code blocks below.</p>
+<p>To start with we simply loop through all the frames in the source video passing them through the video processing pipeline without considering any optimization steps. Because the video is decoded using the CPU the main difference between the CPU and GPU versions is that the frames are uploaded and downloaded to the GPU on every iteration, for details you can expand the code blocks below.</p>
 <div class="cell" data-execution_count="57">
 <details>
 <summary>Expand to inspect the source code</summary>
@@ -376,7 +370,7 @@ Speedup over CPU: 7.67</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_1.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">gpu_naive</figcaption>
+<figcaption class="figure-caption">Base Implementation</figcaption>
 </figure>
 </div>
 </div>
@@ -459,7 +453,7 @@ Next
 </section>
 <section id="pre-allocation-of-return-arrays" class="level1 page-columns page-full">
 <h1>Pre-allocation of return arrays</h1>
-<p>The only difference between this and the base implementation is that all of the return arrays are pre-allocated and passed to the Python functions. e.g.&nbsp;instead of</p>
+<p>The previous implementation is updated to pre-allocate and pass all the return arrays to the Python functions to avoid unecessary memory allocations. e.g.&nbsp;instead of</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>frame_device_big <span class="op">=</span> cv.cuda.resize(frame_device,(cols_big,rows_big))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>the memory for <code>self.frame_device</code> is pre-allocated in the constructor</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -583,7 +577,7 @@ Speedup over CPU: 13.91</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_2.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Pre-allocation of return arrays</figcaption>
 </figure>
 </div>
 </div>
@@ -617,7 +611,7 @@ Hypothesis
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
-<p>As mentioned above by not specifying a stream all calls are placed in the <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/stream-sync-behavior.html">“Default”</a> stream which can be seen at the bottom of the figure. This means that following each asynchronous kernel launch there will be a synchronizing call to <code>cudaDeviceSynchronize()</code> shown below:</p>
+<p>As mentioned above by not specifying a CUDA stream all calls are placed in the <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/stream-sync-behavior.html">“Default”</a> stream which can be seen at the bottom of the figure. This means that due to the way OpenCV is implemented following each asynchronous kernel launch there will be an internal synchronizing call to <code>cudaDeviceSynchronize()</code> shown below:</p>
 <div class="sourceCode" id="annotated-cell-1"><pre class="sourceCode python code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-1" class="code-annotation-target"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(frame_device,(cols_big,rows_big),frame_device_big)</span>
 <span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>cudaDeviceSynchronize()</span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>bgmog2_device.<span class="bu">apply</span>(frame_device_big,lr,cv.cuda.Stream_Null(),fg_device_big)</span>
@@ -628,19 +622,19 @@ Hypothesis
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="1" data-code-annotation="1">asynchronous kernel 1</span>
+<span data-code-annotation="1" data-code-cell="annotated-cell-1" data-code-lines="1">asynchronous kernel 1</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="2">asynchronous kernel 2</span>
+<span data-code-annotation="2" data-code-cell="annotated-cell-1" data-code-lines="3">asynchronous kernel 2</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="3">asynchronous kernel 3</span>
+<span data-code-annotation="3" data-code-cell="annotated-cell-1" data-code-lines="5">asynchronous kernel 3</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="4">synchronous copy from device to host</span>
+<span data-code-annotation="4" data-code-cell="annotated-cell-1" data-code-lines="7">synchronous copy from device to host</span>
 </dd>
 </dl>
 </div>
@@ -668,8 +662,7 @@ Next
 </section>
 <section id="replacing-the-default-stream" class="level1 page-columns page-full">
 <h1>Replacing the default stream</h1>
-<p>Each cuda function is now passed a CUDA stream to work in which should prevent calls to <code>cudaDeviceSynchronize()</code> afteer every function and we have a single call after all functions to <code>self.stream.waitForCompletion()</code> which replaces previous call to<code>cudaDeviceSynchronize()</code></p>
-<p>We have replaced the implicit call to <code>cudaDeviceSynchronize()</code> after every function call with a single call to <code>self.stream.waitForCompletion()</code> after the last function in the pipeline.</p>
+<p>Each CUDA function is now passed the same non default CUDA stream to work in. This will prevent the calls to <code>cudaDeviceSynchronize()</code> after every function call. Because we have removed the synchronization calls an explicit call to <code>self.stream.waitForCompletion()</code> has to be made after we download the frame back from the device to the host to ensure the copy to <code>self.fg_host</code> has completed.</p>
 <div class="cell" data-execution_count="71">
 <details>
 <summary>Expand to inspect the source code</summary>
@@ -722,7 +715,7 @@ Speedup over CPU: 14.64</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_3.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Replacing the default stream</figcaption>
 </figure>
 </div>
 </div>
@@ -754,14 +747,11 @@ Hypothesis
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
-<p>As mentioned above by not specifying a stream all calls are placed in the <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/stream-sync-behavior.html">“Default”</a> stream which can be seen at the bottom of the figure. This means that following each asynchronous kernel launch there will be a synchronizing call to <code>cudaDeviceSynchronize()</code> shown below:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(frame_device,(cols_big,rows_big),frame_device_big)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>cudaDeviceSynchronize()</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>bgmog2_device.<span class="bu">apply</span>(frame_device_big,lr,cv.cuda.Stream_Null(),fg_device_big)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>cudaDeviceSynchronize()</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>cudaDeviceSynchronize()</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>fg_device.download(fg_host)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>What has actually happened is we have tried to use asynchronous copies to and from the device without first <a href="https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html#api-sync-behavior__memcpy-async">pinning the host memory</a>. Therefore what is shown are three asynchronous kernel launches and a synchronous copy from the device to the host, which blocks the host thread until all the previous work on the device is complete:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>    cv.cuda.resize(frame_device,(cols_big,rows_big),frame_device_big,stream<span class="op">=</span>stream) <span class="cf">async</span> kernel <span class="dv">1</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    bgmog2.<span class="bu">apply</span>(frame_device_big,lr,stream,fg_device_big) acync kernel <span class="dv">2</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream<span class="op">=</span>stream) acync kernel <span class="dv">3</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    fg_device.download(stream,fg_host) synchronous copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -786,66 +776,54 @@ Next
 </section>
 <section id="overlap-host-and-device-computation-1" class="level1 page-columns page-full">
 <h1>Overlap host and device computation (1)</h1>
-<div class="cell" data-execution_count="73">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># host mem not implemented, manually pin memory</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PinnedMem(<span class="bu">object</span>):</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, size, dtype<span class="op">=</span>np.uint8):</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.array <span class="op">=</span> np.empty(size,dtype)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        cv.cuda.registerPageLocked(<span class="va">self</span>.array)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pinned <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__del__</span>(<span class="va">self</span>):</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        cv.cuda.unregisterPageLocked(<span class="va">self</span>.array)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pinned <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f'pinned = </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>pinned<span class="sc">}</span><span class="ss">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell" data-execution_count="74">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda3:</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame <span class="op">=</span> PinnedMem((rows_small,cols_small,<span class="dv">3</span>))</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(np.shape(frame)[<span class="dv">0</span>],np.shape(frame)[<span class="dv">1</span>],cv.CV_8UC1)</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frame.array,<span class="va">self</span>.stream)</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device,(cols_big,rows_big),<span class="va">self</span>.frame_device_big,stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big,lr,<span class="va">self</span>.stream,<span class="va">self</span>.fg_device_big)</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big,<span class="va">self</span>.fg_device.size(),<span class="va">self</span>.fg_device,stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion() <span class="co"># imidiate wait</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frame.array</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda3 <span class="op">=</span> ProcFrameCuda3(rows_small,cols_small,rows_big,cols_big,check_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>To force the copies to and from the device to be performed asynchronously with respect to the host the memory for both <code>self.frame</code> and <code>self.fg_host</code> is pinned.</p>
 <div class="cell" data-execution_count="75">
-<details open="">
+<details>
 <summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>gpu_time_3, n_frames <span class="op">=</span> ProcVid1(proc_frame_cuda3,lr)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 3 (overlap host and device - attempt 1): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_2<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># host mem not implemented, manually pin memory</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PinnedMem(<span class="bu">object</span>):</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, size, dtype<span class="op">=</span>np.uint8):</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.array <span class="op">=</span> np.empty(size,dtype)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        cv.cuda.registerPageLocked(<span class="va">self</span>.array)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pinned <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__del__</span>(<span class="va">self</span>):</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        cv.cuda.unregisterPageLocked(<span class="va">self</span>.array)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pinned <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f'pinned = </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>pinned<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda3:</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame <span class="op">=</span> PinnedMem((rows_small,cols_small,<span class="dv">3</span>))</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(np.shape(frame)[<span class="dv">0</span>],np.shape(frame)[<span class="dv">1</span>],cv.CV_8UC1)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frame.array,<span class="va">self</span>.stream)</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device,(cols_big,rows_big),<span class="va">self</span>.frame_device_big,stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big,lr,<span class="va">self</span>.stream,<span class="va">self</span>.fg_device_big)</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big,<span class="va">self</span>.fg_device.size(),<span class="va">self</span>.fg_device,stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion() <span class="co"># imidiate wait</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frame.array</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda3 <span class="op">=</span> ProcFrameCuda3(rows_small,cols_small,rows_big,cols_big,check_res)</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>gpu_time_3, n_frames <span class="op">=</span> ProcVid1(proc_frame_cuda3,lr)</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 3 (overlap host and device - attempt 1): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_2<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_3<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>GPU 3 (overlap host and device - attempt 1): 100 frames, 1.83 ms/frame
@@ -861,7 +839,7 @@ Speedup over CPU: 15.15</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_4.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Overlap host and device computation (1)</figcaption>
 </figure>
 </div>
 </div>
@@ -882,23 +860,32 @@ Observations
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Hypothesis
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>We are issuing asynchronous calls to the device and then immediately waiting on the host for them to complete.</p>
-<blockquote class="blockquote">
-<p><code>cv.cuda.resize(frame_device,(cols_big,rows_big),frame_device_big,stream=stream)</code> async kernel 1<br> <code>bgmog2.apply(frame_device_big,lr,stream,fg_device_big)</code> async kernel 2<br> <code>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream=stream)</code> acync kernel 3<br> <code>fg_device.download(stream,fg_host.array)</code> async copy DtoH<br> <code>stream.waitForCompletion()</code> block until kernel 1-3 and copy have finished</p>
-</blockquote>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(frame_device,(cols_big,rows_big),frame_device_big,stream<span class="op">=</span>stream) <span class="cf">async</span> kernel <span class="dv">1</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>bgmog2.<span class="bu">apply</span>(frame_device_big,lr,stream,fg_device_big) <span class="cf">async</span> kernel <span class="dv">2</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream<span class="op">=</span>stream) acync kernel <span class="dv">3</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>fg_device.download(stream,fg_host.array) <span class="cf">async</span> copy DtoH</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>stream.waitForCompletion() block until kernel <span class="dv">1</span><span class="op">-</span><span class="dv">3</span> <span class="kw">and</span> copy have finished</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>What we really want to do is overlap host and device computation by issuing asynchronous calls to the device and then performing processing on the host, before waiting for the asynchronous device calls to return. For two frames this would be:</p>
-<blockquote class="blockquote">
-<p><code>frame_device.upload(frame[0].array,stream)</code> async copy HtoD, frame 0<br> <code>cv.cuda.resize(frame_device,(n_cols_big,n_rows_big),frame_device_big,stream=stream)</code> async kernel 1, frame 0 <br> <code>bgmog2.apply(frame_device_big,lr,stream,fg_device_big)</code> async kernel 2, frame 0<br> <code>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream=stream)</code> acync kernel 3, frame 0<br> <code>fg_device.download(stream,fg_host.array)</code> async copy DtoH, frame 0<br> <code>ret,_ = cap.read(frame[1].array)</code> host read frame 1 <br> <code>stream.waitForCompletion()</code> <strong>block until kernel 1-3 and copy have finished for frame 0</strong></p>
-</blockquote>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>frame_device.upload(frame[<span class="dv">0</span>].array,stream) <span class="cf">async</span> copy HtoD, frame <span class="dv">0</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(frame_device,(n_cols_big,n_rows_big),frame_device_big,stream<span class="op">=</span>stream) <span class="cf">async</span> kernel <span class="dv">1</span>, frame <span class="dv">0</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>bgmog2.<span class="bu">apply</span>(frame_device_big,lr,stream,fg_device_big) <span class="cf">async</span> kernel <span class="dv">2</span>, frame <span class="dv">0</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream<span class="op">=</span>stream) acync kernel <span class="dv">3</span>, frame <span class="dv">0</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>fg_device.download(stream,fg_host.array) <span class="cf">async</span> copy DtoH, frame <span class="dv">0</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>ret,_ <span class="op">=</span> cap.read(frame[<span class="dv">1</span>].array) host read frame <span class="dv">1</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>stream.waitForCompletion() block until kernel <span class="dv">1</span><span class="op">-</span><span class="dv">3</span> <span class="kw">and</span> copy have finished <span class="cf">for</span> frame <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -913,10 +900,11 @@ Next
 </div>
 <div id="callout-12" class="callout-12-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
-<p>Move the position of the synchronization point to after a new frame has been read as described above. To do this We also need to increase the number of host frame containers to two because moving the sync point means frame 0 may still be in the process of being uploaded to the device when we read frame 1. That is, when we call</p>
-<blockquote class="blockquote">
-<p><code>ret,_ = cap.read(frame[1].array)</code> we have not synced, and we have no way to know if the previous call to <code>frame_device.upload(frame[0].array,stream)</code> has finished, hence we need to write to <code>frame[1].array</code> <br></p>
-</blockquote>
+<p>Move the position of the synchronization point to after a new frame has been read as described above. To do this we also need to increase the number of host frame containers to two because moving the sync point means frame 0 may still be in the process of being uploaded to the device when we read frame 1. That is, when we call</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ret,_ <span class="op">=</span> cap.read(frame[<span class="dv">1</span>].array)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>we have not synced, and we have no way to know if the previous call to</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>frame_device.upload(frame[<span class="dv">0</span>].array,stream)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>has finished, hence we need to read to <code>frame[1].array</code> and not <code>frame[0].array</code>.</p>
 </div>
 </div>
 </div>
@@ -925,84 +913,73 @@ Next
 </section>
 <section id="overlap-host-and-device-computation-2" class="level1 page-columns page-full">
 <h1>Overlap host and device computation (2)</h1>
-<div class="cell" data-execution_count="77">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ProcVid2(proc_frame,lr,simulate<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv.VideoCapture(vidPath)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (cap.isOpened()<span class="op">==</span> <span class="va">False</span>): </span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Error opening video stream or file"</span>)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    n_frames <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()    </span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span>(cap.isOpened()):</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        ret,_ <span class="op">=</span> cap.read(proc_frame.Frame())</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ret <span class="op">==</span> <span class="va">True</span>:</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>            n_frames <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> simulate:</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                proc_frame.ProcessFrame(lr)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    proc_frame.Sync()</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    end <span class="op">=</span> time.time()    </span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    cap.release()</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (end <span class="op">-</span> start)<span class="op">*</span><span class="dv">1000</span><span class="op">/</span>n_frames, n_frames<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell" data-execution_count="78">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda4:</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_in <span class="op">=</span> [PinnedMem((rows_small,cols_small,<span class="dv">3</span>)),PinnedMem((rows_small,cols_small,<span class="dv">3</span>))]</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.frame_num <span class="op">&gt;</span> <span class="dv">1</span>):</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.stream.waitForCompletion() <span class="co"># wait after we have read the next frame</span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array, <span class="va">self</span>.stream)</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device, (cols_big,rows_big), <span class="va">self</span>.frame_device_big, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big, lr, <span class="va">self</span>.stream, <span class="va">self</span>.fg_device_big )</span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big, <span class="va">self</span>.fg_device.size(), <span class="va">self</span>.fg_device, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames_in)</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array</span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion()</span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda4 <span class="op">=</span> ProcFrameCuda4(rows_small,cols_small,rows_big,cols_big,check_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>We now run one frame behind, that is we start by reading frame 0 and asynchronously launching kernels to process it on the device as before however this time instead of immediately synchronizing with the host to retrieve the processed frame we continue reading frame 1 before calling <code>self.stream.waitForCompletion()</code>.</p>
+<p>This gives the device chance to process the kernels whilst we are decoding frame 1 on the host. The process then continues in this fashion until we reach the last frame where we have to synchronize immediately as there is no more host work to complete.</p>
 <div class="cell" data-scrolled="true" data-execution_count="79">
-<details open="">
+<details>
 <summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>gpu_time_4, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda4,lr)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 4 (overlap host and device - attempt 2): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_3<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ProcVid2(proc_frame,lr,simulate<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv.VideoCapture(vidPath)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (cap.isOpened()<span class="op">==</span> <span class="va">False</span>): </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Error opening video stream or file"</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    n_frames <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()    </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span>(cap.isOpened()):</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>        ret,_ <span class="op">=</span> cap.read(proc_frame.Frame())</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ret <span class="op">==</span> <span class="va">True</span>:</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>            n_frames <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> simulate:</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                proc_frame.ProcessFrame(lr)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    proc_frame.Sync()</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    end <span class="op">=</span> time.time()    </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    cap.release()</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (end <span class="op">-</span> start)<span class="op">*</span><span class="dv">1000</span><span class="op">/</span>n_frames, n_frames<span class="op">;</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda4:</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_in <span class="op">=</span> [PinnedMem((rows_small,cols_small,<span class="dv">3</span>)),PinnedMem((rows_small,cols_small,<span class="dv">3</span>))]</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1)</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.frame_num <span class="op">&gt;</span> <span class="dv">1</span>):</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.stream.waitForCompletion() <span class="co"># wait after we have read the next frame</span></span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array, <span class="va">self</span>.stream)</span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device, (cols_big,rows_big), <span class="va">self</span>.frame_device_big, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big, lr, <span class="va">self</span>.stream, <span class="va">self</span>.fg_device_big )</span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big, <span class="va">self</span>.fg_device.size(), <span class="va">self</span>.fg_device, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
+<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
+<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames_in)</span>
+<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array</span>
+<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
+<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion()</span>
+<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb26-55"><a href="#cb26-55" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
+<span id="cb26-56"><a href="#cb26-56" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-57"><a href="#cb26-57" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda4 <span class="op">=</span> ProcFrameCuda4(rows_small,cols_small,rows_big,cols_big,check_res)</span>
+<span id="cb26-58"><a href="#cb26-58" aria-hidden="true" tabindex="-1"></a>gpu_time_4, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda4,lr)</span>
+<span id="cb26-59"><a href="#cb26-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 4 (overlap host and device - attempt 2): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb26-60"><a href="#cb26-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_3<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb26-61"><a href="#cb26-61" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb26-62"><a href="#cb26-62" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_4<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>GPU 4 (overlap host and device - attempt 2): 100 frames, 1.83 ms/frame
@@ -1018,7 +995,7 @@ Speedup over CPU: 15.18</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_5.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Overlap host and device computation (2)</figcaption>
 </figure>
 </div>
 </div>
@@ -1039,22 +1016,25 @@ Observations
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Hypothesis
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>This is most likely to be because we are working on Windows where the GPU is a Windows Display Driver Model device. See below for more details.</p>
-</div>
-</div>
 <blockquote class="blockquote">
 <p><a href="https://devtalk.nvidia.com/default/topic/548639/is-wddm-causing-this-/">CUDA driver has a software queue for WDDM devices to reduce the average overhead of submitting command buffers to the WDDM KMD driver</a></p>
 </blockquote>
 <p>This would cause all the device calls from the previous frame to be queued and then issued when we call <code>stream.waitForCompletion()</code> and could explain the profiler output.</p>
+</div>
+</div>
+</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1068,9 +1048,14 @@ Next
 <div id="callout-15" class="callout-15-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>Test the hypothesis by forcing the CUDA driver to dispatch all queued calls by issuing a call to <code>stream.queryIfComplete()</code> as shown below.</p>
-<blockquote class="blockquote">
-<p><code>frame_device.upload(frames_in[0].array, stream)</code> async copy HtoD, frame 0<br> <code>cv.cuda.resize(frame_device,(n_cols_big,n_rows_big),frame_device_big,stream=stream)</code> async kernel 1, frame 0 <br> <code>bgmog2.apply(frame_device_big, lr, stream, fg_device_big )</code> async kernel 2, frame 0<br> <code>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream=stream)</code> acync kernel 3, frame 0<br> <code>fg_device.download(stream,fg_host.array)</code> async copy DtoH, frame 0<br> <code>stream.queryIfComplete()</code> <strong>force WDDM to dispatch any qued device calls</strong><br> <code>ret,_ = cap.read(frame[1].array)</code> host read frame 1 <br> <code>stream.waitForCompletion()</code> block until kernel 1-3 and copy have finished for frame 0</p>
-</blockquote>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>frame_device.upload(frames_in[<span class="dv">0</span>].array, stream) <span class="cf">async</span> copy HtoD, frame <span class="dv">0</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(frame_device,(n_cols_big,n_rows_big),frame_device_big,stream<span class="op">=</span>stream) <span class="cf">async</span> kernel <span class="dv">1</span>, frame <span class="dv">0</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>bgmog2.<span class="bu">apply</span>(frame_device_big, lr, stream, fg_device_big ) <span class="cf">async</span> kernel <span class="dv">2</span>, frame <span class="dv">0</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>cv.cuda.resize(fg_device_big,fg_device.size(),fg_device,stream<span class="op">=</span>stream) acync kernel <span class="dv">3</span>, frame <span class="dv">0</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>fg_device.download(stream,fg_host.array) <span class="cf">async</span> copy DtoH, frame <span class="dv">0</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>stream.queryIfComplete() force WDDM to dispatch <span class="bu">any</span> queued device calls</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>ret,_ <span class="op">=</span> cap.read(frame[<span class="dv">1</span>].array) host read frame <span class="dv">1</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>stream.waitForCompletion() block until kernel <span class="dv">1</span><span class="op">-</span><span class="dv">3</span> <span class="kw">and</span> copy have finished <span class="cf">for</span> frame <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1079,60 +1064,56 @@ Next
 </section>
 <section id="overlap-host-and-device-computation-3" class="level1 page-columns page-full">
 <h1>Overlap host and device computation (3)</h1>
-<div class="cell" data-execution_count="81">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda5:</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_in <span class="op">=</span> [PinnedMem((rows_small,cols_small,<span class="dv">3</span>)),PinnedMem((rows_small,cols_small,<span class="dv">3</span>))]</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1)</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.frame_num <span class="op">&gt;</span> <span class="dv">1</span>):</span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.stream.waitForCompletion() <span class="co"># wait after we have read the next frame</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array, <span class="va">self</span>.stream)</span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device, (cols_big,rows_big), <span class="va">self</span>.frame_device_big, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big, lr, <span class="va">self</span>.stream, <span class="va">self</span>.fg_device_big )</span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big, <span class="va">self</span>.fg_device.size(), <span class="va">self</span>.fg_device, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.queryIfComplete() <span class="co"># kick WDDM</span></span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames_in)</span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array</span>
-<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion()</span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda5 <span class="op">=</span> ProcFrameCuda5(rows_small,cols_small,rows_big,cols_big,check_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>The only change here is to add</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.stream.queryIfComplete() <span class="co"># kick WDDM</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>after the call to asynchronous download the processed frame has been issued, which should force the WDDM to dispatch any queued device calls.</p>
 <div class="cell" data-execution_count="82">
-<details open="">
+<details>
 <summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>gpu_time_5, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda5,lr)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 5 (overlap host and device - attempt 3): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_4<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda5:</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,store_res<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream <span class="op">=</span> cv.cuda_Stream()</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_in <span class="op">=</span> [PinnedMem((rows_small,cols_small,<span class="dv">3</span>)),PinnedMem((rows_small,cols_small,<span class="dv">3</span>))]</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device_big <span class="op">=</span> cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device <span class="op">=</span> cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_host <span class="op">=</span> PinnedMem((rows_small,cols_small))</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_num <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.frame_num <span class="op">&gt;</span> <span class="dv">1</span>):</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.stream.waitForCompletion() <span class="co"># wait after we have read the next frame</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frame_device.upload(<span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array, <span class="va">self</span>.stream)</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frame_device, (cols_big,rows_big), <span class="va">self</span>.frame_device_big, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frame_device_big, lr, <span class="va">self</span>.stream, <span class="va">self</span>.fg_device_big )</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fg_device_big, <span class="va">self</span>.fg_device.size(), <span class="va">self</span>.fg_device, stream<span class="op">=</span><span class="va">self</span>.stream)</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fg_device.download(<span class="va">self</span>.stream,<span class="va">self</span>.fg_host.array)</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.queryIfComplete() <span class="co"># kick WDDM</span></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames_in)</span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames_in[<span class="va">self</span>.i_writable_mem].array</span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.stream.waitForCompletion()</span>
+<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fg_host.array))</span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda5 <span class="op">=</span> ProcFrameCuda5(rows_small,cols_small,rows_big,cols_big,check_res)</span>
+<span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a>gpu_time_5, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda5,lr)</span>
+<span id="cb30-41"><a href="#cb30-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 5 (overlap host and device - attempt 3): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb30-42"><a href="#cb30-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_4<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb30-43"><a href="#cb30-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb30-44"><a href="#cb30-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_5<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>GPU 5 (overlap host and device - attempt 3): 100 frames, 1.23 ms/frame
@@ -1148,7 +1129,7 @@ Speedup over CPU: 22.60</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_6.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Overlap host and device computation (3)</figcaption>
 </figure>
 </div>
 </div>
@@ -1170,25 +1151,42 @@ Observations
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Hypothesis
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>The device is stalling.</p>
 <p>As already mentioned the host time cannot be changed. Additionally from the profiler output it is clear that the host time (~0.62ms) is less than the device time (~0.79ms).</p>
-<p>That is given the processing pipeline below &gt; <code>Process frame 0 on the device</code> <strong>~0.79ms</strong> (copy frame 0 to the device execute kernel 1-3 and copy back to the host)<br> <code>ret,_ = cap.read(frame[1].array)</code> <strong>~0.62ms</strong> (read frame 1 on the host) <br> <code>stream.waitForCompletion()</code> block for (<strong>~0.17ms</strong> = <sub>0.79ms-</sub>0.62ms) until processing for frame 0 has finished</p>
+<p>That is given the processing pipeline below;</p>
+<ol type="1">
+<li>process frame 0 on the device <strong>~0.79ms</strong> (copy frame 0 to the device execute kernel 1-3 and copy back to the host)</li>
+<li><code>ret,_ = cap.read(frame[1].array)</code> <strong>~0.62ms</strong> (read frame 1 on the host)</li>
+<li><code>stream.waitForCompletion()</code> block for (<strong>~0.17ms</strong> = 0.79ms-0.62ms) until processing for frame 0 has finished</li>
+</ol>
 <p><code>stream.waitForCompletion()</code> will on average cause the host to wait ~0.17ms for the device processing to finish. This can be observed in the profiler output by the length of <code>cudaStreamchronize()</code> which for each frame ends exactly following the <code>Memcpy(DtoH)</code>. Unfortunately this wait stalls the device because it has no work to perform until more calls are issued by the host, which in this case does not occur until after the call to <code>stream.waitForCompletion()</code>. If only there was a way to issue work to the device in advance of <code>stream.waitForCompletion()</code>, which will continue to be performed afterwards.</p>
 <p>Fortunately there is by using multiple streams, each processing a single frame at a time. This allows us to issue commands in advance, to process frame 1 before we start the wait on the host for frame 0, shown below</p>
-<blockquote class="blockquote">
-<p><code>ret,_ = cap.read(frame[0].array)</code>host read frame 0 <br> i)<code>Process frame 0 in stream 0</code><br> <code>ret,_ = cap.read(frame[1].array)</code>host read frame 1 <br> ii)<code>Process frame 1 in stream 1</code><br> <code>ret,_ = cap.read(frame[2].array)</code>host read frame 2 <br> <code>stream[0].waitForCompletion()</code> <strong>block until i) the processing for frame 0 has finished, allowing the device to continue with ii)</strong> <br> iii)<code>Process frame 2 in stream 0</code><br> <code>ret,_ = cap.read(frame[0].array)</code>host read frame 3 <br> <code>stream[1].waitForCompletion()</code> <strong>block until ii) the processing for frame 1 has finished, allowing the device to continue with iii)</strong><br> …</p>
-</blockquote>
+<ol type="1">
+<li><code>ret,_ = cap.read(frame[0].array)</code> host read frame 0</li>
+<li>Process frame 0 in stream 0</li>
+<li><code>ret,_ = cap.read(frame[1].array)</code> host read frame 1</li>
+<li>Process frame 1 in stream 1</li>
+<li><code>ret,_ = cap.read(frame[2].array)</code> host read frame 2</li>
+<li><code>stream[0].waitForCompletion()</code> <strong>block until (2) the processing for frame 0 has finished, allowing the device to continue with (4)</strong></li>
+<li>Process frame 2 in stream 0</li>
+<li><code>ret,_ = cap.read(frame[0].array)</code> host read frame 3</li>
+<li><code>stream[1].waitForCompletion()</code> <strong>block until (4) the processing for frame 1 has finished, allowing the device to continue with (7)</strong></li>
+<li>…</li>
+</ol>
 <p>Notice that when <code>stream[0].waitForCompletion()</code> is called the device has <code>Process frame 1 in stream 1</code> already queued up in stream 1 meaning that the wait on the host should not cause a stall on the device.</p>
 <p><strong>Note:</strong> Using multiple streams in this way will add additional latency and is not going to be suitable for real time processing, that said the additional latency in most real world cases will be tolerable and worth the reduction in processing time.</p>
+</div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -1212,121 +1210,114 @@ Next
 </section>
 <section id="overlap-host-and-device-computation---multiple-streams" class="level1 page-columns page-full">
 <h1>Overlap host and device computation - multiple streams</h1>
-<div class="cell" data-execution_count="84">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SyncType():</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    none <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    soft <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    hard <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda6:</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,n_streams,store_res<span class="op">=</span><span class="va">False</span>,sync<span class="op">=</span>SyncType.soft,device_timer<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_streams <span class="op">=</span> n_streams</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res        </span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sync <span class="op">=</span> sync</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device <span class="op">=</span> []</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device_big <span class="op">=</span> []</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device_big <span class="op">=</span> []</span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device <span class="op">=</span> []</span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_small <span class="op">=</span> []   </span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.streams <span class="op">=</span> []</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames <span class="op">=</span> []</span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.InitMem()</span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.InitStreams()</span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_stream <span class="op">=</span> <span class="dv">0</span>        </span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_frames <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.device_timer <span class="op">=</span> device_timer</span>
-<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer:</span>
-<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_start <span class="op">=</span> []</span>
-<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_stop <span class="op">=</span> []</span>
-<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.InitEvents()</span>
-<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.device_time <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitMem(<span class="va">self</span>):</span>
-<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames.append(PinnedMem((rows_small,cols_small,<span class="dv">3</span>)))</span>
-<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
-<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames_device.append(cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3))</span>
-<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames_device_big.append(cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3))</span>
-<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_device_big.append(cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1))</span>
-<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_device.append(cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1))</span>
-<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_small.append(PinnedMem((rows_small,cols_small)))</span>
-<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>                    </span>
-<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitStreams(<span class="va">self</span>):</span>
-<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams): </span>
-<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.sync <span class="op">==</span> SyncType.hard:</span>
-<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams.append(cv.cuda.Stream_Null())</span>
-<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="va">self</span>.sync <span class="op">==</span> SyncType.soft:</span>
-<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams.append(cv.cuda_Stream())</span>
-<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitEvents(<span class="va">self</span>):</span>
-<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
-<span id="cb31-54"><a href="#cb31-54" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_start.append(cv.cuda_Event())</span>
-<span id="cb31-55"><a href="#cb31-55" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_stop.append(cv.cuda_Event()) </span>
-<span id="cb31-56"><a href="#cb31-56" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb31-57"><a href="#cb31-57" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> IncStream(<span class="va">self</span>):</span>
-<span id="cb31-58"><a href="#cb31-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_stream <span class="op">=</span> (<span class="va">self</span>.i_stream<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="va">self</span>.n_streams</span>
-<span id="cb31-59"><a href="#cb31-59" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb31-60"><a href="#cb31-60" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
-<span id="cb31-61"><a href="#cb31-61" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_frames <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb31-62"><a href="#cb31-62" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="va">self</span>.i_stream</span>
-<span id="cb31-63"><a href="#cb31-63" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.IncStream()</span>
-<span id="cb31-64"><a href="#cb31-64" aria-hidden="true" tabindex="-1"></a>        stream <span class="op">=</span> <span class="va">self</span>.streams[i]</span>
-<span id="cb31-65"><a href="#cb31-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.n_frames <span class="op">&gt;</span> <span class="va">self</span>.n_streams <span class="kw">and</span> <span class="va">self</span>.sync <span class="op">!=</span> SyncType.none):            </span>
-<span id="cb31-66"><a href="#cb31-66" aria-hidden="true" tabindex="-1"></a>            stream.waitForCompletion() <span class="co"># wait once both streams are used               </span></span>
-<span id="cb31-67"><a href="#cb31-67" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.device_timer:  <span class="va">self</span>.device_time <span class="op">+=</span> cv.cuda_Event.elapsedTime(<span class="va">self</span>.events_start[i],<span class="va">self</span>.events_stop[i])</span>
-<span id="cb31-68"><a href="#cb31-68" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb31-69"><a href="#cb31-69" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fgs_small[i].array))</span>
-<span id="cb31-70"><a href="#cb31-70" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer: <span class="va">self</span>.events_start[i].record(stream)</span>
-<span id="cb31-71"><a href="#cb31-71" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device[i].upload(<span class="va">self</span>.frames[<span class="va">self</span>.i_writable_mem].array,stream)</span>
-<span id="cb31-72"><a href="#cb31-72" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frames_device[i], (cols_big,rows_big), <span class="va">self</span>.frames_device_big[i], stream<span class="op">=</span>stream)</span>
-<span id="cb31-73"><a href="#cb31-73" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frames_device_big[i], lr, stream, <span class="va">self</span>.fgs_device_big[i])</span>
-<span id="cb31-74"><a href="#cb31-74" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fgs_device_big[i], <span class="va">self</span>.fgs_device[i].size(), <span class="va">self</span>.fgs_device[i], stream<span class="op">=</span>stream)</span>
-<span id="cb31-75"><a href="#cb31-75" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device[i].download(stream, <span class="va">self</span>.fgs_small[i].array)</span>
-<span id="cb31-76"><a href="#cb31-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer: <span class="va">self</span>.events_stop[i].record(stream)</span>
-<span id="cb31-77"><a href="#cb31-77" aria-hidden="true" tabindex="-1"></a>        stream.queryIfComplete() <span class="co"># kick WDDM       </span></span>
-<span id="cb31-78"><a href="#cb31-78" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb31-79"><a href="#cb31-79" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
-<span id="cb31-80"><a href="#cb31-80" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames)</span>
-<span id="cb31-81"><a href="#cb31-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames[<span class="va">self</span>.i_writable_mem].array</span>
-<span id="cb31-82"><a href="#cb31-82" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb31-83"><a href="#cb31-83" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
-<span id="cb31-84"><a href="#cb31-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sync on last frames</span></span>
-<span id="cb31-85"><a href="#cb31-85" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">self</span>.sync <span class="op">==</span> SyncType.none):</span>
-<span id="cb31-86"><a href="#cb31-86" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb31-87"><a href="#cb31-87" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb31-88"><a href="#cb31-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
-<span id="cb31-89"><a href="#cb31-89" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="kw">not</span> <span class="va">self</span>.streams[<span class="va">self</span>.i_stream].queryIfComplete()):</span>
-<span id="cb31-90"><a href="#cb31-90" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams[<span class="va">self</span>.i_stream].waitForCompletion()</span>
-<span id="cb31-91"><a href="#cb31-91" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
-<span id="cb31-92"><a href="#cb31-92" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fgs_small[<span class="va">self</span>.i_stream].array))</span>
-<span id="cb31-93"><a href="#cb31-93" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.IncStream()        </span>
-<span id="cb31-94"><a href="#cb31-94" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb31-95"><a href="#cb31-95" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> FrameTimeMs(<span class="va">self</span>):</span>
-<span id="cb31-96"><a href="#cb31-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer:</span>
-<span id="cb31-97"><a href="#cb31-97" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.device_time<span class="op">/</span><span class="va">self</span>.n_frames</span>
-<span id="cb31-98"><a href="#cb31-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb31-99"><a href="#cb31-99" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="dv">0</span></span>
-<span id="cb31-100"><a href="#cb31-100" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb31-101"><a href="#cb31-101" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda6 <span class="op">=</span> ProcFrameCuda6(rows_small,cols_small,rows_big,cols_big,<span class="dv">2</span>,check_res,SyncType.soft)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <div class="cell" data-execution_count="85">
-<details open="">
+<details>
 <summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>gpu_time_6, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda6,lr)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 6 (multiple streams): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_5<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SyncType():</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    none <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    soft <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    hard <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProcFrameCuda6:</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,rows_small,cols_small,rows_big,cols_big,n_streams,store_res<span class="op">=</span><span class="va">False</span>,sync<span class="op">=</span>SyncType.soft,device_timer<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rows_small, <span class="va">self</span>.cols_small, <span class="va">self</span>.rows_big, <span class="va">self</span>.cols_big <span class="op">=</span> rows_small,cols_small,rows_big,cols_big</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_streams <span class="op">=</span> n_streams</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.store_res <span class="op">=</span> store_res        </span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sync <span class="op">=</span> sync</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2 <span class="op">=</span> cv.cuda.createBackgroundSubtractorMOG2()</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device <span class="op">=</span> []</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device_big <span class="op">=</span> []</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device_big <span class="op">=</span> []</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device <span class="op">=</span> []</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_small <span class="op">=</span> []   </span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.streams <span class="op">=</span> []</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames <span class="op">=</span> []</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.InitMem()</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.InitStreams()</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.res <span class="op">=</span> []</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_stream <span class="op">=</span> <span class="dv">0</span>        </span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_frames <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.device_timer <span class="op">=</span> device_timer</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer:</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_start <span class="op">=</span> []</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_stop <span class="op">=</span> []</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.InitEvents()</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.device_time <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitMem(<span class="va">self</span>):</span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames.append(PinnedMem((rows_small,cols_small,<span class="dv">3</span>)))</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames_device.append(cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC3))</span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.frames_device_big.append(cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC3))</span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_device_big.append(cv.cuda_GpuMat(rows_big,cols_big,cv.CV_8UC1))</span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_device.append(cv.cuda_GpuMat(rows_small,cols_small,cv.CV_8UC1))</span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fgs_small.append(PinnedMem((rows_small,cols_small)))</span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>                    </span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitStreams(<span class="va">self</span>):</span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams): </span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.sync <span class="op">==</span> SyncType.hard:</span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams.append(cv.cuda.Stream_Null())</span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="va">self</span>.sync <span class="op">==</span> SyncType.soft:</span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams.append(cv.cuda_Stream())</span>
+<span id="cb32-50"><a href="#cb32-50" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb32-51"><a href="#cb32-51" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> InitEvents(<span class="va">self</span>):</span>
+<span id="cb32-52"><a href="#cb32-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
+<span id="cb32-53"><a href="#cb32-53" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_start.append(cv.cuda_Event())</span>
+<span id="cb32-54"><a href="#cb32-54" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.events_stop.append(cv.cuda_Event()) </span>
+<span id="cb32-55"><a href="#cb32-55" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb32-56"><a href="#cb32-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> IncStream(<span class="va">self</span>):</span>
+<span id="cb32-57"><a href="#cb32-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_stream <span class="op">=</span> (<span class="va">self</span>.i_stream<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="va">self</span>.n_streams</span>
+<span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ProcessFrame(<span class="va">self</span>,lr):</span>
+<span id="cb32-60"><a href="#cb32-60" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_frames <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb32-61"><a href="#cb32-61" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="va">self</span>.i_stream</span>
+<span id="cb32-62"><a href="#cb32-62" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.IncStream()</span>
+<span id="cb32-63"><a href="#cb32-63" aria-hidden="true" tabindex="-1"></a>        stream <span class="op">=</span> <span class="va">self</span>.streams[i]</span>
+<span id="cb32-64"><a href="#cb32-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="va">self</span>.n_frames <span class="op">&gt;</span> <span class="va">self</span>.n_streams <span class="kw">and</span> <span class="va">self</span>.sync <span class="op">!=</span> SyncType.none):            </span>
+<span id="cb32-65"><a href="#cb32-65" aria-hidden="true" tabindex="-1"></a>            stream.waitForCompletion() <span class="co"># wait once both streams are used               </span></span>
+<span id="cb32-66"><a href="#cb32-66" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.device_timer:  <span class="va">self</span>.device_time <span class="op">+=</span> cv.cuda_Event.elapsedTime(<span class="va">self</span>.events_start[i],<span class="va">self</span>.events_stop[i])</span>
+<span id="cb32-67"><a href="#cb32-67" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb32-68"><a href="#cb32-68" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fgs_small[i].array))</span>
+<span id="cb32-69"><a href="#cb32-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer: <span class="va">self</span>.events_start[i].record(stream)</span>
+<span id="cb32-70"><a href="#cb32-70" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.frames_device[i].upload(<span class="va">self</span>.frames[<span class="va">self</span>.i_writable_mem].array,stream)</span>
+<span id="cb32-71"><a href="#cb32-71" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.frames_device[i], (cols_big,rows_big), <span class="va">self</span>.frames_device_big[i], stream<span class="op">=</span>stream)</span>
+<span id="cb32-72"><a href="#cb32-72" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bgmog2.<span class="bu">apply</span>(<span class="va">self</span>.frames_device_big[i], lr, stream, <span class="va">self</span>.fgs_device_big[i])</span>
+<span id="cb32-73"><a href="#cb32-73" aria-hidden="true" tabindex="-1"></a>        cv.cuda.resize(<span class="va">self</span>.fgs_device_big[i], <span class="va">self</span>.fgs_device[i].size(), <span class="va">self</span>.fgs_device[i], stream<span class="op">=</span>stream)</span>
+<span id="cb32-74"><a href="#cb32-74" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fgs_device[i].download(stream, <span class="va">self</span>.fgs_small[i].array)</span>
+<span id="cb32-75"><a href="#cb32-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer: <span class="va">self</span>.events_stop[i].record(stream)</span>
+<span id="cb32-76"><a href="#cb32-76" aria-hidden="true" tabindex="-1"></a>        stream.queryIfComplete() <span class="co"># kick WDDM       </span></span>
+<span id="cb32-77"><a href="#cb32-77" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-78"><a href="#cb32-78" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Frame(<span class="va">self</span>):</span>
+<span id="cb32-79"><a href="#cb32-79" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.i_writable_mem <span class="op">=</span> (<span class="va">self</span>.i_writable_mem <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="bu">len</span>(<span class="va">self</span>.frames)</span>
+<span id="cb32-80"><a href="#cb32-80" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.frames[<span class="va">self</span>.i_writable_mem].array</span>
+<span id="cb32-81"><a href="#cb32-81" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-82"><a href="#cb32-82" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Sync(<span class="va">self</span>):</span>
+<span id="cb32-83"><a href="#cb32-83" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sync on last frames</span></span>
+<span id="cb32-84"><a href="#cb32-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">self</span>.sync <span class="op">==</span> SyncType.none):</span>
+<span id="cb32-85"><a href="#cb32-85" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb32-86"><a href="#cb32-86" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-87"><a href="#cb32-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="va">self</span>.n_streams):</span>
+<span id="cb32-88"><a href="#cb32-88" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="kw">not</span> <span class="va">self</span>.streams[<span class="va">self</span>.i_stream].queryIfComplete()):</span>
+<span id="cb32-89"><a href="#cb32-89" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.streams[<span class="va">self</span>.i_stream].waitForCompletion()</span>
+<span id="cb32-90"><a href="#cb32-90" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="va">self</span>.store_res):</span>
+<span id="cb32-91"><a href="#cb32-91" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.res.append(np.copy(<span class="va">self</span>.fgs_small[<span class="va">self</span>.i_stream].array))</span>
+<span id="cb32-92"><a href="#cb32-92" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.IncStream()        </span>
+<span id="cb32-93"><a href="#cb32-93" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb32-94"><a href="#cb32-94" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> FrameTimeMs(<span class="va">self</span>):</span>
+<span id="cb32-95"><a href="#cb32-95" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.device_timer:</span>
+<span id="cb32-96"><a href="#cb32-96" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.device_time<span class="op">/</span><span class="va">self</span>.n_frames</span>
+<span id="cb32-97"><a href="#cb32-97" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb32-98"><a href="#cb32-98" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb32-99"><a href="#cb32-99" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb32-100"><a href="#cb32-100" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda6 <span class="op">=</span> ProcFrameCuda6(rows_small,cols_small,rows_big,cols_big,<span class="dv">2</span>,check_res,SyncType.soft)</span>
+<span id="cb32-101"><a href="#cb32-101" aria-hidden="true" tabindex="-1"></a>gpu_time_6, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda6,lr)</span>
+<span id="cb32-102"><a href="#cb32-102" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'GPU 6 (multiple streams): </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames, </span><span class="sc">{</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb32-103"><a href="#cb32-103" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Incremental speedup: </span><span class="sc">{</span>gpu_time_5<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb32-104"><a href="#cb32-104" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over GPU baseline: </span><span class="sc">{</span>gpu_time_0<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb32-105"><a href="#cb32-105" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Speedup over CPU: </span><span class="sc">{</span>cpu_time_1<span class="op">/</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>GPU 6 (multiple streams): 100 frames, 0.97 ms/frame
@@ -1342,7 +1333,7 @@ Speedup over CPU: 28.68</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_7.PNG" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Overlap host and device computation - multiple streams</figcaption>
 </figure>
 </div>
 </div>
@@ -1364,16 +1355,19 @@ Observations
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Hypothesis
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <p>If the above assumption is correct we should be able to see this effect by using device timers to get a more accurate value for the average device time.</p>
+</div>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -1402,20 +1396,19 @@ Next
 <section id="timing-without-the-profiler" class="level1">
 <h1>Timing without the profiler</h1>
 <div class="cell" data-execution_count="94">
-<details open="">
+<details>
 <summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#export</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda7 <span class="op">=</span> ProcFrameCuda6(rows_small,cols_small,rows_big,cols_big,<span class="dv">2</span>,check_res,SyncType.soft,<span class="va">True</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>ProcVid2(proc_frame_cuda7,lr)</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Mean times calculated over </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames:'</span>)</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to process each frame on the device: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to process each frame (host/device): </span><span class="sc">{</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Gain from memcpy/kernel overlap if device is saturated: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">-</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>hostTime, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda6, lr, <span class="va">True</span>)</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to read and decode each frame on the host: </span><span class="sc">{</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Total processing time host + device: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">+</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Gain from host/device overlap: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">+</span>hostTime <span class="op">-</span> gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Currently waisted time on host: </span><span class="sc">{</span>gpu_time_6<span class="op">-</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>proc_frame_cuda7 <span class="op">=</span> ProcFrameCuda6(rows_small,cols_small,rows_big,cols_big,<span class="dv">2</span>,check_res,SyncType.soft,<span class="va">True</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>ProcVid2(proc_frame_cuda7,lr)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Mean times calculated over </span><span class="sc">{</span>n_frames<span class="sc">}</span><span class="ss"> frames:'</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to process each frame on the device: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to process each frame (host/device): </span><span class="sc">{</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Gain from memcpy/kernel overlap if device is saturated: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">-</span>gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>hostTime, n_frames <span class="op">=</span> ProcVid2(proc_frame_cuda6, lr, <span class="va">True</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Time to read and decode each frame on the host: </span><span class="sc">{</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Total processing time host + device: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">+</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Gain from host/device overlap: </span><span class="sc">{</span>proc_frame_cuda7<span class="sc">.</span>FrameTimeMs()<span class="op">+</span>hostTime <span class="op">-</span> gpu_time_6<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'-&gt; Currently waisted time on host: </span><span class="sc">{</span>gpu_time_6<span class="op">-</span>hostTime<span class="sc">:.2f}</span><span class="ss"> ms/frame'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Mean times calculated over 100 frames:
@@ -1454,70 +1447,17 @@ Observations
 <p><a id="summary"></a></p>
 </section>
 </section>
-<section id="summary" class="level1">
-<h1>Summary</h1>
-<p>When calling OpenCV CUDA functions the most effective optimizations (in order of effectiveness/ease to implement) for this toy problem are given below. Whilst (1) will always be effective, the other optimizations will heavily depend on the CPU/GPU specifications, data size and the amount of processing which can be performed on the device before returning to the host. Therefore it is always beneficial to use a tool such as the Nvidia visual profiler to analyze your pipeline as you make changes. 1. Pre-allocate and pass all Numpy and/or GpuMat arrays (making sure they are the correct size) as function arguments to avoid them being allocated each time the function is called. 2. Try to design a processing pipeline which allows memory copies to overlap kernel calls and work to be performed on both the host and the device at the same time. 3. Use CUDA streams with pinned host memory and if you are working on windows consider calling <code>stream.queryIfComplete()</code> to force the WDDM driver to dispatch the CUDA calls. 4. Use multiple streams.</p>
-<p><a id="export"></a></p>
-<section id="run-outside-the-notebook" class="level3">
-<h3 class="anchored" data-anchor-id="run-outside-the-notebook">Run outside the notebook</h3>
-<div class="cell" data-execution_count="4">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># taken from https://github.com/fastai/fastai_docs/blob/master/dev_nb/notebook2script.py</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python notebook2script.py <span class="st">"opencv4-cuda-streams.ipynb"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Converted opencv4-cuda-streams.ipynb to exp\nb_opencv4-cuda-streams.py</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="9">
-<details open="">
-<summary>Expand to inspect the source code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span> python exp<span class="op">/</span>nb_opencv4<span class="op">-</span>cuda<span class="op">-</span>streams.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>CPU 0 (naive): 100 frames, 29.74 ms/frame
-GPU 0 (naive): 100 frames, 9.06 ms/frame
-Speedup over CPU: 3.28
-CPU 1 (pre-allocation): 100 frames, 27.59 ms/frame
-Speedup over CPU baseline: 1.08
-GPU 1 (pre-allocation): 100 frames, 1.93 ms/frame
-Incremental speedup: 4.69
-Speedup over CPU: 14.29
-GPU 2 (replacing the default stream): 100 frames, 1.82 ms/frame
-Incremental speedup: 1.06
-Speedup over GPU baseline: 4.99
-Speedup over CPU: 15.18
-GPU 3 (overlap host and device - attempt 1): 100 frames, 1.72 ms/frame
-Incremental speedup: 1.06
-Speedup over GPU baseline: 5.28
-Speedup over CPU: 16.06
-GPU 4 (overlap host and device - attempt 2): 100 frames, 1.72 ms/frame
-Incremental speedup: 1.00
-Speedup over GPU baseline: 5.27
-Speedup over CPU: 16.03
-GPU 5 (overlap host and device - attempt 3): 100 frames, 1.11 ms/frame
-Incremental speedup: 1.55
-Speedup over GPU baseline: 8.17
-Speedup over CPU: 24.88
-GPU 6 (multiple streams): 100 frames, 0.90 ms/frame
-Incremental speedup: 1.23
-Speedup over GPU baseline: 10.03
-Speedup over CPU: 30.54
-Mean times calculated over 100 frames:
-Time to process each frame on the device: 0.93 ms/frame
-Time to process each frame (host/device): 0.90 ms/frame
--&gt; Gain from memcpy/kernel overlap if device is saturated: 0.03 ms/frame
-Time to read and decode each frame on the host: 0.65 ms/frame
--&gt; Total processing time host + device: 1.58 ms/frame
--&gt; Gain from host/device overlap: 0.68 ms/frame
--&gt; Currently waisted time on host: 0.26 ms/frame
-[ INFO:0] global E:\Dev\Repos\opencv_fork_1\modules\videoio\src\videoio_registry.cpp (187) cv::`anonymous-namespace'::VideoBackendRegistry::VideoBackendRegistry VIDEOIO: Enabled backends(7, sorted by priority): FFMPEG(1000); GSTREAMER(990); INTEL_MFX(980); MSMF(970); DSHOW(960); CV_IMAGES(950); CV_MJPEG(940)</code></pre>
-</div>
-</div>
+<section id="results-and-suggested-optimization-strategies" class="level1">
+<h1>Results and suggested optimization strategies</h1>
+<p>When calling OpenCV CUDA functions the most effective optimizations (in order of effectiveness/ease to implement) for this toy problem are given below. Whilst (1) will always be effective, the other optimizations will heavily depend on the CPU/GPU specifications, data size and the amount of processing which can be performed on the device before returning to the host. Therefore it is always beneficial to use a tool such as the Nvidia visual profiler to analyze your pipeline as you make changes.</p>
+<ol type="1">
+<li>Pre-allocate and pass all Numpy and/or <code>GpuMat</code> arrays (making sure they are the correct size) as function arguments to avoid them being allocated each time the function is called.</li>
+<li>Try to design a processing pipeline which allows memory copies to overlap kernel calls and work to be performed on both the host and the device at the same time.</li>
+<li>Use CUDA streams with pinned host memory and if you are working on windows consider calling <code>stream.queryIfComplete()</code> to force the WDDM driver to dispatch the CUDA calls.</li>
+<li>Use multiple streams.</li>
+</ol>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

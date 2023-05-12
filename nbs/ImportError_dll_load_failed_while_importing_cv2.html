@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2023-05-12">
 
-<title>cudawarped - “ImportError: DLL load failed while importing cv2: The specified module could not be found.”</title>
+<title>cudawarped - ImportError: DLL load failed while importing cv2: The specified module could not be found.</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../imgs/profile_1-e1674474909304.webp" rel="icon">
+<link href="../imgs/favicon-32x32.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -95,7 +96,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="cudawarped - “ImportError: DLL load failed while importing cv2: The specified module could not be found.”">
+<meta property="og:title" content="cudawarped - ImportError: DLL load failed while importing cv2: The specified module could not be found.">
 <meta property="og:description" content="">
 <meta property="og:image" content="https://cudawarped.github.io/opencv-experiments/nbs/imgs/proc_mon_filter.png">
 <meta property="og:site-name" content="cudawarped">
@@ -103,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:image:width" content="1273">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -128,7 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target="">
+    <a class="nav-link active" href="../index.html" rel="" target="" aria-current="page">
  <span class="menu-text">OpenCV</span></a>
   </li>  
 </ul>
@@ -138,18 +139,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html">ImportError: DLL load failed…</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenCV Guides</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Build with CUDA and Python on Windows</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accelerate with CUDA streams in Python</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ImportError: DLL load failed…</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CUDA Performance Comparisson</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link active" data-scroll-target="#the-problem">The problem</a></li>
+  <li><a href="#fix-when-path-to-missing-dlls-is-known" id="toc-fix-when-path-to-missing-dlls-is-known" class="nav-link" data-scroll-target="#fix-when-path-to-missing-dlls-is-known">Fix when path to missing DLL’s is known</a></li>
+  <li><a href="#fix-when-path-to-missing-dlls-is-not-known" id="toc-fix-when-path-to-missing-dlls-is-not-known" class="nav-link" data-scroll-target="#fix-when-path-to-missing-dlls-is-not-known">Fix when path to missing DLL’s is not known</a>
+  <ul class="collapse">
+  <li><a href="#manually-adding-filter-entries" id="toc-manually-adding-filter-entries" class="nav-link" data-scroll-target="#manually-adding-filter-entries">Manually Adding Filter Entries</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">“ImportError: DLL load failed while importing cv2: The specified module could not be found.”</h1>
+<div class="quarto-title-block"><div><h1 class="title">ImportError: DLL load failed while importing cv2: The specified module could not be found.</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source" data-quarto-source-url="https://github.com/cudawarped/opencv-experiments/blob/master/nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -157,6 +218,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 12, 2023</p>
+    </div>
+  </div>
   
     
   </div>
@@ -164,15 +231,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<section id="the-problem" class="level1">
+<h1>The problem</h1>
 <p>If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling <code>import cv2</code>, this short guide should help solve your problem.</p>
-<p>The guide assumes that you have either installed the python bindings during the build process (<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">not recommended</a>) or manually copied <code>cv2.cp3x-win_amd64.pyd</code> to your distributions <code>site-packages</code> directory (e.g.&nbsp;<code>C:\Users\&lt;USER&gt;\mambaforge\Lib\site-packages</code>).</p>
-<p>So what’s the issue? Although the message is quite explicit regarding the cause, it doesn’t really help with finding a solution. In a nutshell python has found <code>cv2.cp3x-win_amd64.pyd</code>, tried and then failed to load it because a it can’t find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the <code>cv2.cp3x-win_amd64.pyd</code> and see which dependencies the system can’t find.</p>
+<p>The guide assumes that you have either installed the python bindings during the build process (<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">not recommended</a>) or manually copied <strong>cv2.cpxx-win_amd64.pyd</strong> to your distributions <strong>site-packages</strong> directory (e.g.&nbsp;<strong>C:\Users\&lt;USER&gt;\mambaforge\Lib\site-packages</strong>).</p>
+<p>So what’s the issue? Although the message is quite explicit regarding the cause, it doesn’t really help with finding a solution. In a nutshell python has found <strong>cv2.cpxx-win_amd64.pyd</strong>, tried and then failed to load it because a it can’t find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the <strong>cv2.cpxx-win_amd64.pyd</strong> and see which dependencies the system can’t find.</p>
 <p>Now this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll resolution), however we are not, so even if dependency walker can’t detect any problems we may still be facing the above error.</p>
 <p>The good news is there is an easy fix if you know where the missing DLL’s are and only slightly more involved if you don’t as long as you have access to the missing DLL’s on your system.</p>
-<section id="fix-when-path-to-missing-dlls-is-known" class="level2">
-<h2 class="anchored" data-anchor-id="fix-when-path-to-missing-dlls-is-known">Fix when path to missing DLL’s is known</h2>
-<p>To demonstrate the fix, I have built the OpenCV shared library and corresponding python bindings and manually copied them to the <code>site-packages</code> directory inside my python distribution (<code>C:\Users\b\mambaforge\Lib\site-packages</code>).</p>
-<p>As I have built a shared library the python bindings are dependant on <code>opencv_world470.dll</code> and I haven’t told python where they are I get the error shown below whenn trying to import them.</p>
+</section>
+<section id="fix-when-path-to-missing-dlls-is-known" class="level1">
+<h1>Fix when path to missing DLL’s is known</h1>
+<p>To demonstrate the fix, I have built the OpenCV shared library and corresponding python bindings and manually copied them to the <strong>site-packages</strong> directory inside my python distribution (<strong>C:\Users\b\mambaforge\Lib\site-packages</strong>).</p>
+<p>As I have built a shared library the python bindings are dependant on <strong>opencv_world470.dll</strong> and I haven’t told python where they are I get the error shown below whenn trying to import them.</p>
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
@@ -182,88 +252,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Given that I know the path to OpenCV’s shared libraries is required and I haven’t told python about it, the first thing to try is to add it to pythons DLL search path and see if that solves the problem.</p>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#os.add_dll_directory("D:\\build\\opencv\\4_7_0\\cuda_12_D\\bin")</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_0_cc_6_1_8_6_ff_scratch_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_0_cc_6_1_8_6_ff_scratch</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">3rd_party</span><span class="ch">\\</span><span class="st">deps</span><span class="ch">\\</span><span class="st">ffmpeg-n5.0-latest-win64-gpl-shared-5.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ahh the same error, what’s going on.</p>
+<p>In this case I also built OpenCV against the CUDA SDK so there is a good chance its missing DLL’s from there as well. I can try to fix the issue by simply adding the location of the CUDA SDK binaries to the python DLL search path as shown below.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
 </div>
-<p>Ahh the same error, what’s going on.</p>
-<p>In this case I also built OpenCV against the CUDA SDK so there is a good chance its missing DLL’s from there aswell. I can try to fix the issue by simply adding the location of the CUDA SDK binaries to the python DLL search path as shown below.</p>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This appears to have solved the issue, but its a good idea to examine the build information by calling <code>print(cv2.getBuildInformation())</code> just to double check I have loaded the right version of OpenCV.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv2.getBuildInformation())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>npMat <span class="op">=</span> (np.random.random((<span class="dv">129</span>, <span class="dv">128</span>, <span class="dv">3</span>)) <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cuMat <span class="op">=</span> cv.cuda_GpuMat()</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cuMat.upload(npMat)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(cuMat.cudaPtr() <span class="op">!=</span> <span class="dv">0</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>cuMatFromPtrSz <span class="op">=</span> cv.cuda.createGpuMatFromCudaMemory(cuMat.size(),cuMat.<span class="bu">type</span>(),cuMat.cudaPtr(), cuMat.step)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(cuMat.cudaPtr() <span class="op">==</span> cuMatFromPtrSz.cudaPtr())</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>cuMatFromPtrRc <span class="op">=</span> cv.cuda.createGpuMatFromCudaMemory(cuMat.size()[<span class="dv">1</span>],cuMat.size()[<span class="dv">0</span>],cuMat.<span class="bu">type</span>(),cuMat.cudaPtr(), cuMat.step)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(cuMat.cudaPtr() <span class="op">==</span> cuMatFromPtrRc.cudaPtr())</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>stream <span class="op">=</span> cv.cuda_Stream()</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(stream.cudaPtr() <span class="op">!=</span> <span class="dv">0</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>streamFromPtr <span class="op">=</span> cv.cuda.wrapStream(stream.cudaPtr())</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(stream.cudaPtr() <span class="op">==</span> streamFromPtr.cudaPtr())</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>asyncstream <span class="op">=</span> cv.cuda_Stream(<span class="dv">1</span>)  <span class="co"># cudaStreamNonBlocking</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(asyncstream.cudaPtr() <span class="op">!=</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-title-container flex-fill">
+Expand to see an example of the output from <code>print(cv2.getBuildInformation())</code>
 </div>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cuMatFromPtrRc.size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
-<pre><code>(129, 128)</code></pre>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-</div>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cv.cuda_GpuMat(<span class="dv">1</span>,<span class="dv">10</span>,<span class="dv">0</span>).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<pre><code>(10, 1)</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cuMat.size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
-<pre><code>(128, 129)</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">help</span>(cv2.cuda.wrapStream)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Help on built-in function wrapStream:
-
-wrapStream(...)
-    wrapStream(cudaStreamMemoryAddress) -&gt; retval
-    .   @brief Bindings overload to create a Stream object from the address stored in an existing CUDA Runtime API stream pointer (cudaStream_t).
-    .   
-    .   @param cudaStreamMemoryAddress Memory address stored in a CUDA Runtime API stream pointer (cudaStream_t). The created Stream object does not perform any allocation or deallocation and simply wraps existing raw CUDA Runtime API stream pointer.
-    .   
-    .   @note Overloaded for generation of bindings only, not exported or intended for use internally from C++.
-</code></pre>
-</div>
-</div>
-<p>This appears to have solved the issue, but its a good idea to examine the build information just to double check I have loaded the right version of OpenCV.</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv2.getBuildInformation())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-General configuration for OpenCV 4.7.0 =====================================
-  Version control:               4.7.0
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>General configuration for OpenCV 4.7.0-dev =====================================
+  Version control:               4.7.0-291-g47ae518c87
 
   Extra modules:
     Location (extra):            D:/repos/opencv/contrib/modules
-    Version control (extra):     4.7.0
+    Version control (extra):     4.7.0-42-ga42b8bef
 
   Platform:
-    Timestamp:                   2023-01-31T15:00:40Z
+    Timestamp:                   2023-03-21T15:46:23Z
     Host:                        Windows 10.0.22621 AMD64
     CMake:                       3.25.1
     CMake generator:             Ninja
     CMake build tool:            D:/bin/ninja/ninja.exe
     MSVC:                        1934
-    Configuration:               Debug
+    Configuration:               Release
 
   CPU/HW features:
     Baseline:                    SSE SSE2 SSE3
@@ -273,20 +304,20 @@ General configuration for OpenCV 4.7.0 =====================================
       SSE4_1 (18 files):         + SSSE3 SSE4_1
       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2
       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX
-      AVX (5 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
-      AVX2 (34 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
+      AVX (8 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
+      AVX2 (36 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX
 
   C/C++:
     Built as dynamic libs?:      YES
     C++ standard:                11
     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe  (ver 19.34.31937.0)
-    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /MD /O2 /Ob2 /DNDEBUG 
+    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /MD /O2 /Ob2 /DNDEBUG  /Zi
     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /MDd /Zi /Ob0 /Od /RTC1 
     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe
-    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /MD /O2 /Ob2 /DNDEBUG 
+    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /MD /O2 /Ob2 /DNDEBUG  /Zi
     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /MDd /Zi /Ob0 /Od /RTC1 
-    Linker flags (Release):      /machine:x64  /INCREMENTAL:NO 
+    Linker flags (Release):      /machine:x64  /INCREMENTAL:NO  /debug
     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL 
     ccache:                      NO
     Precompiled headers:         NO
@@ -294,17 +325,17 @@ General configuration for OpenCV 4.7.0 =====================================
     3rdparty dependencies:
 
   OpenCV modules:
-    To be built:                 aruco barcode bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
-    Disabled:                    -
+    To be built:                 aruco barcode bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode xfeatures2d ximgproc xobjdetect xphoto
+    Disabled:                    world
     Disabled by dependency:      -
-    Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
+    Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 sfm viz
     Applications:                tests perf_tests examples apps
-    Documentation:               NO
-    Non-free algorithms:         NO
+    Documentation:               doxygen python
+    Non-free algorithms:         YES
 
   Windows RT support:            NO
 
-  GUI: 
+  GUI:                           WIN32UI
     Win32 UI:                    YES
     OpenGL support:              YES (opengl32 glu32)
     VTK support:                 NO
@@ -326,12 +357,12 @@ General configuration for OpenCV 4.7.0 =====================================
 
   Video I/O:
     DC1394:                      NO
-    FFMPEG:                      YES (prebuilt binaries)
-      avcodec:                   YES (58.134.100)
-      avformat:                  YES (58.76.100)
-      avutil:                    YES (56.70.100)
-      swscale:                   YES (5.9.100)
-      avresample:                YES (4.0.0)
+    FFMPEG:                      YES (find_package)
+      avcodec:                   YES (59.18.100)
+      avformat:                  YES (59.16.100)
+      avutil:                    YES (57.17.100)
+      swscale:                   YES (6.4.100)
+      avresample:                NO
     GStreamer:                   NO
     DirectShow:                  YES
     Media Foundation:            YES
@@ -342,32 +373,33 @@ General configuration for OpenCV 4.7.0 =====================================
   Trace:                         YES (with Intel ITT)
 
   Other third-party libraries:
-    Intel IPP:                   2020.0.0 Gold [2020.0.0]
+    Intel IPP:                   2021.8 [2021.8.0]
            at:                   D:/build/opencv/4_7_0/cuda_12_D/3rdparty/ippicv/ippicv_win/icv
-    Intel IPP IW:                sources (2020.0.0)
+    Intel IPP IW:                sources (2021.8.0)
               at:                D:/build/opencv/4_7_0/cuda_12_D/3rdparty/ippicv/ippicv_win/iw
     Lapack:                      NO
     Eigen:                       NO
     Custom HAL:                  NO
     Protobuf:                    build (3.19.1)
+    Flatbuffers:                 builtin/3rdparty (23.5.9)
 
-  NVIDIA CUDA:                   YES (ver 12.0, CUFFT CUBLAS NVCUVID NVCUVENC FAST_MATH)
-    NVIDIA GPU arch:             50 52 60 61 70 75 80 86 89 90
-    NVIDIA PTX archs:            90
+  NVIDIA CUDA:                   YES (ver 12.0, CUFFT CUBLAS NVCUVID NVCUVENC)
+    NVIDIA GPU arch:             61 86
+    NVIDIA PTX archs:            86
 
-  cuDNN:                         YES (ver 8.7.0)
+  cuDNN:                         YES (ver 8.8.1)
 
   OpenCL:                        YES (NVD3D11)
     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
     Link libraries:              Dynamic load
 
   Python 3:
-    Interpreter:                 C:/Users/b/mambaforge/python.exe (ver 3.9.13)
-    Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.13)
-    numpy:                       C:/Users/b/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)
-    install path:                C:/Users/b/mambaforge/Lib/site-packages/cv2/python-3.9
+    Interpreter:                 C:/Users/b/mambaforge//python.exe (ver 3.9.16)
+    Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.16)
+    numpy:                       C:/Users/b/mambaforge//lib/site-packages/numpy/core/include (ver 1.23.5)
+    install path:                C:/Users/b/mambaforge//Lib/site-packages//cv2/python-3.9
 
-  Python (for build):            C:/Users/b/mambaforge/python.exe
+  Python (for build):            C:/Users/b/mambaforge//python.exe
 
   Java:                          
     ant:                         NO
@@ -375,26 +407,39 @@ General configuration for OpenCV 4.7.0 =====================================
     Java wrappers:               NO
     Java tests:                  NO
 
-  Install to:                    D:/build/opencv/4_7_0/cuda_12_0/install
------------------------------------------------------------------
-
-</code></pre>
+  Install to:                    D:/build/opencv/4_7_0/cuda_12_D/install
+-----------------------------------------------------------------</code></pre>
+</div>
 </div>
 </div>
 <p>That was easy but what can I do if I’m not as good at guessing what’s missing. Next I will use the same example again to demonstrate how to find out which DLL’s python is searching for.</p>
 </section>
-<section id="fix-when-path-to-missing-dlls-is-not-known" class="level2">
-<h2 class="anchored" data-anchor-id="fix-when-path-to-missing-dlls-is-not-known">Fix when path to missing dll’s is not known</h2>
+<section id="fix-when-path-to-missing-dlls-is-not-known" class="level1">
+<h1>Fix when path to missing DLL’s is not known</h1>
 <p>To find which DLL’s are missing we can use <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/procmon">process monitor</a> which will enable us to see the names of the DLL’s which python is trying to load.</p>
-<p>Process monitor by default has produces a significant amount of output so it is a good idea to filter out as much of this noise as you can. To do this you can either load <a href="https://github.com/cudawarped/opencv-experiments/raw/master/nbs/misc/ProcmonConfiguration.pmc">this filter</a> (as <a href="https://github.com/opencv/opencv/issues/23372#issuecomment-1476180498">suggested by LaurentBerger</a>) with “File-&gt;Import Configuration”, or manually add the filter entries on the “Process Monitor Filter” window, which is opened by default every time you launch the application, details below.</p>
-<p><strong>Manually Adding Filter Entries</strong></p>
-<p>Since we only want to view shared libaries which are accessed by the python.exe process, we can add the following filters to make our lives easier 1. Process Name -&gt; is -&gt; python.exe 2. Operation -&gt; is -&gt; CreateFile 3. Result -&gt; is -&gt; NAME NOT FOUND 4. Result -&gt; is -&gt; SUCCESS 5. Path -&gt; contains -&gt; .dll 6. Path -&gt; contains -&gt; .pyd (not striclty necessary, if this was missing the error would be “ModuleNotFoundError: No module named ‘cv2’” but its a shared library so why not)</p>
+<p>Process monitor by default has produces a significant amount of output so it is a good idea to filter out as much of this noise as you can. To do this you can either load <a href="https://github.com/cudawarped/opencv-experiments/raw/master/nbs/misc/ProcmonConfiguration.pmc">this filter</a> (as <a href="https://github.com/opencv/opencv/issues/23372#issuecomment-1476180498">suggested by LaurentBerger</a>) with <strong>“File-&gt;Import Configuration”</strong>, or manually add the filter entries on the <strong>“Process Monitor Filter”</strong> window, which is opened by default every time you launch the application, details below.</p>
+<section id="manually-adding-filter-entries" class="level2">
+<h2 class="anchored" data-anchor-id="manually-adding-filter-entries">Manually Adding Filter Entries</h2>
+<p>Since we only want to view shared libaries which are accessed by the python.exe process, we can add the following filters to make our lives easier:</p>
+<ol type="1">
+<li>Process Name -&gt; is -&gt; python.exe</li>
+<li>Operation -&gt; is -&gt; CreateFile</li>
+<li>Result -&gt; is -&gt; NAME NOT FOUND</li>
+<li>Result -&gt; is -&gt; SUCCESS</li>
+<li>Path -&gt; contains -&gt; .dll</li>
+<li>Path -&gt; contains -&gt; .pyd (not striclty necessary, if this was missing the error would be “ModuleNotFoundError: No module named ‘cv2’” but its a shared library so why not)</li>
+</ol>
 <p>Your filter should now resemble the below.</p>
-<p><img src="imgs/proc_mon_filter.png" class="img-fluid"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imgs/proc_mon_filter.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Process Monitor Filter</figcaption>
+</figure>
+</div>
 <p>Before continuing it is advisable to close any other python proceses as the output from these will pollute the main window.</p>
 <p>Now start python and before typing <code>import cv2</code>, press the clear button (red trash can) in process monitor to clear any output generated during python’s initialization.</p>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
@@ -402,15 +447,15 @@ General configuration for OpenCV 4.7.0 =====================================
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="imgs/proc_mon_failed_search_opencv.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Process Monitor failed to locate <strong>cv2.cp39-win_amd64.pyd</strong></figcaption>
 </figure>
 </div>
-<p>Because I have reset the python DLL search path on running <code>import cv2</code> I get the above output in process monitor which shows that we successfully found <code>cv2.cp3x-win_amd64.pyd</code> (otherwise we would see the “ModuleNotFoundError: No module named ‘cv2’” error) however it also shows several attempts have been made to locate <code>opencv_img_hash_470.dll</code> and <code>opencv_world470.dll</code> without success.</p>
+<p>Because I have reset the python DLL search path on running <code>import cv2</code> I get the above output in process monitor which shows that we successfully found <strong>cv2.cp39-win_amd64.pyd</strong> (otherwise we would see the “ModuleNotFoundError: No module named ‘cv2’” error) however it also shows several attempts have been made to locate <strong>opencv_img_hash_470.dll</strong> and <strong>opencv_world470.dll</strong> without success.</p>
 <p>As before we add the directory containing these to the python DLL search path.</p>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
@@ -418,12 +463,13 @@ General configuration for OpenCV 4.7.0 =====================================
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="imgs/proc_mon_failed_search_nvidia.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">title</figcaption>
+<figcaption class="figure-caption">Process Monitor failed to locate <strong>nppc64_12.dll</strong></figcaption>
 </figure>
 </div>
-<p>Now process monitor shows that <code>opencv_img_hash_470.dll</code> and <code>opencv_world470.dll</code> were located successfully after a few attempts however we are missing <code>nppc64_12.dll</code> which is part of the CUDA SDK. As before if we add the CUDA SDK binary directory to the python DLL search path the call to <code>import cv2</code> will be successful. If however we were still seeing the same error we could simply repeat the process, that is examine the output in process monitor and add the directories containing the missing DLL’s to the python DLL search path.</p>
+<p>Now process monitor shows that <strong>opencv_img_hash_470.dll</strong> and <strong>opencv_world470.dll</strong> were located successfully after a few attempts however we are missing <strong>nppc64_12.dll</strong> which is part of the CUDA SDK. As before if we add the CUDA SDK binary directory to the python DLL search path the call to <code>import cv2</code> will be successful. If however we were still seeing the same error we could simply repeat the process, that is examine the output in process monitor and add the directories containing the missing DLL’s to the python DLL search path.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -506,6 +552,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
@@ -678,4 +775,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></div></div></footer></body></html>
+</body></html>

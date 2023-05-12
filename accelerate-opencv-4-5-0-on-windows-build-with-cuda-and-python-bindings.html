@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>cudawarped - OpenCV Guides</title>
+<title>cudawarped – accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./imgs/favicon-32x32.png" rel="icon" type="image/png">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -61,41 +59,8 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<meta property="og:title" content="cudawarped - OpenCV Guides">
-<meta property="og:site-name" content="cudawarped">
 </head>
 
 <body class="nav-fixed">
@@ -142,134 +107,13 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content column-page" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">OpenCV Guides</h1>
-</div>
+
+
+<p>accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings/</p>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1519768800000" data-listing-file-modified-sort="1683885438582" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
-<div class="thumbnail">
-<p><a href="./opencv_cuda_performance.html"> <p class="card-img-top"><img src="imgs\gpu_spec-2.webp"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./opencv_cuda_performance.html">
-<h3 class="no-anchor listing-title">
-OpenCV CUDA Performance Comparisson (Nvidia vs Intel)
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./opencv_cuda_performance.html">
-<div class="listing-date">
-Feb 28, 2018
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-listing-date-sort="1569963600000" data-listing-file-modified-sort="1683898071894" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16">
-<div class="thumbnail">
-<p><a href="./nbs/opencv4-cuda-streams.html"> <p class="card-img-top"><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_1.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./nbs/opencv4-cuda-streams.html">
-<h3 class="no-anchor listing-title">
-Accelerating OpenCV with Python and CUDA streams
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Since…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./nbs/opencv4-cuda-streams.html">
-<div class="listing-date">
-Oct 2, 2019
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-listing-date-sort="1683838800000" data-listing-file-modified-sort="1683894708579" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17">
-<div class="thumbnail">
-<p><a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html"> <p class="card-img-top"><img src="nbs\imgs\proc_mon_filter.png"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html">
-<h3 class="no-anchor listing-title">
-ImportError: DLL load failed while importing cv2: The specified module could not be found.
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling <code>import cv2</code>, this…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html">
-<div class="listing-date">
-May 12, 2023
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-listing-date-sort="1683838800000" data-listing-file-modified-sort="1683885454412" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="39">
-<div class="thumbnail">
-<p><a href="./accelerate_opencv_cuda_python.html"> <p class="card-img-top"><img src="imgs\opencv_cuda_intel.webp"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./accelerate_opencv_cuda_python.html">
-<h3 class="no-anchor listing-title">
-Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Because the pre-built Windows libraries available for OpenCV do not include the CUDA modules, or support for the Nvidia Video Codec SDK or cuDNN, I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./accelerate_opencv_cuda_python.html">
-<div class="listing-date">
-May 12, 2023
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
