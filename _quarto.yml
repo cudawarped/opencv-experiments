@@ -1,7 +1,5 @@
 project:
   type: website
-  resources:
-    - CNAME
   render:
     - "nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"
     - nbs\opencv4-cuda-streams.ipynb
@@ -16,7 +14,8 @@ website:
   favicon: imgs\favicon-32x32.png
   back-to-top-navigation: true
   google-analytics: "UA-106782659-2"
-  
+  resources:
+    - CNAME
   open-graph: true
   navbar:
     tools:
