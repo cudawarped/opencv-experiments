@@ -1,1 +1,1 @@
-Sitemap: https://cudawarped.github.io/opencv-experiments/sitemap.xml
+Sitemap: https://www.jamesbowley.co.uk/sitemap.xml
