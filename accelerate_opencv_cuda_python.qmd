@@ -4,6 +4,8 @@ toc: true
 date: 05/12/23
 aliases:
   - accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html
+  - build-opencv-with-cuda-in-windows.html
+  - accelerating-opencv-4-build-with-cuda-intel-mkl-tbb-and-python-bindings
 #highlight-style: arrow
 #code-block-border-left: true
 #code-block-border-left: "#31BAE9"
@@ -17,7 +19,7 @@ aliases:
 
 Because the pre-built [Windows libraries](https://github.com/opencv/opencv/releases) available for [OpenCV](https://opencv.org/releases) do not include the [CUDA modules](https://docs.opencv.org/4.x/d1/d1e/group__cuda.html), or support for the Nvidia [Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) or [cuDNN](https://developer.nvidia.com/cudnn), I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV shared libraries with Visual Studio, [CUDA](https://developer.nvidia.com/cuda-toolkit/whatsnew) (optionally the [Nvidia Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) and [cuDNN](https://developer.nvidia.com/cudnn)), and bindings for accessing the OpenCV CUDA modules from within Python.
 
-If you just need the Windows libraries or a Python Wheelt take a look at [OpenCV C++ CUDA Builds](https://github.com/cudawarped/opencv_contrib/releases) and/or [OpenCV python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) to see if there is a pre-built version suitable for your setup.
+If you just need the Windows libraries or a Python wheele take a look at [OpenCV C++ CUDA builds](https://github.com/cudawarped/opencv_contrib/releases) and/or [OpenCV Python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) to see if there is a pre-built version suitable for your setup.
 
 To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in [OpenCV CUDA Performance Comparisson (Nvidia vs Intel)](opencv_cuda_performance.qmd).
 
@@ -27,7 +29,7 @@ To see if building the OpenCV CUDA modules is suitable for your application you 
 
 1. This guide assumes you are building the latest stable release of OpenCV against the most recent CUDA dependencies.  Whilst the instructions can also work on older versions, this is not guaranteed so please update to the latest stable releases before raising any issues.
 
-2. If you just need the OpenCV binaries or a Python Wheel which includes the CUDA modules, check <a href="https://github.com/cudawarped/opencv_contrib/releases" target="_blank" rel="noopener noreferrer">OpenCV C++ CUDA Builds</a> and/or [OpenCV python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) first to see if they are available for your desired combination of OpenCV and CUDA.
+2. If you just need the OpenCV binaries or a Python wheel which includes the CUDA modules, check <a href="https://github.com/cudawarped/opencv_contrib/releases" target="_blank" rel="noopener noreferrer">OpenCV C++ CUDA builds</a> and/or [OpenCV Python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) first to see if they are available for your desired combination of OpenCV and CUDA.
 
 3. If you have previously built and/or are trying to manually install the Python bindings and are facing errors check out the [troubleshooting Python bindings installation issues](#troubleshooting-python-bindings-installation-issues) and [manually installing OpenCV Python bindings](#manually-installing-opencv-python-bindings) sections first.
 

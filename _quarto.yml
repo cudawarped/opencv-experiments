@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - CNAME
   render:
     - "nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"
     - nbs\opencv4-cuda-streams.ipynb
@@ -12,6 +14,8 @@ website:
   repo-url: https://github.com/cudawarped/opencv-experiments/
   repo-actions: [issue]
   favicon: imgs\favicon-32x32.png
+  back-to-top-navigation: true
+  google-analytics: "UA-106782659-2"
   
   open-graph: true
   navbar:
@@ -28,6 +32,13 @@ website:
       #  file: index.qmd
       - text: "OpenCV"
         file: index.qmd
+      - text: "Downloads"
+        menu:
+          - text: OpenCV Python CUDA wheels
+            href: https://github.com/cudawarped/opencv-python-cuda-wheels/releases
+          - text: OpenCV C++ CUDA builds 
+            href: https://github.com/cudawarped/opencv-python-cuda-wheels/releases
+      #    - https://github.com/cudawarped/opencv-python-cuda-wheels/releases
       #- text: "How-To"
       #  file: howto.qmd
 
