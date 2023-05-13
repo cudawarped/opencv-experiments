@@ -165,19 +165,19 @@
     "href": "index.html",
     "title": "OpenCV Guides",
     "section": "",
-    "text": "ImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nOpenCV CUDA Performance Comparisson (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "ImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nOpenCV CUDA Performance Comparison (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "opencv_cuda_performance.html",
     "href": "opencv_cuda_performance.html",
-    "title": "OpenCV CUDA Performance Comparisson (Nvidia vs Intel)",
+    "title": "OpenCV CUDA Performance Comparison (Nvidia vs Intel)",
     "section": "",
     "text": "In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which OpenCV and/or Computer Vision algorithms, in general, benefit the most from GPU acceleration, and therefore, under what circumstances it might be a good idea to invest in a GPU."
   },
   {
     "objectID": "opencv_cuda_performance.html#gpu-specifications",
     "href": "opencv_cuda_performance.html#gpu-specifications",
-    "title": "OpenCV CUDA Performance Comparisson (Nvidia vs Intel)",
+    "title": "OpenCV CUDA Performance Comparison (Nvidia vs Intel)",
     "section": "GPU specifications",
     "text": "GPU specifications\nThe GPU’s tested comprise three different micro-architectures, ranging from a low end laptop (730m) to a mid range desktop (GTX 1060) GPU. The full specifications are shown below, where I have also included the maximum theoretical speedup, if the OpenCV function were bandwidth or compute limited. This value is just included to give an indication of what should be possible if architectural improvements, SM count etc. don’t have any impact on performance. In “general” most algorithms will be bandwidth limited implying that the average speed up of the OpenCV functions could be somewhere between these two values. If you are not familiar with this concept then I would recommend watching Memory Bandwidth Bootcamp: Best Practices, Memory Bandwidth Bootcamp: Beyond Best Practices and Memory Bandwidth Bootcamp: Collaborative Access Patterns by Tony Scudiero for a good overview."
   },
@@ -186,7 +186,7 @@
     "href": "tutorials.html",
     "title": "OpenCV Guides",
     "section": "",
-    "text": "OpenCV CUDA Performance Comparisson (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "OpenCV CUDA Performance Comparison (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "tutorials1.html",
