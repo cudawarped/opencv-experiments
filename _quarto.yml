@@ -93,5 +93,3 @@ format:
     toc: false
     link-external-newwindow: true
     link-external-icon: false
-    resources:
-      - CNAME
