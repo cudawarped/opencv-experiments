@@ -95,6 +95,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-106782659-2', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
 
 <meta property="og:title" content="cudawarped - Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows">
 <meta property="og:description" content="">
@@ -130,6 +144,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
  <span class="menu-text">OpenCV</span></a>
   </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-downloads" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Downloads</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-downloads">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV Python CUDA wheels</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV C++ CUDA builds</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <div class="quarto-navbar-tools ms-auto">
     <a href="https://github.com/cudawarped" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
@@ -250,7 +279,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="why-manually-build-opencv" class="level1">
 <h1>Why manually build OpenCV?</h1>
 <p>Because the pre-built <a href="https://github.com/opencv/opencv/releases">Windows libraries</a> available for <a href="https://opencv.org/releases">OpenCV</a> do not include the <a href="https://docs.opencv.org/4.x/d1/d1e/group__cuda.html">CUDA modules</a>, or support for the Nvidia <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Video Codec SDK</a> or <a href="https://developer.nvidia.com/cudnn">cuDNN</a>, I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV shared libraries with Visual Studio, <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew">CUDA</a> (optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Nvidia Video Codec SDK</a> and <a href="https://developer.nvidia.com/cudnn">cuDNN</a>), and bindings for accessing the OpenCV CUDA modules from within Python.</p>
-<p>If you just need the Windows libraries or a Python Wheelt take a look at <a href="https://github.com/cudawarped/opencv_contrib/releases">OpenCV C++ CUDA Builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV python CUDA wheels</a> to see if there is a pre-built version suitable for your setup.</p>
+<p>If you just need the Windows libraries or a Python wheele take a look at <a href="https://github.com/cudawarped/opencv_contrib/releases">OpenCV C++ CUDA builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV Python CUDA wheels</a> to see if there is a pre-built version suitable for your setup.</p>
 <p>To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in <a href="./opencv_cuda_performance.html">OpenCV CUDA Performance Comparisson (Nvidia vs Intel)</a>.</p>
 </section>
 <section id="pre-build-checklist" class="level1">
@@ -258,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Before continuing there are a few things to be aware of:</strong></p>
 <ol type="1">
 <li><p>This guide assumes you are building the latest stable release of OpenCV against the most recent CUDA dependencies. Whilst the instructions can also work on older versions, this is not guaranteed so please update to the latest stable releases before raising any issues.</p></li>
-<li><p>If you just need the OpenCV binaries or a Python Wheel which includes the CUDA modules, check <a href="https://github.com/cudawarped/opencv_contrib/releases" target="_blank" rel="noopener noreferrer">OpenCV C++ CUDA Builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV python CUDA wheels</a> first to see if they are available for your desired combination of OpenCV and CUDA.</p></li>
+<li><p>If you just need the OpenCV binaries or a Python wheel which includes the CUDA modules, check <a href="https://github.com/cudawarped/opencv_contrib/releases" target="_blank" rel="noopener noreferrer">OpenCV C++ CUDA builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV Python CUDA wheels</a> first to see if they are available for your desired combination of OpenCV and CUDA.</p></li>
 <li><p>If you have previously built and/or are trying to manually install the Python bindings and are facing errors check out the <a href="#troubleshooting-python-bindings-installation-issues">troubleshooting Python bindings installation issues</a> and <a href="#manually-installing-opencv-python-bindings">manually installing OpenCV Python bindings</a> sections first.</p></li>
 <li><p>If you already have the OpenCV source and the required dependencies and are just looking for the CMake flags they can be found <a href="#opencv-cuda-python-windows-cmake-flags">here</a>.</p></li>
 </ol>
@@ -745,7 +774,7 @@ directory on installation. This can easily be resolved by creating the <strong>p
 </section>
 </section>
 
-</main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -95,6 +95,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-106782659-2', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
 
 <meta property="og:title" content="cudawarped - Accelerating OpenCV with Python and CUDA streams">
 <meta property="og:description" content="">
@@ -130,6 +144,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link active" href="../index.html" rel="" target="" aria-current="page">
  <span class="menu-text">OpenCV</span></a>
   </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-downloads" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Downloads</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-downloads">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV Python CUDA wheels</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV C++ CUDA builds</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <div class="quarto-navbar-tools ms-auto">
     <a href="https://github.com/cudawarped" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
@@ -622,19 +651,19 @@ Hypothesis
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="1" data-code-annotation="1">asynchronous kernel 1</span>
+<span data-code-lines="1" data-code-annotation="1" data-code-cell="annotated-cell-1">asynchronous kernel 1</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="2">asynchronous kernel 2</span>
+<span data-code-lines="3" data-code-annotation="2" data-code-cell="annotated-cell-1">asynchronous kernel 2</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="3">asynchronous kernel 3</span>
+<span data-code-lines="5" data-code-annotation="3" data-code-cell="annotated-cell-1">asynchronous kernel 3</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="4">synchronous copy from device to host</span>
+<span data-code-lines="7" data-code-annotation="4" data-code-cell="annotated-cell-1">synchronous copy from device to host</span>
 </dd>
 </dl>
 </div>
@@ -1460,7 +1489,7 @@ Observations
 
 </section>
 
-</main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
