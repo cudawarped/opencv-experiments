@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2018-02-28">
 
-<title>cudawarped - OpenCV Guides</title>
+<title>cudawarped - OpenCV CUDA Performance Comparison (Nvidia vs Intel)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,30 +21,62 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./imgs/favicon-32x32.png" rel="icon" type="image/png">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../imgs/favicon-32x32.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -63,35 +96,6 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
 <script type="text/javascript">
 
@@ -108,10 +112,10 @@ ga('send', {
 </script>
 <style>html{ scroll-behavior: smooth; }</style>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta property="og:title" content="cudawarped - OpenCV Guides">
+<meta property="og:title" content="cudawarped - OpenCV CUDA Performance Comparison (Nvidia vs Intel)">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://www.jamesbowley.co.uk/imgs/gpu_spec-2.webp">
 <meta property="og:site-name" content="cudawarped">
 </head>
 
@@ -122,10 +126,10 @@ ga('send', {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./imgs\profile_1-e1674474909304.webp" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../imgs\profile_1-e1674474909304.webp" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">cudawarped</span>
     </a>
   </div>
@@ -136,11 +140,11 @@ ga('send', {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./qmd/about.html" rel="" target="">
+    <a class="nav-link" href="../qmd/about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+    <a class="nav-link active" href="../index.html" rel="" target="" aria-current="page">
  <span class="menu-text">OpenCV</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -171,7 +175,7 @@ ga('send', {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">OpenCV Guides</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../qmd/opencv_cuda_performance.html">CUDA Performance Comparisson</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -185,31 +189,31 @@ ga('send', {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">OpenCV Guides</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./qmd/accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link">
+  <a href="../qmd/accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Build with CUDA and Python on Windows</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
+  <a href="../nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Accelerate with CUDA streams in Python</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
+  <a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ImportError: DLL load failed…</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./qmd/opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
+  <a href="../qmd/opencv_cuda_performance.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">CUDA Performance Comparisson</span></a>
   </div>
 </li>
@@ -218,13 +222,27 @@ ga('send', {
 </nav>
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#test-setup" id="toc-test-setup" class="nav-link" data-scroll-target="#test-setup">Test setup</a>
+  <ul class="collapse">
+  <li><a href="#gpu-specifications" id="toc-gpu-specifications" class="nav-link" data-scroll-target="#gpu-specifications">GPU specifications</a></li>
+  </ul></li>
+  <li><a href="#cpu-specifications" id="toc-cpu-specifications" class="nav-link" data-scroll-target="#cpu-specifications">CPU specifications</a></li>
+  <li><a href="#benchmark-results" id="toc-benchmark-results" class="nav-link" data-scroll-target="#benchmark-results">Benchmark results</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">OpenCV Guides</h1>
+<h1 class="title">OpenCV CUDA Performance Comparison (Nvidia vs Intel)</h1>
 </div>
 
 
@@ -232,6 +250,12 @@ ga('send', {
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 28, 2018</p>
+    </div>
+  </div>
   
     
   </div>
@@ -239,117 +263,76 @@ ga('send', {
 
 </header>
 
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which OpenCV and/or Computer Vision algorithms, in general, benefit the most from GPU acceleration, and therefore, under what circumstances it might be a good idea to invest in a GPU.</p>
+</section>
+<section id="test-setup" class="level1 page-columns page-full">
+<h1>Test setup</h1>
+<ul>
+<li><p><strong>Software</strong>: OpenCV 3.4 compiled on Visual Studio 2017 with CUDA 9.1, Intel MKL with TBB, and TBB. To generate the CPU results I simply ran the CUDA performance tests with CUDA disabled, so that the fall back CPU functions were called, by changing the following</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PERF_RUN_CUDA</span><span class="op">()</span><span class="pp">  </span><span class="op">:</span>perf<span class="op">::</span>GpuPerf<span class="op">::</span>targetDevice<span class="op">()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>to</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define PERF_RUN_CUDA</span><span class="op">()</span><span class="pp">  </span><span class="kw">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>in <a href="https://github.com/opencv/opencv/blob/6d4f66472e14b29b8e1623859cfebfdc67f677c3/modules/ts/include/opencv2/ts/ts_perf.hpp#L228">modules\ts\include\opencv2\ts\ts_perf.hpp</a>.</p>
+<p>The performance tests cover 104 of the OpenCV functions, with each function being tested for a number of different configurations (function arguments). The total number of different CUDA performance configurations/tests which run successfully are 6031, of which only 5300 configurations are supported by both the GPU and CPU.</p></li>
+<li><p><strong>Hardware</strong>: Four different hardware configurations were tested, consisting of 3 laptops and 1 desktop, the CPU/GPU combinations are listed below:</p>
+<ol type="1">
+<li>CPU: <a href="https://ark.intel.com/products/81016/Intel-Core-i5-4210U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-4120U</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gt-730m" rel="noopener" target="_blank">730m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/85212/Intel-Core-i5-5200U-Processor-3M-Cache-up-to-2_70-GHz" rel="noopener" target="_blank">i5-5200U</a>, GPU: <a href="https://www.geforce.com/hardware/notebook-gpus/geforce-840m" rel="noopener" target="_blank">840m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/88967/Intel-Core-i7-6700HQ-Processor-6M-Cache-up-to-3_50-GHz" rel="noopener" target="_blank">i7-6700HQ</a>, GPU: <a href="https://www.geforce.co.uk/hardware/notebook-gpus/geforce-gtx-980m" rel="noopener" target="_blank">GTX 980m</a> (laptop)</li>
+<li>CPU: <a href="https://ark.intel.com/products/88184/Intel-Core-i5-6500-Processor-6M-Cache-up-to-3_60-GHz" rel="noopener" target="_blank">i5-6500</a>, GPU: <a href="https://www.geforce.co.uk/hardware/10series/geforce-gtx-1060/" rel="noopener" target="_blank">GTX 1060</a> (desktop)</li>
+</ol></li>
+</ul>
+<section id="gpu-specifications" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="gpu-specifications">GPU specifications</h2>
+<p>The GPU’s tested comprise three different micro-architectures, ranging from a low end laptop (730m) to a mid range desktop (GTX 1060) GPU. The full specifications are shown below, where I have also included the maximum theoretical speedup, if the OpenCV function were bandwidth or compute limited. This value is just included to give an indication of what should be possible if architectural improvements, SM count etc. don’t have any impact on performance. In “general” most algorithms will be bandwidth limited implying that the average speed up of the OpenCV functions could be somewhere between these two values. If you are not familiar with this concept then I would recommend watching <a href="http://on-demand.gputechconf.com/gtc/2015/video/S5353.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Best Practices</a>, <a href="http://on-demand.gputechconf.com/gtc/2015/video/S5376.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Beyond Best Practices</a> and <a href="http://on-demand.gputechconf.com/gtc/2016/video/S6181.html" rel="noopener" target="_blank">Memory Bandwidth Bootcamp: Collaborative Access Patterns</a> by <a href="https://www.linkedin.com/in/tscudiero" rel="noopener" target="_blank">Tony Scudiero</a> for a good overview.</p>
+<div class="column-screen">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=1232846262&amp;single=true" data-fig-align="center"><img src="../imgs/gpu_spec-2.webp" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="cpu-specifications" class="level1 page-columns page-full">
+<h1>CPU specifications</h1>
+<p>The CPU’s tested also comprise three different micro-architectures, ranging from a low end laptop dual core (i5-4120U) to a mid range desktop quad core (i5-6500) CPU. The full specifications are shown below, where I have again included the maximum theoretical speedup depending on whether the OpenCV functions are limited by the CPU bandwidth or clock speed (I could not find any Intel published GFLOPS information).</p>
+<div class="column-screen">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=921370251&amp;single=true" data-fig-align="center"><img src="../imgs/cpu_spec-2.webp" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="benchmark-results" class="level1">
+<h1>Benchmark results</h1>
+<p>The results for all tests are available <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubhtml?gid=0&amp;single=true">here</a>, where you can check if a specific configuration benefits from an improvement in performance when moved to the GPU.</p>
+To get an overall picture of the performance increase which can be achieved from using the CUDA functions over the standard CPU ones, the speedup of each CPU/GPU over the least powerful CPU (i5_4210U), is compared. The below figure shows the speedup averaged over all 5300 tests (All Configs). Because the average speedup is influenced by the number of different configurations tested per OpenCV function, two additional measures are also shown (which only consider one configuration per function) on the below figure:
+<ul>
+<li>
+GPU Min - the average speedup, taken over all OpenCV functions for the configuration where the GPU speedup was smallest.
+</li>
+<li>
+GPU Max - the average speedup, taken over all OpenCV functions for the configuration where the GPU speedup was greatest.
+</li>
+</ul>
+<p><a id="average_perf_increase"></a> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=396876054&amp;format=interactive" rel="noopener" target="_blank"><img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=396876054&amp;format=image" alt=""></a></p>
+<p>The results demonstrate that the configuration (function arguments), makes a massive difference to the CPU/GPU performance. That said even the slowest configurations on the slowest GPU’s are in the same ball park, performance wise, as the fastest configurations on the most powerful CPU’s in the test. This combined with a higher average performance for all GPU’s tested, implies that you should nearly always see an improvement when moving to the GPU, if you have several OpenCV functions in your pipeline (as long as you don’t keep moving your data to and from the GPU), even if you are using a low end two generation old laptop GPU (730m).</p>
+<p>Now lets examine some individual OpenCV functions. Because each function has many configurations, for each function the average execution time over all configurations tested, is used to calculate the speedup over the i5-4120U. This will provides a guide to the expected performance of a function irrespective of the specific configuration. The next figure shows the top 20 functions where the GPU speedup, was largest. It is worth noting that the speedup of the GTX 1060 over all of the CPU’s is so large that it has to be shown on a log scale. <a id="top_20"></a> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=1721545249&amp;format=interactive" rel="noopener" target="_blank"><img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=1721545249&amp;format=image" alt="" class="alignnone size-full wp-image-547"></a></p>
+<p><a id="bottom_20"></a> Next, the bottom 20 functions where the GPU speedup, was smallest. <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=289329247&amp;format=interactive" rel="noopener" target="_blank"><img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=289329247&amp;format=image" alt="" class="alignnone size-full wp-image-547"></a></p>
+<p>The above figure demonstrates that, although the CUDA implementations are on average much quicker, some functions are significantly quicker on the CPU. Generally this is due to the function using the Intel Integrated Performance Primitives for Image processing and Computer Vision (<a href="https://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-open-source-computer-vision-library-opencv-faq" rel="noopener" target="_blank">IPP-ICV</a>) and/or <a href="https://en.wikipedia.org/wiki/SIMD" rel="noopener" target="_blank">SIMD</a> instructions. That said the above results also show, that some of these slower functions, do benefit from the parallelism of the GPU, but a more powerful GPU is required to leverage this.</p>
+<p>Finally lets examine which OpenCV functions took the longest. This is importanti f you are using one of these functions, as you may consider calling its CUDA counterpart, even if it is the only OpenCV function you need. The below figure contains the execution time for the 20 functions which took the longest on the i5-4120U, again this has to be shown on a log scale because the GPU execution time is much smaller than the CPU execution time.</p>
+<p><a id="slowest"></a> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=675587392&amp;format=interactive" rel="noopener" target="_blank"><img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTpHmM6T6sCkJUrr6UEVX2V9MRPUs-oD_z979UiGEixOmLaF1qZez_H3EWC96XYXuf4_i2WlhM0g-rz/pubchart?oid=675587392&amp;format=image" alt="" class="alignnone size-full wp-image-547"></a></p>
+<p>Given the possible performance increases shown in the results, if you were performing mean shift filtering with OpenCV, on a laptop with only low end i5-4120U, the execution time of nearly 7 seconds may encourage you to upgrade your hardware. From the above it is clear that it is much better to invest in a tiny GPU (730m) which will reduce your processing time by a factor of 10 to a more tolerable 0.6 seconds, or a mid range GPU (GTX 1060), reducing your processing time by a factor of 100 to 0.07 seconds, rather than a mid range i7 which will give you less than a 30% reduction.</p>
+<p>To conclude I would just reiterate that, the benefit you will get from moving your processing to the GPU with OpenCV will depend on the function you call and configuration that you use, in addition to your processing pipeline. That said from, what I have observed, on average the CUDA functions are much much quicker than their CPU counterparts. Please let me know if there are any mistakes in my results and/or analysis.</p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1683838800000" data-listing-file-modified-sort="1683918149752" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17">
-<div class="thumbnail">
-<p><a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html"> <p class="card-img-top"><img src="nbs\imgs\proc_mon_filter.png"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html">
-<h3 class="no-anchor listing-title">
-ImportError: DLL load failed while importing cv2: The specified module could not be found.
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling <code>import cv2</code>, this…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./nbs/ImportError_dll_load_failed_while_importing_cv2.html">
-<div class="listing-date">
-May 12, 2023
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-listing-date-sort="1683838800000" data-listing-file-modified-sort="1684043017253" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="39">
-<div class="thumbnail">
-<p><a href="./qmd/accelerate_opencv_cuda_python.html"> <p class="card-img-top"><img src="imgs\opencv_cuda_intel.webp"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./qmd/accelerate_opencv_cuda_python.html">
-<h3 class="no-anchor listing-title">
-Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Because the pre-built Windows libraries available for OpenCV do not include the CUDA modules, or support for the Nvidia Video Codec SDK or cuDNN, I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./qmd/accelerate_opencv_cuda_python.html">
-<div class="listing-date">
-May 12, 2023
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-listing-date-sort="1569963600000" data-listing-file-modified-sort="1683997804165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16">
-<div class="thumbnail">
-<p><a href="./nbs/opencv4-cuda-streams.html"> <p class="card-img-top"><img src="https://raw.githubusercontent.com/cudawarped/opencv-experiments/master/nbs/imgs/nvprof_1.PNG"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./nbs/opencv4-cuda-streams.html">
-<h3 class="no-anchor listing-title">
-Accelerating OpenCV with Python and CUDA streams
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Since…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./nbs/opencv4-cuda-streams.html">
-<div class="listing-date">
-Oct 2, 2019
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-listing-date-sort="1519768800000" data-listing-file-modified-sort="1684042429378" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
-<div class="thumbnail">
-<p><a href="./qmd/opencv_cuda_performance.html"> <p class="card-img-top"><img src="imgs\gpu_spec-2.webp"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./qmd/opencv_cuda_performance.html">
-<h3 class="no-anchor listing-title">
-OpenCV CUDA Performance Comparison (Nvidia vs Intel)
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-In this post I am going to use the OpenCV’s performance tests to compare the CUDA and CPU implementations. The idea, is to get an indication of which…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./qmd/opencv_cuda_performance.html">
-<div class="listing-date">
-Feb 28, 2018
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -716,5 +699,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></div></div></footer><script src="site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

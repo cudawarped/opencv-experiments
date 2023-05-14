@@ -3,18 +3,9 @@
     "listing": "/index.html",
     "items": [
       "/nbs/ImportError_dll_load_failed_while_importing_cv2.html",
-      "/accelerate_opencv_cuda_python.html",
+      "/qmd/accelerate_opencv_cuda_python.html",
       "/nbs/opencv4-cuda-streams.html",
-      "/opencv_cuda_performance.html"
-    ]
-  },
-  {
-    "listing": "/tutorials.html",
-    "items": [
-      "/opencv_cuda_performance.html",
-      "/nbs/opencv4-cuda-streams.html",
-      "/nbs/ImportError_dll_load_failed_while_importing_cv2.html",
-      "/accelerate_opencv_cuda_python.html"
+      "/qmd/opencv_cuda_performance.html"
     ]
   }
 ]
