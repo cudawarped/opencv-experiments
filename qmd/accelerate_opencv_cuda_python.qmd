@@ -1,5 +1,0 @@
----
-title: "How To lala"
----
-
-![](https://jamesbowley.co.uk/wp-content/uploads/2017/01/opencv_cuda_intel2.jpg)
