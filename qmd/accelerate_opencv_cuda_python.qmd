@@ -346,6 +346,8 @@ Ninja is installed by default if the **Desktop development with C++** workload i
 
 2. Telling CMake to use **Ninja** instead of Visual Studio, i.e. replacing **-G"Visual Studio 17 2022"** with **-GNinja**.
 
+[As the CMake **\-\-build** option is just for [convenience](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project) you can alternatively call Ninja directly with **ninja -C PATH_TO_BUILD_DIR install**.]{.aside}
+
 Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant **--config** argument, i.e.
 ```{.default .code-overflow-wrap}
 "C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL
