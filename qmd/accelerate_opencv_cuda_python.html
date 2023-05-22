@@ -606,7 +606,7 @@ Important
 </div>
 <p>If everything was successful, congratulations, you now have OpenCV built with CUDA. To quickly verify that the CUDA modules are working and check if there is any performance benefit on your specific hardware see <a href="#verifying-opencv-is-cuda-accelerated">verifying OpenCV is CUDA accelerated</a>.</p>
 </section>
-<section id="decreasing-the-build-time-with-ninja" class="level2">
+<section id="decreasing-the-build-time-with-ninja" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="decreasing-the-build-time-with-ninja">Decreasing the build time with Ninja</h2>
 <p>The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins to under an hour on an i7-8700) by utilizing the Ninja build system instead of directly generating Visual Studio solution files. The only difference you may notice is that Ninja will only produce one configuration at a time, either a Debug or Release, therefore if you don’t want to build Release (the default) the <strong>CMAKE_BUILD_TYPE</strong> has to be passed to CMake.</p>
 <p>Ninja is installed by default if the <strong>Desktop development with C++</strong> workload is selected when installing Visual Studio, therefore building with Ninja only requires two extra configuration steps, expand the tip below for an example of the modified command line arguments.:</p>
@@ -615,6 +615,7 @@ Important
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Telling CMake to use <strong>Ninja</strong> instead of Visual Studio, i.e.&nbsp;replacing <strong>-G”Visual Studio 17 2022”</strong> with <strong>-GNinja</strong>.</p></li>
 </ol>
+<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">As the CMake <strong>--build</strong> option is just for <a href="https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project">convenience</a> you can alternatively call Ninja directly with <strong>ninja -C PATH_TO_BUILD_DIR install</strong>.</span></div></div>
 <p>Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant <strong>–config</strong> argument, i.e.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>for an example fo the full command line for building a Release version of OpenCV with the Ninja build system go to the <a href="#opencv-cuda-python-windows-cmake-flags">Ninja tab</a>.</p>
