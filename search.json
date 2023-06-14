@@ -102,7 +102,7 @@
     "href": "index.html",
     "title": "OpenCV Guides",
     "section": "",
-    "text": "ImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV (including Python) with CUDA on Windows\n\n\nComprehensive Guide with Python Bindings, cuDNN, and Nvidia Video Codec SDK\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nOpenCV CUDA Performance Comparison (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "ImportError: DLL load failed while importing cv2: The specified module could not be found.\n\n\n\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nBuild OpenCV (including Python) with CUDA on Windows\n\n\nComprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK\n\n\n\n\n\n\n\n\n\nMay 12, 2023\n\n\n\n\n\n\n  \n\n\n\n\nAccelerating OpenCV with Python and CUDA streams\n\n\n\n\n\n\n\n\n\n\n\n\nOct 2, 2019\n\n\n\n\n\n\n  \n\n\n\n\nOpenCV CUDA Performance Comparison (Nvidia vs Intel)\n\n\n\n\n\n\n\n\n\n\n\n\nFeb 28, 2018\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "qmd/about.html",
