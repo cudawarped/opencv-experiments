@@ -190,8 +190,8 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../qmd/accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Build with CUDA and Python on Windows</span></a>
+  <a href="../qmd/opencv_cuda_python_windows.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Build OpenCV (including Python) with CUDA on Windows</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -294,7 +294,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Since Aug 2018 the OpenCV CUDA API has been exposed to python. To get the most from this new functionality you need to have a basic understanding of CUDA (most importantly that it is <a href="https://en.wikipedia.org/wiki/Data_parallelism">data</a> not <a href="https://en.wikipedia.org/wiki/Task_parallelism">task</a> parallel) and its interaction with OpenCV. Below I have tried to introduce these topics with an example of how you could optimize a toy video processing pipeline. The actual functions called in the pipeline are not important, they are simply there to simulate a common processing pipeline consisting of work performed on both the host (CPU) and device (GPU).</p>
+<p>Since August 2018 the OpenCV CUDA API has been exposed to python. To get the most from this new functionality you need to have a basic understanding of CUDA (most importantly that it is <a href="https://en.wikipedia.org/wiki/Data_parallelism">data</a> not <a href="https://en.wikipedia.org/wiki/Task_parallelism">task</a> parallel) and its interaction with OpenCV. Below I have tried to introduce these topics with an example of how you could optimize a toy video processing pipeline. The actual functions called in the pipeline are not important, they are simply there to simulate a common processing pipeline consisting of work performed on both the host (CPU) and device (GPU).</p>
 <p>This guide is taken from a <a href="https://jupyter.org/">Jupyter Notebook</a> which can be cloned from <a href="https://github.com/cudawarped/opencv-experiments/blob/master/nbs/opencv4-cuda-streams.ipynb">here</a>. The procedure is as follows, following some quick <a href="#initialization">initialization</a>, we start with a <a href="#base-implementation">base</a> implementation on both the <a href="#cpu_naive">CPU</a> and <a href="#gpu_naive">GPU</a> to get a baseline result. We then proceed to incrementally improve the implementation by using the information provided by the <a href="https://developer.nvidia.com/nvidia-visual-profiler">Nvidia Visual Profiler</a>.</p>
 <p>On a laptop RTX 2080 paired with an i7-8700 the final CUDA incarnation resulted in a speed up of ~30x and ~10x over the naive CPU and GPU implementations.</p>
 </section>
@@ -650,19 +650,19 @@ Hypothesis
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-annotation="1" data-code-lines="1">asynchronous kernel 1</span>
+<span data-code-annotation="1" data-code-cell="annotated-cell-1" data-code-lines="1">asynchronous kernel 1</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-annotation="2" data-code-lines="3">asynchronous kernel 2</span>
+<span data-code-annotation="2" data-code-cell="annotated-cell-1" data-code-lines="3">asynchronous kernel 2</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-annotation="3" data-code-lines="5">asynchronous kernel 3</span>
+<span data-code-annotation="3" data-code-cell="annotated-cell-1" data-code-lines="5">asynchronous kernel 3</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-annotation="4" data-code-lines="7">synchronous copy from device to host</span>
+<span data-code-annotation="4" data-code-cell="annotated-cell-1" data-code-lines="7">synchronous copy from device to host</span>
 </dd>
 </dl>
 </div>

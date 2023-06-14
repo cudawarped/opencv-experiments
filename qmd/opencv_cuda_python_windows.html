@@ -8,9 +8,9 @@
 
 <meta name="dcterms.date" content="2023-05-12">
 <meta name="keywords" content="OpenCV, CUDA, Windows, Python">
-<meta name="description" content="Comprehensive guide to building OpenCV with CUDA on Windows. With instructions for generating Python bindings, building with cuDNN to accelerate the DNN module, the Nvidia Video Codec SDK to accelerate video decoding and Ninja to accelerate the build process.">
+<meta name="description" content="Comprehensive Guide to Building OpenCV with CUDA on Windows: Step-by-Step Instructions for Accelerating OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK, and Ninja. Learn how to generate Python bindings, optimize the DNN module with cuDNN, speed up video decoding using the Nvidia Video Codec SDK, and leverage Ninja to expedite the build process.">
 
-<title>cudawarped - Build OpenCV with CUDA on Windows</title>
+<title>Build OpenCV (including Python) with CUDA on Windows: Comprehensive Guide with Python Bindings, cuDNN, and Nvidia Video Codec SDK</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -110,13 +110,13 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <style>html{ scroll-behavior: smooth; }</style>
 
 
-<meta property="og:title" content="cudawarped - Build OpenCV with CUDA on Windows">
-<meta property="og:description" content="including Python bindings, cuDNN and the Nvidia Video Codec SDK">
+<meta property="og:title" content="Build OpenCV (including Python) with CUDA on Windows: Comprehensive Guide with Python Bindings, cuDNN, and Nvidia Video Codec SDK">
+<meta property="og:description" content="Comprehensive Guide with Python Bindings, cuDNN, and Nvidia Video Codec SDK">
 <meta property="og:image" content="https://www.jamesbowley.co.uk/imgs/opencv_cuda_intel.webp">
 <meta property="og:site-name" content="cudawarped">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -141,7 +141,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target="">
+    <a class="nav-link active" href="../index.html" rel="" target="" aria-current="page">
  <span class="menu-text">OpenCV</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -167,10 +167,57 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../qmd/opencv_cuda_python_windows.html">Build OpenCV (including Python) with CUDA on Windows</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenCV Guides</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../qmd/opencv_cuda_python_windows.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Build OpenCV (including Python) with CUDA on Windows</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accelerate with CUDA streams in Python</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ImportError: DLL load failed…</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../qmd/opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CUDA Performance Comparisson</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -178,7 +225,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
    
   <ul>
   <li><a href="#why-manually-build-opencv" id="toc-why-manually-build-opencv" class="nav-link active" data-scroll-target="#why-manually-build-opencv">Why manually build OpenCV?</a></li>
-  <li><a href="#pre-build-checklist" id="toc-pre-build-checklist" class="nav-link" data-scroll-target="#pre-build-checklist">Pre-build checklist</a></li>
+  <li><a href="#before-you-begin-quickly-check-which-parts-of-the-guide-are-relevant-to-you" id="toc-before-you-begin-quickly-check-which-parts-of-the-guide-are-relevant-to-you" class="nav-link" data-scroll-target="#before-you-begin-quickly-check-which-parts-of-the-guide-are-relevant-to-you">Before you begin quickly check which parts of the guide are relevant to you</a></li>
   <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
   <li><a href="#building-opencv-with-cmake" id="toc-building-opencv-with-cmake" class="nav-link" data-scroll-target="#building-opencv-with-cmake">Building OpenCV with CMake</a>
   <ul class="collapse">
@@ -200,12 +247,12 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
-<main class="content page-columns page-full column-page-left" id="quarto-document-content">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Build OpenCV with CUDA on Windows</h1>
-<p class="subtitle lead">including Python bindings, cuDNN and the Nvidia Video Codec SDK</p>
+<h1 class="title">Build OpenCV (including Python) with CUDA on Windows</h1>
+<p class="subtitle lead">Comprehensive Guide with Python Bindings, cuDNN, and Nvidia Video Codec SDK</p>
 </div>
 
 
@@ -228,8 +275,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="../imgs/opencv_cuda_intel.webp" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">OpenCV with CUDA</figcaption>
+<p><img src="../imgs/opencv_cuda_intel.webp" class="img-fluid figure-img" alt="OpenCV with CUDA"></p>
 </figure>
 </div>
 <section id="why-manually-build-opencv" class="level1">
@@ -239,9 +285,8 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <p>If you just need the Windows libraries or a Python wheele take a look at <a href="https://github.com/cudawarped/opencv_contrib/releases">OpenCV C++ CUDA builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV Python CUDA wheels</a> to see if there is a pre-built version suitable for your setup.</p>
 <p>To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in <a href="../qmd/opencv_cuda_performance.html">OpenCV CUDA Performance Comparisson (Nvidia vs Intel)</a>.</p>
 </section>
-<section id="pre-build-checklist" class="level1">
-<h1>Pre-build checklist</h1>
-<p><strong>Before continuing there are a few things to be aware of:</strong></p>
+<section id="before-you-begin-quickly-check-which-parts-of-the-guide-are-relevant-to-you" class="level1">
+<h1>Before you begin quickly check which parts of the guide are relevant to you</h1>
 <ol type="1">
 <li><p>This guide assumes you are building the latest stable release of OpenCV against the most recent CUDA dependencies. Whilst the instructions can also work on older versions, this is not guaranteed so please update to the latest stable releases before raising any issues.</p></li>
 <li><p>If you just need the OpenCV binaries or a Python wheel which includes the CUDA modules, check <a href="https://github.com/cudawarped/opencv_contrib/releases" target="_blank" rel="noopener noreferrer">OpenCV C++ CUDA builds</a> and/or <a href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases">OpenCV Python CUDA wheels</a> first to see if they are available for your desired combination of OpenCV and CUDA.</p></li>

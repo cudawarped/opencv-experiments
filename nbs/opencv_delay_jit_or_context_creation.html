@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-05-23">
+
+<title>cudawarped - OpenCV CUDA initialization delay, Just-in-Time (JIT) compilation vs CUDA context creation</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../imgs/favicon-32x32.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-69X21EFRB2"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
+</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta property="og:title" content="cudawarped - OpenCV CUDA initialization delay, Just-in-Time (JIT) compilation vs CUDA context creation">
+<meta property="og:description" content="">
+<meta property="og:image" content="../imgs/OpenCV_logo_black.webp">
+<meta property="og:site-name" content="cudawarped">
+</head>
+
+<body class="nav-sidebar floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../imgs\profile_1-e1674474909304.webp" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">cudawarped</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../qmd/about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../index.html" rel="" target="" aria-current="page">
+ <span class="menu-text">OpenCV</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-downloads" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Downloads</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-downloads">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV Python CUDA wheels</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/cudawarped/opencv-python-cuda-wheels/releases" rel="" target="">
+ <span class="dropdown-text">OpenCV C++ CUDA builds</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+    <a href="https://github.com/cudawarped" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../nbs/opencv_delay_jit_or_context_creation.html">OpenCV CUDA initialization delay</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OpenCV Guides</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../qmd/accelerate_opencv_cuda_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Build with CUDA and Python on Windows</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/opencv4-cuda-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accelerate with CUDA streams in Python</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ImportError: DLL load failed…</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nbs/opencv_delay_jit_or_context_creation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">OpenCV CUDA initialization delay</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../qmd/opencv_cuda_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CUDA Performance Comparisson</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#the-initialization-delay" id="toc-the-initialization-delay" class="nav-link" data-scroll-target="#the-initialization-delay">The Initialization Delay:</a></li>
+  <li><a href="#understanding-the-delay" id="toc-understanding-the-delay" class="nav-link" data-scroll-target="#understanding-the-delay">Understanding the Delay:</a></li>
+  <li><a href="#managing-the-delay" id="toc-managing-the-delay" class="nav-link" data-scroll-target="#managing-the-delay">Managing the Delay:</a></li>
+  </ul></li>
+  <li><a href="#demonstrating-the-initialization-delay" id="toc-demonstrating-the-initialization-delay" class="nav-link" data-scroll-target="#demonstrating-the-initialization-delay">Demonstrating the Initialization Delay:</a>
+  <ul class="collapse">
+  <li><a href="#just-in-time-jit-compilation" id="toc-just-in-time-jit-compilation" class="nav-link" data-scroll-target="#just-in-time-jit-compilation">Just-in-Time (JIT) compilation</a></li>
+  <li><a href="#cuda-context-creation" id="toc-cuda-context-creation" class="nav-link" data-scroll-target="#cuda-context-creation">CUDA context creation</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">OpenCV CUDA initialization delay, Just-in-Time (JIT) compilation vs CUDA context creation</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source" data-quarto-source-url="https://github.com/cudawarped/opencv-experiments/blob/master/nbs/opencv_delay_jit_or_context_creation.ipynb"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 23, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2"></a>os.add_dll_directory(<span class="st">'C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin'</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a>os.add_dll_directory(<span class="st">'D:</span><span class="ch">\\</span><span class="st">3rd_party</span><span class="ch">\\</span><span class="st">deps</span><span class="ch">\\</span><span class="st">ffmpeg-n5.0-latest-win64-gpl-shared-5.0</span><span class="ch">\\</span><span class="st">bin'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#os.add_dll_directory('D:/build/opencv/4_7_0/cuda_12_0_cc_6_1_8_6_ff_scratch_D/bin')</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>os.add_dll_directory(<span class="st">'D:/build/opencv/4_7_0/ptx_test/bin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>&lt;AddedDllDirectory('D:/build/opencv/4_7_0/ptx_test/bin')&gt;</code></pre>
+</div>
+</div>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>When working with OpenCV functions that utilize CUDA, it’s important to be aware of the initialization delay that occurs the first time you call such functions. This blog post aims to shed light on what is meant by an initialization delay and the two main factors contributing to it. Understanding this delay and its causes should allow you to more effectively manage the initialization process. In this blog, we will explore the creation of a CUDA context and the JIT compilation of PTX code as the primary causes of this delay.</p>
+<section id="the-initialization-delay" class="level2">
+<h2 class="anchored" data-anchor-id="the-initialization-delay">The Initialization Delay:</h2>
+<p>The initialization delay is a brief period that occurs during the first invocation of any OpenCV function that employs CUDA. It arises due to two main factors:</p>
+<ol type="1">
+<li><p>Creation of a <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=cuda%20context#context">CUDA context</a>: The first cause of initialization delay arises from the creation of a CUDA context which is analagous to a CPU process. When calling an OpenCV function utilizing CUDA, a CUDA context is created, which always incurs a certain delay.</p></li>
+<li><p><a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#just-in-time-compilation">Just-In-Time compilation</a>. Depending on your build configuration and the hardware you are executing CUDA functions on, PTX (Parallel Thread Execution) code <strong>can be</strong> compiled into device-specific binary code. This compilation happens during the first invocation and adds to the initialization delay.</p></li>
+</ol>
+</section>
+<section id="understanding-the-delay" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-the-delay">Understanding the Delay:</h2>
+<p>It’s essential to acknowledge the existence of the initialization delay, especially when timing your code. Incorrectly attributing this delay to the actual computation can lead to inaccurate performance measurements. Furthermore, understanding the source of the delay enables you to optimize your code effectively.</p>
+</section>
+<section id="managing-the-delay" class="level2">
+<h2 class="anchored" data-anchor-id="managing-the-delay">Managing the Delay:</h2>
+<p>Unlike the delay from JIT compilation (cause #2) the delay from CUDA context creation (cause #1) cannot be removed It is possible to completely remove the delay from JIT compilation (cause #2) but not from CUDA context creation (cause #1). That said by creating the CUDA context in advance or performing context setup during non-time-sensitive stages of your program, you can eliminate the delay from subsequent function calls.</p>
+<p>delay caused by JIT compilation (cause #2), you can take steps to mitigate or remove the delay resulting from the creation of a CUDA context (cause #1). By creating the CUDA context in advance or performing context setup during non-time-sensitive stages of your program, you can eliminate the delay from subsequent function calls.</p>
+</section>
+</section>
+<section id="demonstrating-the-initialization-delay" class="level1 page-columns page-full">
+<h1>Demonstrating the Initialization Delay:</h1>
+<p>To demonstrate the initialization delay, we will utilize two simple functions: <code>time_set_device()</code> and <code>time_abs()</code> shown below. These functions showcase the delay by measuring either</p>
+<ul>
+<li>the time required to call <code>cv.cuda.setDevice()</code> a function which doesn’t perform any computations but is still subject to both types of initialization delay.</li>
+<li>the time required to perform a simple calculation using CUDA.</li>
+</ul>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> timeit <span class="im">import</span> default_timer <span class="im">as</span> timer</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">def</span> time_set_device():</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    start <span class="op">=</span> timer()</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    cv.cuda.setDevice(<span class="dv">0</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.2f}</span><span class="ss">s'</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a>    </span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="kw">def</span> time_abs():</span>
+<span id="cb3-11"><a href="#cb3-11"></a>    start <span class="op">=</span> timer()</span>
+<span id="cb3-12"><a href="#cb3-12"></a>    src_dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">1000</span>,<span class="dv">1000</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb3-13"><a href="#cb3-13"></a>    cv.cuda.<span class="bu">abs</span>(src_dst,src_dst)</span>
+<span id="cb3-14"><a href="#cb3-14"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb3-15"><a href="#cb3-15"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="just-in-time-jit-compilation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="just-in-time-jit-compilation">Just-in-Time (JIT) compilation</h2>
+<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">For more information on JIT compilation see <a href="../qmd/accelerate_opencv_cuda_python.html#choosing-a-suitable-cuda-compute-capability">Choosting a suitable CUDA compute capability</a></span></div></div>
+<p>Under normal circumstances, when no additional <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/#cuda-environment-variables">CUDA Environmental Variables</a> have been set, OpenCV handles the JIT compilation process automatically. If an OpenCV CUDA function is called and the library does not have pre-built binary code suitable for your device, but there is PTX code available with a compute capability less than or equal to that required by your device, the following steps occur:</p>
+<ol type="1">
+<li><p>JIT Compilation to Binary Code: The PTX code is dynamically compiled (JIT compiled) into device-specific binary code. This compilation process incurs an initial delay.</p></li>
+<li><p>Caching of Binary Code: The resulting binary code is then cached in a <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/?highlight=CUDA_CACHE_PATH#cuda-environment-variables">default location</a> and stored in the system’s RAM. This caching ensures that the binary code is readily available for subsequent program executions.</p></li>
+</ol>
+<p>This compilation causes an initial delay, but because the JIT compiled binary code is stored in RAM there will be no additional delay during the lifetime of the program for any functions which <strong>are part of the same OpenCV module as the one the function you called is part of</strong>. Additionaly as long as the cached entry is not deleted there will be no delay when running the same program again.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+example
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let’s consider a scenario where your main GPU is an RTX 2080 with a compute capability of 7.5, and you own additional GPUs with compute capabilities starting from 6.1 (e.g., GeForce 10 series and newer). Under these circumstances its perfectly reasonable to have built OpenCV with the following CMake flags</p>
+<pre><code>-DCUDA_ARCH_PTX=6.1 -DCUDA_ARCH_BIN=7.5</code></pre>
+<p>Now, let’s say you attempt to execute CUDA functions in OpenCV on an RTX 3070, which has a compute capability of 8.6. In this situation, you will encounter a delay as the PTX code initially compiled for compute capability 6.1 needs to be JIT compiled into binary code compatible with the RTX 3070’s compute capability of 8.6.</p>
+</div>
+</div>
+<p>To demonstrate the concept, I will execute a single CUDA function from Python, which is linked against OpenCV. In this demonstration, I have intentionally used the <strong>opencv_worldxxx</strong> module to showcase the maximum delay. By using this module, JIT compilation of all OpenCV modules that utilize CUDA will be triggered.</p>
+<p>To simulate the scenario on an RTX 3070, where OpenCV was built with the flags <code>-DCUDA_ARCH_PTX=8.6 -DCUDA_ARCH_BIN=8.6</code>, we can take the following steps. Under normal circumstances, this configuration would not require JIT compilation. However, to avoid the need to recompile OpenCV, we can simulate OpenCV being built with only the <code>-DCUDA_ARCH_BIN=8.6</code> flag.</p>
+<p>To achieve this simulation, we can set the environmental variable <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/?highlight=CUDA_FORCE_PTX_JIT#cuda-environment-variables"><code>CUDA_FORCE_PTX_JIT</code></a> to 1 before calling any CUDA functions. This configuration ensures that the PTX code is forced to undergo JIT compilation, simulating the absence of pre-compiled binary code specifically tailored for the RTX 3070.</p>
+<p>By executing this CUDA function while emulating the mentioned configuration, we can observe the resulting delay caused by the JIT compilation process. This demonstration provides a practical example of how the presence or absence of pre-compiled binary code impacts the initialization delay when utilizing CUDA functions in OpenCV.</p>
+<p>First we must set the flag to force JIT compilation</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">import</span> os</span>
+<span id="cb5-2"><a href="#cb5-2"></a>os.environ[<span class="st">'CUDA_FORCE_PTX_JIT'</span>] <span class="op">=</span> <span class="st">'1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next lets confirm that there is both binary and PTX code available for the target architecture.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>time_set_device()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.20s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>time_set_device()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.00s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="182">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">def</span> time_abs():</span>
+<span id="cb10-2"><a href="#cb10-2"></a>    start <span class="op">=</span> timer()</span>
+<span id="cb10-3"><a href="#cb10-3"></a>    src_dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">1000</span>,<span class="dv">1000</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a>    cv.cuda.<span class="bu">abs</span>(src_dst,src_dst)</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-6"><a href="#cb10-6"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-7"><a href="#cb10-7"></a>    </span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="kw">def</span> time_resize():</span>
+<span id="cb10-9"><a href="#cb10-9"></a>    src <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">100</span>,<span class="dv">100</span>,cv.CV_8U)</span>
+<span id="cb10-10"><a href="#cb10-10"></a>    dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">50</span>,<span class="dv">50</span>,cv.CV_8U)</span>
+<span id="cb10-11"><a href="#cb10-11"></a>    start <span class="op">=</span> timer()    </span>
+<span id="cb10-12"><a href="#cb10-12"></a>    cv.cuda.resize(src,[<span class="dv">50</span>,<span class="dv">50</span>],dst)</span>
+<span id="cb10-13"><a href="#cb10-13"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-14"><a href="#cb10-14"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-15"><a href="#cb10-15"></a>    </span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="kw">def</span> time_gpumat():</span>
+<span id="cb10-17"><a href="#cb10-17"></a>    start <span class="op">=</span> timer()</span>
+<span id="cb10-18"><a href="#cb10-18"></a>    src_dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">1000</span>,<span class="dv">1000</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-19"><a href="#cb10-19"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-20"><a href="#cb10-20"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-21"><a href="#cb10-21"></a>    </span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="kw">def</span> time_cudaarithm():</span>
+<span id="cb10-23"><a href="#cb10-23"></a>    src_dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-24"><a href="#cb10-24"></a>    start <span class="op">=</span> timer()        </span>
+<span id="cb10-25"><a href="#cb10-25"></a>    cv.cuda.<span class="bu">abs</span>(src_dst,src_dst)</span>
+<span id="cb10-26"><a href="#cb10-26"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-27"><a href="#cb10-27"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-28"><a href="#cb10-28"></a>        </span>
+<span id="cb10-29"><a href="#cb10-29"></a><span class="kw">def</span> time_cudaarithm1():</span>
+<span id="cb10-30"><a href="#cb10-30"></a>    src_dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-31"><a href="#cb10-31"></a>    start <span class="op">=</span> timer()        </span>
+<span id="cb10-32"><a href="#cb10-32"></a>    cv.cuda.absSum(src_dst,src_dst)</span>
+<span id="cb10-33"><a href="#cb10-33"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-34"><a href="#cb10-34"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-35"><a href="#cb10-35"></a>    </span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="kw">def</span> time_cudaarithm2():</span>
+<span id="cb10-37"><a href="#cb10-37"></a>    src2 <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-38"><a href="#cb10-38"></a>    src1 <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-39"><a href="#cb10-39"></a>    dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U,<span class="dv">100</span>)</span>
+<span id="cb10-40"><a href="#cb10-40"></a>    start <span class="op">=</span> timer()        </span>
+<span id="cb10-41"><a href="#cb10-41"></a>    cv.cuda.divide(src1,src2,dst)</span>
+<span id="cb10-42"><a href="#cb10-42"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-43"><a href="#cb10-43"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span>
+<span id="cb10-44"><a href="#cb10-44"></a>    </span>
+<span id="cb10-45"><a href="#cb10-45"></a><span class="kw">def</span> time_cudawarping():</span>
+<span id="cb10-46"><a href="#cb10-46"></a>    src <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">100</span>,<span class="dv">100</span>,cv.CV_8U)</span>
+<span id="cb10-47"><a href="#cb10-47"></a>    dst <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">50</span>,<span class="dv">50</span>,cv.CV_8U)</span>
+<span id="cb10-48"><a href="#cb10-48"></a>    start <span class="op">=</span> timer()    </span>
+<span id="cb10-49"><a href="#cb10-49"></a>    cv.cuda.resize(src,[<span class="dv">50</span>,<span class="dv">50</span>],dst)</span>
+<span id="cb10-50"><a href="#cb10-50"></a>    end <span class="op">=</span> timer()</span>
+<span id="cb10-51"><a href="#cb10-51"></a>    <span class="bu">print</span>(<span class="ss">f'Initialization time: </span><span class="sc">{</span>end<span class="op">-</span>start<span class="sc">:.4f}</span><span class="ss">s'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="188">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb11-2"><a href="#cb11-2"></a>cv.cuda.setDevice(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="189">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#time_gpumat()</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>time_cudaarithm()</span>
+<span id="cb12-3"><a href="#cb12-3"></a>time_cudaarithm1()</span>
+<span id="cb12-4"><a href="#cb12-4"></a>time_cudaarithm2()</span>
+<span id="cb12-5"><a href="#cb12-5"></a>time_cudawarping()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0094s
+Initialization time: 0.0019s
+Initialization time: 0.0003s
+Initialization time: 0.0029s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="190">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># can check and show all this in nsight systems - easier to look at in c++</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#time_gpumat()</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>time_cudaarithm()</span>
+<span id="cb14-4"><a href="#cb14-4"></a>time_cudaarithm1()</span>
+<span id="cb14-5"><a href="#cb14-5"></a>time_cudaarithm2()</span>
+<span id="cb14-6"><a href="#cb14-6"></a>time_cudawarping()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0005s
+Initialization time: 0.0017s
+Initialization time: 0.0002s
+Initialization time: 0.0002s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="123">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#cv.cuda.setDevice(0)</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>time_cudaarithm1()</span>
+<span id="cb16-4"><a href="#cb16-4"></a>time_cudaarithm()</span>
+<span id="cb16-5"><a href="#cb16-5"></a>time_cudawarping()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0066s
+Initialization time: 0.0003s
+Initialization time: 0.0015s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co">#cv.cuda.setDevice(0)</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>time_cudawarping()</span>
+<span id="cb18-4"><a href="#cb18-4"></a>time_cudaarithm1()</span>
+<span id="cb18-5"><a href="#cb18-5"></a>time_cudaarithm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0018s
+Initialization time: 0.0057s
+Initialization time: 0.0003s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a>time_cudaarithm1()</span>
+<span id="cb20-2"><a href="#cb20-2"></a>time_cudaarithm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0027s
+Initialization time: 0.0002s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb22-2"><a href="#cb22-2"></a>time_set_device()</span>
+<span id="cb22-3"><a href="#cb22-3"></a>time_resize()</span>
+<span id="cb22-4"><a href="#cb22-4"></a>time_abs()</span>
+<span id="cb22-5"><a href="#cb22-5"></a>time_resize()</span>
+<span id="cb22-6"><a href="#cb22-6"></a>time_abs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.15s
+Initialization time: 0.0016s
+Initialization time: 0.0041s
+Initialization time: 0.0003s
+Initialization time: 0.0003s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb24-2"><a href="#cb24-2"></a>time_set_device()</span>
+<span id="cb24-3"><a href="#cb24-3"></a>time_abs()</span>
+<span id="cb24-4"><a href="#cb24-4"></a>time_resize()</span>
+<span id="cb24-5"><a href="#cb24-5"></a>time_abs()</span>
+<span id="cb24-6"><a href="#cb24-6"></a>time_resize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.13s
+Initialization time: 0.0043s
+Initialization time: 0.0015s
+Initialization time: 0.0003s
+Initialization time: 0.0002s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="co">#cv.cuda.resetDevice()</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>time_gpumat()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0005s</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>major <span class="op">=</span> cv.cuda.DeviceInfo().majorVersion()</span>
+<span id="cb28-2"><a href="#cb28-2"></a>minor <span class="op">=</span> cv.cuda.DeviceInfo().minorVersion()</span>
+<span id="cb28-3"><a href="#cb28-3"></a><span class="bu">print</span>(<span class="ss">f'CUDA device has compute capability </span><span class="sc">{</span>major<span class="sc">}</span><span class="ss">.</span><span class="sc">{</span>minor<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb28-4"><a href="#cb28-4"></a><span class="cf">if</span>(cv.cuda_TargetArchs.hasPtx(major,minor) <span class="kw">and</span> cv.cuda_TargetArchs.hasBin(major,minor)):</span>
+<span id="cb28-5"><a href="#cb28-5"></a>    <span class="bu">print</span>(<span class="ss">f'OpenCV is built with both binary and PTX code for the existing CUDA device'</span>)    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CUDA device has compute capability 8.6
+OpenCV is built with both binary and PTX code for the existing CUDA device</code></pre>
+</div>
+</div>
+<p>Now force JIT compilation even though there is compatible binary code available.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>time_set_device()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 172.30s</code></pre>
+</div>
+</div>
+<p>The 172.30s delay above was required for JIT compilation and the initialization of the CUDA context (see <a href="#cuda-context-creation">below</a>). As a result when I call <code>time_cuda()</code> again</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>time_set_device()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.00s</code></pre>
+</div>
+</div>
+<p>there isn’t any delay because the JIT compiled binary code has been stored in RAM and the CUDA context created. Additionally because we are using the world module (opencv_worldxxx) all of the CUDA code has been JIT compiled, so calling <code>time_abs()</code> as below</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>time_abs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.0013s</code></pre>
+</div>
+</div>
+<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">If we had not compiled the world module then JIT is applied to each module seperately. e.g.&nbsp;Calling <code>cv.cuda.set_device()</code> would only JIT compile the CUDA functions which are part of opencv_corexxx and we would therefore get a delay when calling <code>cv.cuda.abs</code>, because it would cause the JIT compilation of opencv_cudaarithm module.</span></div></div>
+<p>time only represents time to initialize the GpuMat and calculate its absolute value.&lt;- show to more decimal places - don’t call it initialization delay</p>
+<p>Understanding the importance of addressing JIT compilation delays is crucial, as this delay can have a significant impact on performance, as observed in the recorded delay of 172.30s. However, it’s worth noting that this JIT delay can be completely eliminated if desired (see <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/#just-in-time-compilation">Just-in-Time Compilation</a>. By ensuring that the <code>-DCUDA_ARCH_BIN</code> flag is set to the compute capability of the intended devices, you can remove this delay entirely.</p>
+<p>On the other hand, it’s essential to recognize that the delay caused by the creation of a CUDA context, which will be explored in the next section, will always be present. While this delay is generally less significant compared to JIT compilation, it is a fundamental aspect of CUDA initialization and cannot be eliminated.</p>
+</section>
+<section id="cuda-context-creation" class="level2">
+<h2 class="anchored" data-anchor-id="cuda-context-creation">CUDA context creation</h2>
+<p>In OpenCV a CUDA context is automatically created by the CUDA runtime the first time a CUDA function is executed. This is a one time delay and only takes a few seconds but its important to realize its there for example when benchmarking CUDA functions. i.e.&nbsp;If you want to time <code>GpuMat</code> creation then it is advisable perform the creation or other CUDA call once before initiating the timing. e.g.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>gpuMat <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U)</span>
+<span id="cb36-2"><a href="#cb36-2"></a>start <span class="op">=</span> timer()</span>
+<span id="cb36-3"><a href="#cb36-3"></a>gpuMat <span class="op">=</span> cv.cuda.GpuMat(<span class="dv">10</span>,<span class="dv">10</span>,cv.CV_8U)</span>
+<span id="cb36-4"><a href="#cb36-4"></a>end <span class="op">=</span> timer()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As we have already initialized a CUDA context above we first need to destroy the existing CUDA context by reseting the device with <code>cv.cuda.resetDevice()</code> before calling <code>time_set_device()</code>.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>cv.cuda.resetDevice()</span>
+<span id="cb37-2"><a href="#cb37-2"></a>time_set_device()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initialization time: 0.33s</code></pre>
+</div>
+</div>
+<p>As you can see the initialization delay is tiny (0.33s) compared to that from JIT compilation, however unlike the JIT compilation delay this will always be present.</p>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
