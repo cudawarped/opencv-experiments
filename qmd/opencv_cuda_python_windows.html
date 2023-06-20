@@ -111,7 +111,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 
 
 <meta property="og:title" content="Build OpenCV (including Python) with CUDA on Windows: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK">
-<meta property="og:description" content="Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK">
+<meta property="og:description" content="Guide to building OpenCV (including Python bindings) with CUDA (optionally the Nvidia Video Codec SDK and cuDNN) from within Visual Studio or from the command line using the Ninja build system.">
 <meta property="og:image" content="https://www.jamesbowley.co.uk/imgs/opencv_cuda_intel.webp">
 <meta property="og:site-name" content="cudawarped">
 </head>
@@ -252,9 +252,13 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Build OpenCV (including Python) with CUDA on Windows</h1>
-<p class="subtitle lead">Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK</p>
 </div>
 
+<div>
+  <div class="description">
+    Guide to building OpenCV (including Python bindings) with <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew">CUDA</a> (optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Nvidia Video Codec SDK</a> and <a href="https://developer.nvidia.com/cudnn">cuDNN</a>) from within Visual Studio or from the command line using the <a href="https://ninja-build.org/">Ninja</a> build system.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -278,7 +282,6 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <p><img src="../imgs/opencv_cuda_intel.webp" class="img-fluid figure-img" alt="OpenCV with CUDA"></p>
 </figure>
 </div>
-<p>Guide to building OpenCV (including Python bindings) with <a href="https://developer.nvidia.com/cuda-toolkit/whatsnew">CUDA</a> (optionally the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Nvidia Video Codec SDK</a> and <a href="https://developer.nvidia.com/cudnn">cuDNN</a>) from within Visual Studio or from the command line using the <a href="https://ninja-build.org/">Ninja</a> build system.</p>
 <section id="why-manually-build-opencv" class="level1">
 <h1>Why manually build OpenCV?</h1>
 <p>The pre-built <a href="https://github.com/opencv/opencv/releases">Windows libraries</a> available for <a href="https://opencv.org/releases">OpenCV</a> do not include the <a href="https://docs.opencv.org/4.x/d1/d1e/group__cuda.html">CUDA modules</a>, support for the Nvidia <a href="https://developer.nvidia.com/nvidia-video-codec-sdk">Video Codec SDK</a> or <a href="https://developer.nvidia.com/cudnn">cuDNN</a>.</p>
