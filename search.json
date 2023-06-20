@@ -4,7 +4,7 @@
     "href": "nbs/ImportError_dll_load_failed_while_importing_cv2.html",
     "title": "ImportError: DLL load failed while importing cv2: The specified module could not be found.",
     "section": "",
-    "text": "If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling import cv2, this short guide should help solve your problem.\nThe guide assumes that you have either installed the python bindings during the build process (not recommended) or manually copied cv2.cpxx-win_amd64.pyd to your distributions site-packages directory (e.g. C:\\Users\\&lt;USER&gt;\\mambaforge\\Lib\\site-packages).\nSo what’s the issue? Although the message is quite explicit regarding the cause, it doesn’t really help with finding a solution. In a nutshell python has found cv2.cpxx-win_amd64.pyd, tried and then failed to load it because a it can’t find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the cv2.cpxx-win_amd64.pyd and see which dependencies the system can’t find.\nNow this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll resolution), however we are not, so even if dependency walker can’t detect any problems we may still be facing the above error.\nThe good news is there is an easy fix if you know where the missing DLL’s are and only slightly more involved if you don’t as long as you have access to the missing DLL’s on your system."
+    "text": "Definitive guide to fixing the “ImportError: DLL load failed while importing cv2: The specified module could not be found” error when trying to import the OpenCV python module."
   },
   {
     "objectID": "nbs/ImportError_dll_load_failed_while_importing_cv2.html#manually-adding-filter-entries",
@@ -124,6 +124,13 @@
     "title": "OpenCV CUDA Performance Comparison (Nvidia vs Intel)",
     "section": "GPU specifications",
     "text": "GPU specifications\nThe GPU’s tested comprise three different micro-architectures, ranging from a low end laptop (730m) to a mid range desktop (GTX 1060) GPU. The full specifications are shown below, where I have also included the maximum theoretical speedup, if the OpenCV function were bandwidth or compute limited. This value is just included to give an indication of what should be possible if architectural improvements, SM count etc. don’t have any impact on performance. In “general” most algorithms will be bandwidth limited implying that the average speed up of the OpenCV functions could be somewhere between these two values. If you are not familiar with this concept then I would recommend watching Memory Bandwidth Bootcamp: Best Practices, Memory Bandwidth Bootcamp: Beyond Best Practices and Memory Bandwidth Bootcamp: Collaborative Access Patterns by Tony Scudiero for a good overview."
+  },
+  {
+    "objectID": "qmd/opencv_cuda_python_windows.html",
+    "href": "qmd/opencv_cuda_python_windows.html",
+    "title": "Build OpenCV (including Python) with CUDA on Windows",
+    "section": "",
+    "text": "Guide to building OpenCV (including Python bindings) with CUDA (optionally the Nvidia Video Codec SDK and cuDNN) from within Visual Studio or from the command line using the Ninja build system."
   },
   {
     "objectID": "qmd/opencv_cuda_python_windows.html#building-opencv-with-cuda-using-visual-studio-solution-files-from-the-command-prompt-cmd",
