@@ -1,10 +1,13 @@
 ---
 title: "OpenCV Guides"
 listing:
+  #image-height: 300px
+  #image-placeholder: "../imgs/OpenCV_logo_black.webp"
   sort: "date desc"
   contents:
-    - ../nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb
-    - ../nbs/opencv4-cuda-streams.ipynb
-    - ../qmd/accelerate_opencv_cuda_python.qmd
-    - ../qmd/opencv_cuda_performance.qmd
+    - nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb
+    - nbs/opencv_cuda_streams_performance_python.ipynb
+    - qmd/opencv_cuda_python_windows.qmd
+    - qmd/opencv_cuda_performance.qmd
+    #- nbs\opencv_delay_jit_or_context_creation.ipynb
 ---

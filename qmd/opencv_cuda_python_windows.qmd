@@ -1,5 +1,6 @@
 ---
-title: "Build OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK and Python on Windows"
+title: "Build OpenCV (including Python) with CUDA on Windows"
+#subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
 aliases:
@@ -9,6 +10,26 @@ aliases:
   - ../build-opencv-4-0-0-with-cuda-10-0-and-intel-mkl-tbb-in-windows
   - ../accelerate-opencv-4-3-0-build-with-cuda-and-python-bindings
   - ../downloads
+  - ../accelerate-opencv-4-3-0-build-with
+  - ../accelerate-opencv-4-2-0-build-with-cuda-and-python-bindin
+  - ../accelerate-opencv-4
+  - ../build-opencv-v3-2-with-cuda
+  - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings.html
+  - ../build-opencv-with-cuda-in-windows.html
+  - ../accelerating-opencv-4-build-with-cuda-intel-mkl-tbb-and-python-bindings.html
+  - ../build-opencv-4-0-0-with-cuda-10-0-and-intel-mkl-tbb-in-windows.html
+  - ../accelerate-opencv-4-3-0-build-with-cuda-and-python-bindings.html
+  - ../downloads.html
+  - ../accelerate-opencv-4-3-0-build-with.html
+  - ../accelerate-opencv-4-2-0-build-with-cuda-and-python-bindin.html
+  - ../accelerate-opencv-4.html
+  - ../build-opencv-v3-2-with-cuda.html
+  - accelerate_opencv_cuda_python
+  - accelerate_opencv_cuda_python.html
+keywords: OpenCV, CUDA, Windows, Python, Build, Compile, CMake, Ninja, cuDNN, cudacodec, Nvidia Video Codec SDK
+pagetitle: "Build OpenCV (including Python) with CUDA on Windows: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK"
+description-meta: "Comprehensive guide to Building OpenCV with CUDA on Windows: Step-by-Step Instructions for Accelerating OpenCV with CUDA, cuDNN, Nvidia Video Codec SDK. Learn how to generate Python bindings, optimize the DNN module with cuDNN, speed up video decoding using the Nvidia Video Codec SDK, and leverage Ninja to expedite the build process."
+description: Guide to building OpenCV (including Python bindings) with [CUDA](https://developer.nvidia.com/cuda-toolkit/whatsnew) (optionally the [Nvidia Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) and [cuDNN](https://developer.nvidia.com/cudnn)) from within Visual Studio or from the command line using the [Ninja](https://ninja-build.org/) build system.
 #highlight-style: arrow
 #code-block-border-left: true
 #code-block-border-left: "#31BAE9"
@@ -16,19 +37,17 @@ aliases:
 
 ---
 
-![](../imgs/opencv_cuda_intel.webp){fig-align="center"}
+![](../imgs/opencv_cuda_intel.webp){fig-align="center" fig-alt="OpenCV with CUDA"}
 
 # Why manually build OpenCV?
 
-Because the pre-built [Windows libraries](https://github.com/opencv/opencv/releases) available for [OpenCV](https://opencv.org/releases) do not include the [CUDA modules](https://docs.opencv.org/4.x/d1/d1e/group__cuda.html), or support for the Nvidia [Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) or [cuDNN](https://developer.nvidia.com/cudnn), I have included the build instructions in the guide below for anyone who is interested. This guide includes instructions for compiling the 64 bit version of the OpenCV shared libraries with Visual Studio, [CUDA](https://developer.nvidia.com/cuda-toolkit/whatsnew) (optionally the [Nvidia Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) and [cuDNN](https://developer.nvidia.com/cudnn)), and bindings for accessing the OpenCV CUDA modules from within Python.
+The pre-built [Windows libraries](https://github.com/opencv/opencv/releases) available for [OpenCV](https://opencv.org/releases) do not include the [CUDA modules](https://docs.opencv.org/4.x/d1/d1e/group__cuda.html), support for the Nvidia [Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) or [cuDNN](https://developer.nvidia.com/cudnn).
 
 If you just need the Windows libraries or a Python wheele take a look at [OpenCV C++ CUDA builds](https://github.com/cudawarped/opencv_contrib/releases) and/or [OpenCV Python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) to see if there is a pre-built version suitable for your setup.
 
 To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in [OpenCV CUDA Performance Comparisson (Nvidia vs Intel)](opencv_cuda_performance.qmd).
 
-# Pre-build checklist
-
-**Before continuing there are a few things to be aware of:**  
+# Before you begin quickly check which parts of the guide are relevant to you
 
 1. This guide assumes you are building the latest stable release of OpenCV against the most recent CUDA dependencies.  Whilst the instructions can also work on older versions, this is not guaranteed so please update to the latest stable releases before raising any issues.
 
@@ -60,11 +79,11 @@ If your system path is too long, CUDA will not add the path to its shared librar
 [Before building you may want to ensure that your GPU has decoding support by refering to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>]{.aside}
 
 5. **Optional** - To **decode** video on the GPU with the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>:
-    i) Register and <a href="https://developer.nvidia.com/nvidia-video-codec-sdk#Download" target="_blank" rel="noopener noreferrer">download</a> the latest version of the Video Codec SDK.
+    i) Register and <a href="https://developer.nvidia.com/nvidia-video-codec-sdk#Download" target="_blank" rel="noopener noreferrer">download</a> the latest version of the **Complete Video Codec SDK xx.x Package**.
     ii) Extract and copy the contents of **Interface** and **Lib**  to the **include** and **lib** directories inside your CUDA installation.
 
 6. **Optional** - To use the DNN CUDA backend:
-    i) Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> cuDNN.</li>
+    i) Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> the latest version of cuDNN for the version of CUDA you have installed by clicking on **Local Installer for Windows (Zip)**.</li>
 
     ii) Extract and copy the **bin**, **include** and **lib** directories to your CUDA installation.
 
@@ -75,7 +94,7 @@ The installation directory for CUDA xx.x is
 
 [All python distributions should work however I recommend building and testing against a new install of this compact distribution to avoid any problems caused by existing configurations.]{.aside}
 
-7. **Optional** – To call OpenCV CUDA routines from python, install the latest x64 bit version of [mambaforge](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe).
+7. **Optional** – To call OpenCV CUDA routines from python, install the latest x64 bit version of [mambaforge](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe) with numpy (execute **mamba install numpy** from the miniforge prompt once mambaforge is installed.)
 
 
 # Building OpenCV with CMake
@@ -135,7 +154,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
     ```
 
     ## Ninja
-    For details see [decreasing the build time with Ninja](l#decreasing-the-build-time-with-ninja)
+    For details see [decreasing the build time with Ninja](#decreasing-the-build-time-with-ninja)
 
     ```{.default .code-overflow-wrap}
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
