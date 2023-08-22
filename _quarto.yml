@@ -3,8 +3,10 @@ project:
   resources:
       - CNAME
   render:
-    - "nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb"
-    - nbs\opencv4-cuda-streams.ipynb
+    - nbs/ImportError_dll_load_failed_while_importing_cv2.ipynb
+    #- nbs/opencv4-cuda-streams.ipynb
+    - nbs/opencv_cuda_streams_performance_python.ipynb
+    #- nbs\opencv_delay_jit_or_context_creation.ipynb
     - "*.html"
     - "*.qmd"
 
@@ -15,7 +17,7 @@ website:
   repo-actions: [issue]
   favicon: imgs\favicon-32x32.png
   back-to-top-navigation: true
-  google-analytics: "UA-106782659-2"
+  google-analytics: "G-69X21EFRB2"
   open-graph: true
   navbar:
     tools:
@@ -32,7 +34,10 @@ website:
       - text: "OpenCV"
         file: index.qmd
       - text: "Downloads"
+        #href: qmd/downloads.qmd
         menu:
+          - text: "OpenCV"
+            file: qmd/downloads.qmd
           - text: OpenCV Python CUDA wheels
             href: https://github.com/cudawarped/opencv-python-cuda-wheels/releases
           - text: OpenCV C++ CUDA builds 
@@ -49,12 +54,14 @@ website:
       #contents: auto
       contents:
         - index.qmd
-        - text: "Build with CUDA and Python on Windows"
-          file: qmd\accelerate_opencv_cuda_python.qmd
+        - text: "Build OpenCV (including Python) with CUDA on Windows"
+          file: qmd\opencv_cuda_python_windows.qmd
         - text: "Accelerate with CUDA streams in Python"
-          file: nbs\opencv4-cuda-streams.ipynb
+          file: nbs\opencv_cuda_streams_performance_python.ipynb
         - text: "ImportError: DLL load failed..."
           file: nbs\ImportError_dll_load_failed_while_importing_cv2.ipynb
+        #- text: "OpenCV CUDA initialization delay"
+        #  file: nbs\opencv_delay_jit_or_context_creation.ipynb
         - text: "CUDA Performance Comparisson"
           file: qmd\opencv_cuda_performance.qmd
       #  - text: "Import dll load failed while importing cv2"

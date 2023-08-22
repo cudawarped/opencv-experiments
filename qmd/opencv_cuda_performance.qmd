@@ -4,6 +4,7 @@ toc: true
 date: 02/28/18
 aliases:
   - ../opencv-3-4-gpu-cuda-performance-comparison-nvidia-vs-intel
+  - ../opencv-3-4-gpu-cuda-perform
 ---
 
 # Introduction
