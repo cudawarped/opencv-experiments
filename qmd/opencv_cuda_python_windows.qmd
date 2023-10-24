@@ -3,6 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
+date-modified: 25/10/23
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -129,28 +130,31 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
     ## All CUDA modules
 
     ```{.default .code-overflow-wrap #opencv-cuda-python-windows-cmake-flags}
-    "C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
+    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
     ```
 
     ## cuDNN only
     If you just want to CUDA accelerate the DNN module and are not interested in building the rest of the CUDA modules this will significantly reduce compilation time and size of opencv_worldxxx.dll.
 
     ```{.default .code-overflow-wrap}
-    "C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
+    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
     ```
-    
-    
+
     ## Without Python bindings
 
     ```{.default .code-overflow-wrap}
-    "C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0
+    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
+    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0
 
     ```
 
     ## Without CUDA
 
     ```{.default .code-overflow-wrap}
-    "C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
+    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
     ```
 
     ## Ninja
@@ -158,7 +162,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ```{.default .code-overflow-wrap}
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-    "C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DCUDA_ARCH_PTX=8.6 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON
+    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON
     ```
 
     Following the configuration step the build is started with
@@ -169,6 +173,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     where
 
+    i) **N_THREADS** should be set to the number of cores/logical processors your CPU has,
     i) **PATH_TO_OPENCV_SOURCE** is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.), 
     ii) **PATH_TO_OPENCV_CONTRIB_MODULES** is the path to the **modules** directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),
     iii) **PATH_TO_BUILD_DIR** is the path to the directory where the build files should go,
@@ -187,139 +192,140 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ## Example of CMake Configuration Output
     ```{.default}
-    --
-    -- General configuration for OpenCV 4.7.0-dev =====================================
-    --   Version control:               4.7.0-252-g88a438e542
-    --
-    --   Extra modules:
-    --     Location (extra):            D:/repos/opencv/contrib/modules
-    --     Version control (extra):     4.7.0-42-ga42b8bef
-    --
-    --   Platform:
-    --     Timestamp:                   2023-05-03T10:21:52Z
-    --     Host:                        Windows 10.0.22621 AMD64
-    --     CMake:                       3.25.1
-    --     CMake generator:             Visual Studio 17 2022
-    --     CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe
-    --     MSVC:                        1934
-    --     Configuration:               Debug Release
-    --
-    --   CPU/HW features:
-    --     Baseline:                    SSE SSE2 SSE3
-    --       requested:                 SSE3
-    --     Dispatched code generation:  SSE4_1 SSE4_2 FP16 AVX AVX2 AVX512_SKX
-    --       requested:                 SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX
-    --       SSE4_1 (18 files):         + SSSE3 SSE4_1
-    --       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2
-    --       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX
-    --       AVX (8 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
-    --       AVX2 (36 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
-    --       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX
-    --
-    --   C/C++:
-    --     Built as dynamic libs?:      YES
-    --     C++ standard:                11
-    --     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe  (ver 19.34.31937.0)
-    --     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MD /O2 /Ob2 /DNDEBUG
-    --     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MDd /Zi /Ob0 /Od /RTC1
-    --     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe
-    --     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP   /MD /O2 /Ob2 /DNDEBUG
-    --     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP /MDd /Zi /Ob0 /Od /RTC1
-    --     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO
-    --     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL
-    --     ccache:                      NO
-    --     Precompiled headers:         NO
-    --     Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cufft.lib -LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/lib/x64
-    --     3rdparty dependencies:
-    --
-    --   OpenCV modules:
-    --     To be built:                 aruco barcode bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
-    --     Disabled:                    -
-    --     Disabled by dependency:      -
-    --     Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
-    --     Applications:                tests perf_tests examples apps
-    --     Documentation:               NO
-    --     Non-free algorithms:         NO
-    --
-    --   Windows RT support:            NO
-    --
-    --   GUI:
-    --     Win32 UI:                    YES
-    --     VTK support:                 NO
-    --
-    --   Media I/O:
-    --     ZLib:                        build (ver 1.2.13)
-    --     JPEG:                        build-libjpeg-turbo (ver 2.1.3-62)
-    --       SIMD Support Request:      YES
-    --       SIMD Support:              NO
-    --     WEBP:                        build (ver encoder: 0x020f)
-    --     PNG:                         build (ver 1.6.37)
-    --     TIFF:                        build (ver 42 - 4.2.0)
-    --     JPEG 2000:                   build (ver 2.4.0)
-    --     OpenEXR:                     build (ver 2.3.0)
-    --     HDR:                         YES
-    --     SUNRASTER:                   YES
-    --     PXM:                         YES
-    --     PFM:                         YES
-    --
-    --   Video I/O:
-    --     DC1394:                      NO
-    --     FFMPEG:                      YES (prebuilt binaries)
-    --       avcodec:                   YES (58.134.100)
-    --       avformat:                  YES (58.76.100)
-    --       avutil:                    YES (56.70.100)
-    --       swscale:                   YES (5.9.100)
-    --       avresample:                YES (4.0.0)
-    --     GStreamer:                   NO
-    --     DirectShow:                  YES
-    --     Media Foundation:            YES
-    --       DXVA:                      YES
-    --
-    --   Parallel framework:            Concurrency
-    --
-    --   Trace:                         YES (with Intel ITT)
-    --
-    --   Other third-party libraries:
-    --     Intel IPP:                   2021.8 [2021.8.0]
-    --            at:                   D:/build/opencv/4_7_0/delete_this/3rdparty/ippicv/ippicv_win/icv
-    --     Intel IPP IW:                sources (2021.8.0)
-    --               at:                D:/build/opencv/4_7_0/delete_this/3rdparty/ippicv/ippicv_win/iw
-    --     Lapack:                      NO
-    --     Eigen:                       NO
-    --     Custom HAL:                  NO
-    --     Protobuf:                    build (3.19.1)
-    --     Flatbuffers:                 builtin/3rdparty (23.1.21)
-    --
-    --   NVIDIA CUDA:                   YES (ver 12.1, CUFFT CUBLAS NVCUVID NVCUVENC)
-    --     NVIDIA GPU arch:
-    --     NVIDIA PTX archs:            90
-    --
-    --   cuDNN:                         NO
-    --
-    --   OpenCL:                        YES (NVD3D11)
-    --     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
-    --     Link libraries:              Dynamic load
-    --
-    --   Python 3:
-    --     Interpreter:                 C:/Users/username/mambaforge/python.exe (ver 3.9.16)
-    --     Libraries:                   C:/Users/username/mambaforge/libs/python39.lib (ver 3.9.16)
-    --     numpy:                       C:/Users/username/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)
-    --     install path:                C:/Users/username/mambaforge/Lib/site-packages/cv2/python-3.9
-    --
-    --   Python (for build):            C:/Users/username/mambaforge/python.exe
-    --
-    --   Java:
-    --     ant:                         NO
-    --     JNI:                         NO
-    --     Java wrappers:               NO
-    --     Java tests:                  NO
-    --
-    --   Install to:                    D:/build/opencv/4_7_0/install
-    -- -----------------------------------------------------------------
-    --
-    -- Configuring done
-    -- Generating done
-    -- Build files have been written to: D:/build/opencv/4_7_0
+--
+-- General configuration for OpenCV 4.8.0-dev =====================================
+--   Version control:               4.8.0-343-ga3b3a589f9
+--
+--   Extra modules:
+--     Location (extra):            D:/repos/opencv/contrib/modules
+--     Version control (extra):     4.8.1-33-g5b95c334
+--
+--   Platform:
+--     Timestamp:                   2023-10-24T16:50:47Z
+--     Host:                        Windows 10.0.22621 AMD64
+--     CMake:                       3.25.1
+--     CMake generator:             Visual Studio 17 2022
+--     CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe
+--     MSVC:                        1936
+--     Configuration:               Debug Release
+--
+--   CPU/HW features:
+--     Baseline:                    SSE SSE2 SSE3
+--       requested:                 SSE3
+--     Dispatched code generation:  SSE4_1 SSE4_2 FP16 AVX AVX2 AVX512_SKX
+--       requested:                 SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX
+--       SSE4_1 (18 files):         + SSSE3 SSE4_1
+--       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2
+--       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX
+--       AVX (9 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
+--       AVX2 (38 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
+--       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX
+--
+--   C/C++:
+--     Built as dynamic libs?:      YES
+--     C++ standard:                11
+--     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe  (ver 19.36.32537.0)
+--     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MD /O2 /Ob2 /DNDEBUG
+--     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MDd /Zi /Ob0 /Od /RTC1
+--     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe
+--     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP   /MD /O2 /Ob2 /DNDEBUG
+--     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP /MDd /Zi /Ob0 /Od /RTC1
+--     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO
+--     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL
+--     ccache:                      NO
+--     Precompiled headers:         NO
+--     Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cudnn.lib cufft.lib -LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3/lib/x64
+--     3rdparty dependencies:
+--
+--   OpenCV modules:
+--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
+--     Disabled:                    -
+--     Disabled by dependency:      -
+--     Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
+--     Applications:                tests perf_tests examples apps
+--     Documentation:               NO
+--     Non-free algorithms:         NO
+--
+--   Windows RT support:            NO
+--
+--   GUI:
+--     Win32 UI:                    YES
+--     VTK support:                 NO
+--
+--   Media I/O:
+--     ZLib:                        build (ver 1.2.13)
+--     JPEG:                        build-libjpeg-turbo (ver 2.1.3-62)
+--       SIMD Support Request:      YES
+--       SIMD Support:              NO
+--     WEBP:                        build (ver encoder: 0x020f)
+--     PNG:                         build (ver 1.6.37)
+--     TIFF:                        build (ver 42 - 4.2.0)
+--     JPEG 2000:                   build (ver 2.5.0)
+--     OpenEXR:                     build (ver 2.3.0)
+--     HDR:                         YES
+--     SUNRASTER:                   YES
+--     PXM:                         YES
+--     PFM:                         YES
+--
+--   Video I/O:
+--     DC1394:                      NO
+--     FFMPEG:                      YES (prebuilt binaries)
+--       avcodec:                   YES (58.134.100)
+--       avformat:                  YES (58.76.100)
+--       avutil:                    YES (56.70.100)
+--       swscale:                   YES (5.9.100)
+--       avresample:                YES (4.0.0)
+--     GStreamer:                   NO
+--     DirectShow:                  YES
+--     Media Foundation:            YES
+--       DXVA:                      YES
+--
+--   Parallel framework:            Concurrency
+--
+--   Trace:                         YES (with Intel ITT)
+--
+--   Other third-party libraries:
+--     Intel IPP:                   2021.8 [2021.8.0]
+--            at:                   D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/icv
+--     Intel IPP IW:                sources (2021.8.0)
+--               at:                D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/iw
+--     Lapack:                      NO
+--     Eigen:                       NO
+--     Custom HAL:                  NO
+--     Protobuf:                    build (3.19.1)
+--     Flatbuffers:                 builtin/3rdparty (23.5.9)
+--
+--   NVIDIA CUDA:                   YES (ver 12.3, CUFFT CUBLAS NVCUVID NVCUVENC)
+--     NVIDIA GPU arch:             50 52 60 61 70 75 80 86 89 90
+--     NVIDIA PTX archs:            90
+--
+--   cuDNN:                         YES (ver 8.9.5)
+--
+--   OpenCL:                        YES (NVD3D11)
+--     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
+--     Link libraries:              Dynamic load
+--
+--   Python 3:
+--     Interpreter:                 C:/Users/b/mambaforge/python.exe (ver 3.9.16)
+--     Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.16)
+--     numpy:                       C:/Users/b/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)
+--     install path:                C:/Users/b/mambaforge//Lib/site-packages//cv2/python-3.9
+--
+--   Python (for build):            C:/Users/b/mambaforge/python.exe
+--
+--   Java:
+--     ant:                         NO
+--     Java:                        NO
+--     JNI:                         NO
+--     Java wrappers:               NO
+--     Java tests:                  NO
+--
+--   Install to:                    D:/build/opencv/4_8_X/install
+-- -----------------------------------------------------------------
+--
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/build/opencv/4_8_X
     ```
     :::
 
@@ -363,7 +369,7 @@ Ninja is installed by default if the **Desktop development with C++** workload i
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
     ```
 
-2. Telling CMake to use **Ninja** instead of Visual Studio, i.e. replacing **-G"Visual Studio 17 2022"** with **-GNinja**.
+2. Telling CMake to use **Ninja** instead of Visual Studio, i.e. replacing **-G&quot;Visual Studio 17 2022&quot;** with **-GNinja**.
 
 [As the CMake **\-\-build** option is just for [convenience](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project) you can alternatively call Ninja directly with **ninja -C PATH_TO_BUILD_DIR install**.]{.aside}
 
