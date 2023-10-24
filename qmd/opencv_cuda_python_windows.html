@@ -276,6 +276,12 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">January 10, 2025</p>
+    </div>
+  </div>
     
   </div>
   
@@ -383,22 +389,26 @@ Tip
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">All CUDA modules</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">cuDNN only</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Without Python bindings</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Without CUDA</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Ninja</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="sourceCode" id="opencv-cuda-python-windows-cmake-flags"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="opencv-cuda-python-windows-cmake-flags-1"><a href="#opencv-cuda-python-windows-cmake-flags-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="opencv-cuda-python-windows-cmake-flags"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="opencv-cuda-python-windows-cmake-flags-1"><a href="#opencv-cuda-python-windows-cmake-flags-1" aria-hidden="true" tabindex="-1"></a>set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS</span>
+<span id="opencv-cuda-python-windows-cmake-flags-2"><a href="#opencv-cuda-python-windows-cmake-flags-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>If you just want to CUDA accelerate the DNN module and are not interested in building the rest of the CUDA modules this will significantly reduce compilation time and size of opencv_worldxxx.dll.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<div class="sourceCode" id="cb2"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DWITH_CUFFT=ON -DCUDA_ARCH_PTX=9.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
-<div class="sourceCode" id="cb3"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
 <p>For details see <a href="#decreasing-the-build-time-with-ninja">decreasing the build time with Ninja</a></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -B"PATH_TO_BUILD_DIR" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DWITH_CUBLAS=ON -DCUDA_ARCH_PTX=8.6 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Following the configuration step the build is started with</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -406,6 +416,7 @@ Tip
 </div>
 <p>where</p>
 <ol type="i">
+<li><strong>N_THREADS</strong> should be set to the number of cores/logical processors your CPU has,</li>
 <li><strong>PATH_TO_OPENCV_SOURCE</strong> is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.),</li>
 <li><strong>PATH_TO_OPENCV_CONTRIB_MODULES</strong> is the path to the <strong>modules</strong> directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),</li>
 <li><strong>PATH_TO_BUILD_DIR</strong> is the path to the directory where the build files should go,</li>
@@ -440,20 +451,20 @@ Example of CMake Configuration Output
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>-- General configuration for OpenCV 4.7.0-dev =====================================</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>--   Version control:               4.7.0-252-g88a438e542</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>-- General configuration for OpenCV 4.8.0-dev =====================================</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>--   Version control:               4.8.0-343-ga3b3a589f9</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>--   Extra modules:</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>--     Location (extra):            D:/repos/opencv/contrib/modules</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>--     Version control (extra):     4.7.0-42-ga42b8bef</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>--     Version control (extra):     4.8.1-33-g5b95c334</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>--   Platform:</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>--     Timestamp:                   2023-05-03T10:21:52Z</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>--     Timestamp:                   2023-10-24T16:50:47Z</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>--     Host:                        Windows 10.0.22621 AMD64</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>--     CMake:                       3.25.1</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>--     CMake generator:             Visual Studio 17 2022</span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>--     CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>--     MSVC:                        1934</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>--     MSVC:                        1936</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>--     Configuration:               Debug Release</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>--   CPU/HW features:</span>
@@ -464,28 +475,28 @@ Example of CMake Configuration Output
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>--       SSE4_1 (18 files):         + SSSE3 SSE4_1</span>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>--       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2</span>
 <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>--       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>--       AVX (8 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>--       AVX2 (36 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>--       AVX (9 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>--       AVX2 (38 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2</span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>--       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>--   C/C++:</span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>--     Built as dynamic libs?:      YES</span>
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>--     C++ standard:                11</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>--     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe  (ver 19.34.31937.0)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>--     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe  (ver 19.36.32537.0)</span>
 <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>--     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MD /O2 /Ob2 /DNDEBUG</span>
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>--     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MDd /Zi /Ob0 /Od /RTC1</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>--     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>--     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe</span>
 <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>--     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP   /MD /O2 /Ob2 /DNDEBUG</span>
 <span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>--     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP /MDd /Zi /Ob0 /Od /RTC1</span>
 <span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>--     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO</span>
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>--     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL</span>
 <span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>--     ccache:                      NO</span>
 <span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>--     Precompiled headers:         NO</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>--     Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppicom.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cufft.lib -LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/lib/x64</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>--     Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cudnn.lib cufft.lib -LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3/lib/x64</span>
 <span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>--     3rdparty dependencies:</span>
 <span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>--   OpenCV modules:</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>--     To be built:                 aruco barcode bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto</span>
 <span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>--     Disabled:                    -</span>
 <span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>--     Disabled by dependency:      -</span>
 <span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>--     Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 python2 sfm viz</span>
@@ -507,7 +518,7 @@ Example of CMake Configuration Output
 <span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>--     WEBP:                        build (ver encoder: 0x020f)</span>
 <span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>--     PNG:                         build (ver 1.6.37)</span>
 <span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>--     TIFF:                        build (ver 42 - 4.2.0)</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>--     JPEG 2000:                   build (ver 2.4.0)</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>--     JPEG 2000:                   build (ver 2.5.0)</span>
 <span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>--     OpenEXR:                     build (ver 2.3.0)</span>
 <span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>--     HDR:                         YES</span>
 <span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>--     SUNRASTER:                   YES</span>
@@ -533,45 +544,46 @@ Example of CMake Configuration Output
 <span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>--   Other third-party libraries:</span>
 <span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>--     Intel IPP:                   2021.8 [2021.8.0]</span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>--            at:                   D:/build/opencv/4_7_0/delete_this/3rdparty/ippicv/ippicv_win/icv</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>--            at:                   D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/icv</span>
 <span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>--     Intel IPP IW:                sources (2021.8.0)</span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>--               at:                D:/build/opencv/4_7_0/delete_this/3rdparty/ippicv/ippicv_win/iw</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>--               at:                D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/iw</span>
 <span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>--     Lapack:                      NO</span>
 <span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>--     Eigen:                       NO</span>
 <span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>--     Custom HAL:                  NO</span>
 <span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>--     Protobuf:                    build (3.19.1)</span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>--     Flatbuffers:                 builtin/3rdparty (23.1.21)</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>--     Flatbuffers:                 builtin/3rdparty (23.5.9)</span>
 <span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>--   NVIDIA CUDA:                   YES (ver 12.1, CUFFT CUBLAS NVCUVID NVCUVENC)</span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>--     NVIDIA GPU arch:</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>--   NVIDIA CUDA:                   YES (ver 12.3, CUFFT CUBLAS NVCUVID NVCUVENC)</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>--     NVIDIA GPU arch:             50 52 60 61 70 75 80 86 89 90</span>
 <span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>--     NVIDIA PTX archs:            90</span>
 <span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>--   cuDNN:                         NO</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>--   cuDNN:                         YES (ver 8.9.5)</span>
 <span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>--   OpenCL:                        YES (NVD3D11)</span>
 <span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>--     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2</span>
 <span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>--     Link libraries:              Dynamic load</span>
 <span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>--   Python 3:</span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>--     Interpreter:                 C:/Users/username/mambaforge/python.exe (ver 3.9.16)</span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>--     Libraries:                   C:/Users/username/mambaforge/libs/python39.lib (ver 3.9.16)</span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>--     numpy:                       C:/Users/username/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)</span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>--     install path:                C:/Users/username/mambaforge/Lib/site-packages/cv2/python-3.9</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>--     Interpreter:                 C:/Users/b/mambaforge/python.exe (ver 3.9.16)</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>--     Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.16)</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>--     numpy:                       C:/Users/b/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>--     install path:                C:/Users/b/mambaforge//Lib/site-packages//cv2/python-3.9</span>
 <span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>--   Python (for build):            C:/Users/username/mambaforge/python.exe</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>--   Python (for build):            C:/Users/b/mambaforge/python.exe</span>
 <span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>--</span>
 <span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>--   Java:</span>
 <span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>--     ant:                         NO</span>
-<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>--     JNI:                         NO</span>
-<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>--     Java wrappers:               NO</span>
-<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>--     Java tests:                  NO</span>
-<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>--   Install to:                    D:/build/opencv/4_7_0/install</span>
-<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>-- -----------------------------------------------------------------</span>
-<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>--</span>
-<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>-- Configuring done</span>
-<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>-- Generating done</span>
-<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>-- Build files have been written to: D:/build/opencv/4_7_0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>--     Java:                        NO</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>--     JNI:                         NO</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>--     Java wrappers:               NO</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>--     Java tests:                  NO</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>--</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>--   Install to:                    D:/build/opencv/4_8_X/install</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>-- -----------------------------------------------------------------</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>--</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>-- Configuring done</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>-- Generating done</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>-- Build files have been written to: D:/build/opencv/4_8_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -624,7 +636,7 @@ Important
 <ol type="1">
 <li><p>Configuring Visual Studio Development tools by entering the following into the command prompt before entering the CMake command (changing Community to either Professional or Enterprise if necessary)</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-overflow-wrap code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p>Telling CMake to use <strong>Ninja</strong> instead of Visual Studio, i.e.&nbsp;replacing <strong>-G”Visual Studio 17 2022”</strong> with <strong>-GNinja</strong>.</p></li>
+<li><p>Telling CMake to use <strong>Ninja</strong> instead of Visual Studio, i.e.&nbsp;replacing <strong>-G"Visual Studio 17 2022"</strong> with <strong>-GNinja</strong>.</p></li>
 </ol>
 <div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="">As the CMake <strong>--build</strong> option is just for <a href="https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project">convenience</a> you can alternatively call Ninja directly with <strong>ninja -C PATH_TO_BUILD_DIR install</strong>.</span></div></div>
 <p>Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant <strong>–config</strong> argument, i.e.</p>
