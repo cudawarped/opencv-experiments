@@ -3,7 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
-date-modified: 25/10/23
+date-modified: 10/24/23
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -130,31 +130,31 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
     ## All CUDA modules
 
     ```{.default .code-overflow-wrap #opencv-cuda-python-windows-cmake-flags}
-    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
-    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     ## cuDNN only
     If you just want to CUDA accelerate the DNN module and are not interested in building the rest of the CUDA modules this will significantly reduce compilation time and size of opencv_worldxxx.dll.
 
     ```{.default .code-overflow-wrap}
-    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
-    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     ## Without Python bindings
 
     ```{.default .code-overflow-wrap}
-    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
-    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0
+    set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0
 
     ```
 
     ## Without CUDA
 
     ```{.default .code-overflow-wrap}
-    set CMAKE_BUILD_PARALLEL_LEVEL=N_THREADS
-    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/
+    set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     ## Ninja
@@ -162,7 +162,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ```{.default .code-overflow-wrap}
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-    "C:\Program Files\CMake\bin\cmake.exe" -H"PATH_TO_OPENCV_SOURCE" -DOPENCV_EXTRA_MODULES_PATH="PATH_TO_OPENCV_CONTRIB_MODULES" -B"PATH_TO_BUILD_DIR" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=PATH_TO_PYTHON_DIST/include -DPYTHON3_LIBRARY=PATH_TO_PYTHON_DIST/libs/python%pyVer%.lib -DPYTHON3_EXECUTABLE=PATH_TO_PYTHON_DIST/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=PATH_TO_PYTHON_DIST/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=PATH_TO_PYTHON_DIST/Lib/site-packages/ -DOPENCV_SKIP_PYTHON_LOADER=ON
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     Following the configuration step the build is started with
@@ -173,12 +173,12 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     where
 
-    i) **N_THREADS** should be set to the number of cores/logical processors your CPU has,
-    i) **PATH_TO_OPENCV_SOURCE** is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.), 
-    ii) **PATH_TO_OPENCV_CONTRIB_MODULES** is the path to the **modules** directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),
-    iii) **PATH_TO_BUILD_DIR** is the path to the directory where the build files should go,
-    iv) **PATH_TO_PYTHON_DIST** is the directory where mambaforge was installed and,
-    v) **PYTHON_VERSION** is the concatination of the major and minor version of your python install, e.g. for Python 3.10.10 **PYTHON_VERSION**==310.
+    i) **\<N_THREADS\>** should be set to the number of cores/logical processors on your CPU,
+    i) **\<PATH_TO_OPENCV_SOURCE\>** is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.), 
+    ii) **\<PATH_TO_OPENCV_CONTRIB_MODULES\>** is the path to the **modules** directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),
+    iii) **\<PATH_TO_BUILD_DIR\>** is the path to the directory where the build files should go,
+    iv) **\<PATH_TO_PYTHON_DIST\>** is the directory where mambaforge was installed and,
+    v) **\<PYTHON_LIB\>** is the concatination of "python" with the major and minor version of your python install and ".lib", e.g. for Python 3.10.6 **\<PYTHON_LIB\>**==python310.lib.  You can confirm this by looking in your **\<PATH_TO_PYTHON_DIST\>**/libs directory.
 
     ::: {.callout-warning appearance="default"}
     When passing **paths** to CMake on the command line make sure not to terminate them using **\\** as this is a special character and will cause the following arguments to be ignored. e.g. **PATH_TO_OPENCV_SOURCE** can be **D:\\opencv** or **D:\\opencv/** but not **D:\\opencv\\**.
@@ -307,9 +307,9 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 --
 --   Python 3:
 --     Interpreter:                 C:/Users/b/mambaforge/python.exe (ver 3.9.16)
---     Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.16)
+--     Libraries:                   C:/Users/b/mambaforge/libs/python39.lib (ver 3.9.16)
 --     numpy:                       C:/Users/b/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)
---     install path:                C:/Users/b/mambaforge//Lib/site-packages//cv2/python-3.9
+--     install path:                C:/Users/b/mambaforge/Lib/site-packages/cv2/python-3.9
 --
 --   Python (for build):            C:/Users/b/mambaforge/python.exe
 --
