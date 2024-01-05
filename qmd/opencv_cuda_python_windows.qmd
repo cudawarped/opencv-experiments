@@ -3,7 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
-date-modified: 10/24/23
+date-modified: 01/05/24
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -44,9 +44,9 @@ description: Guide to building OpenCV (including Python bindings) with [CUDA](ht
 
 The pre-built [Windows libraries](https://github.com/opencv/opencv/releases) available for [OpenCV](https://opencv.org/releases) do not include the [CUDA modules](https://docs.opencv.org/4.x/d1/d1e/group__cuda.html), support for the Nvidia [Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) or [cuDNN](https://developer.nvidia.com/cudnn).
 
-If you just need the Windows libraries or a Python wheele take a look at [OpenCV C++ CUDA builds](https://github.com/cudawarped/opencv_contrib/releases) and/or [OpenCV Python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) to see if there is a pre-built version suitable for your setup.
+If you just need the Windows libraries or a Python wheel take a look at [OpenCV C++ CUDA builds](https://github.com/cudawarped/opencv_contrib/releases) and/or [OpenCV Python CUDA wheels](https://github.com/cudawarped/opencv-python-cuda-wheels/releases) to see if there is a pre-built version suitable for your setup.
 
-To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in [OpenCV CUDA Performance Comparisson (Nvidia vs Intel)](opencv_cuda_performance.qmd).
+To see if building the OpenCV CUDA modules is suitable for your application you can get an indication of the performance boost of most functions in [OpenCV CUDA Performance Comparison (Nvidia vs Intel)](opencv_cuda_performance.qmd).
 
 # Before you begin quickly check which parts of the guide are relevant to you
 
@@ -77,7 +77,7 @@ There are a couple of components you need to download and/or install before you 
 If your system path is too long, CUDA will not add the path to its shared libraries **C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\vxx.x\\bin ** during installation.  If you receive a warning about this at the end of the installation process do not forget to manually add the this to your system or user path.
 :::
 
-[Before building you may want to ensure that your GPU has decoding support by refering to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>]{.aside}
+[Before building you may want to ensure that your GPU has decoding support by referring to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>]{.aside}
 
 5. **Optional** - To **decode** video on the GPU with the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>:
     i) Register and <a href="https://developer.nvidia.com/nvidia-video-codec-sdk#Download" target="_blank" rel="noopener noreferrer">download</a> the latest version of the **Complete Video Codec SDK xx.x Package**.
@@ -101,7 +101,7 @@ The installation directory for CUDA xx.x is
 # Building OpenCV with CMake
 
 [If you have any build issues with OpenCV then you will need to provide the arguments passed to CMake as well as the output from the generation step when asking for assistance which is another good reason to avoid the CMake GUI if you can.]{.aside}
-Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI.  Most new users will find the GUI more accessable however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions for using the CMake GUI.
+Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI.  Most new users will find the GUI more accessible however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions for using the CMake GUI.
 
 In addition there are several ways to build OpenCV using Visual Studio. For simplicity only two methods are discussed:
 
@@ -110,7 +110,12 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
 ## Building OpenCV with CUDA using Visual Studio solution files from the command prompt (cmd)
 
- The following steps will build the opencv_worldxxx.dll using NVIDIA's recommended settings for future hardware compatibility. This does however have two drawbacks, first the build can take several hours to complete and second, the shared library can be over 1GB depending on the configuration that you choose. To find out how to reduce both the compilation time and size of opencv_worldxxx.dll read [choosing a suitable CUDA compute capability](#choosing-the-cuda-compute-capability) first and then continue as below. Additionally to reduce the build time futher you can use the Ninja build system, see [building OpenCV with the ninja build system to reduce the build time](#decreasing-the-build-time-with-ninja).
+ The following steps will build opencv_worldxxx.dll which is suitable for use on the installed GPU and any other GPUs with the ["same"](#choosing-a-suitable-cuda-compute-capability) compute capability.  This is the best way to get started as it has the smallest build time, but it will limit your options if you want to build software which runs on a range of different GPUs.  To fully understand the implications of this please read [choosing a suitable CUDA compute capability](#choosing-a-suitable-cuda-compute-capability).
+
+::: {.callout-tip collapse=false}
+## Use Ninja for faster build times
+Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the build time I recommended always using the Ninja build system instead, see the Ninja tab below for the command line arguments and [building OpenCV with the ninja build system to reduce the build time](#decreasing-the-build-time-with-ninja) for more information.
+:::
 
 1. Open windows command prompt, type **cmd** in the Windows search bar.
 
@@ -119,7 +124,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
 2.  Paste the below into to the command prompt and press **Enter**.
 
-    [An additionaly option you may want to include is **-DCUDA_FAST_MATH=ON** which compiles the CUDA kernels with the [-use_fast_math](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions) option.  This will however cause some of the accuracy and performace tests to fail as the floating point results will be slightly less accurate.]{.aside}
+    [An additionally option you may want to include is **-DCUDA_FAST_MATH=ON** which compiles the CUDA kernels with the [-use_fast_math](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions) option.  This will however cause some of the accuracy and performance tests to fail as the floating point results will be slightly less accurate.]{.aside}
 
     [The default installation directory for mambaforge is **%userprofile%\\mambaforge**.]{.aside}
 
@@ -131,7 +136,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ```{.default .code-overflow-wrap #opencv-cuda-python-windows-cmake-flags}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     ## cuDNN only
@@ -139,14 +144,14 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ```{.default .code-overflow-wrap}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     ## Without Python bindings
 
     ```{.default .code-overflow-wrap}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto
 
     ```
 
@@ -162,12 +167,12 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
 
     ```{.default .code-overflow-wrap}
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Ninja" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DWITH_CUDA=ON -DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90 -DCUDA_ARCH_PTX=9.0 -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Ninja Multi-Config"" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
     ```
 
     Following the configuration step the build is started with
     ```{.default .code-overflow-wrap}
-    "C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL
+    "C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target install --config Release
     ```
     :::
 
@@ -342,7 +347,7 @@ In addition there are several ways to build OpenCV using Visual Studio. For simp
     i) Build directly from the command line by simply entering the following (swaping **Release** for **Debug** to build a release version)
 
         ```{.default .code-overflow-wrap}
-        "C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL --config Debug
+        "C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target install --config Debug
         ```
 
     ii) Build through Visual Studio GUI by opening up the **OpenCV.sln** in Visual Studio, selecting your Configuration, clicking on **Solution Explorer**, expanding **CMakeTargets**, right clicking on **INSTALL** and clicking **Build**.
@@ -359,9 +364,9 @@ If everything was successful, congratulations, you now have OpenCV built with CU
 
 ## Decreasing the build time with Ninja
 
-The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins to under an hour on an i7-8700) by utilizing the Ninja build system instead of directly generating Visual Studio solution files.  The only difference you may notice is that Ninja will only produce one configuration at a time, either a Debug or Release, therefore if you don't want to build Release (the default) the **CMAKE_BUILD_TYPE** has to be passed to CMake.
+The build time for OpenCV can be reduced by more than 2x (from 2 hours to 30 mins to under an hour on an i7-8700) by utilizing the Ninja build system instead of directly generating Visual Studio solution files.
 
-Ninja is installed by default if the **Desktop development with C++** workload is selected when installing Visual Studio, therefore building with Ninja only requires two extra configuration steps, expand the tip below for an example of the modified command line arguments.:
+Ninja is installed by default if the **Desktop development with C++** workload is selected when installing Visual Studio, therefore building with Ninja only requires two extra configuration steps:
 
 1. Configuring Visual Studio Development tools by entering the following into the command prompt before entering the CMake command (changing Community to either Professional or Enterprise if necessary)
 
@@ -369,16 +374,16 @@ Ninja is installed by default if the **Desktop development with C++** workload i
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
     ```
 
-2. Telling CMake to use **Ninja** instead of Visual Studio, i.e. replacing **-G&quot;Visual Studio 17 2022&quot;** with **-GNinja**.
+2. Telling CMake to use Ninja instead of Visual Studio, i.e. replacing **-G&quot;Visual Studio 17 2022&quot;** with **-G&quot;Ninja Multi-Config&quot;**.
 
-[As the CMake **\-\-build** option is just for [convenience](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project) you can alternatively call Ninja directly with **ninja -C PATH_TO_BUILD_DIR install**.]{.aside}
+<!-- [As the CMake **\-\-build** option is just for [convenience](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Getting%20Started.html#building-your-project) you can alternatively call Ninja directly with **ninja -C PATH_TO_BUILD_DIR install**.]{.aside} -->
 
-Once the build files have been generated the build can be kicked off in the same way as before but this time dropping the redundant **--config** argument, i.e.
+Once the build files have been generated the build can be kicked off in the same way as before. i.e.
 ```{.default .code-overflow-wrap}
-"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target INSTALL
+"C:\Program Files\CMake\bin\cmake.exe" --build PATH_TO_BUILD_DIR --target install --config Release
 ```
 
-for an example fo the full command line for building a Release version of OpenCV with the Ninja build system go to the [Ninja tab](#opencv-cuda-python-windows-cmake-flags).
+for an example fo the full command line for building a Release version of OpenCV with the Ninja build system go to the [Ninja](#opencv-cuda-python-windows-cmake-flags) tab.
 
 # Verifying OpenCV is CUDA accelerated
 [The GEMM test is used in this example but any of the accuracy (**opencv_test_cuda\*.exe**) or performance (**opencv_perf_cuda\*.exe**) tests could have been chosen.]{.aside}
@@ -529,7 +534,8 @@ If you have downloaded the pre-built binaries or are having issues with the auto
 
 # Choosing a suitable CUDA compute capability
 
-The default command line options given above implement NVIDIA’s recommended settings for future hardware compatibility. This means that OpenCV should work on all GPU’s currently supported by the most recent version of CUDA and all GPU’s released in the future. As mentioned above this comes at a cost, both in terms of compilation time and shared library size. Before discussing the CMake settings which can be used to reduce these costs we need to understand the following concepts:
+The default command line options given above will build a version of OpenCV which runs on the GPUs which are installed at configuration time.
+As mentioned above depending on your circumstances this might be the best solution. e.g. If you don't have a GPU installed on the build system. Before discussing the various options which can be used to add support for GPUs with different compute capabilities to those installed on your system it is important to understand the following concepts:
 
 1) **Compute capability** – every GPU has a fixed compute capability which determines its general specifications and features. In general the more recent the GPU the higher the compute-capability and the more features it will support. This is important because: 
     - Each version of CUDA supports different compute capabilities. Usually a new version of CUDA comes out to suppoort a new GPU architecture, in the case of CUDA 11.0, support was added for the Ampere (compute 8.0, with compute 8.6 added in CUDA 11.1) architecture. On the flip side support for compute 3.0 and 3.2 was dropped. Therefore by if we chose to build OpenCV with CUDA 11.0 we limit ourselves to GPU’s of compute capability >=3.5. Notice we have not limited ourselves to compute capability GPU’s <=8.6, the reason for this is discussed in the next section.
@@ -549,9 +555,9 @@ The default command line options given above implement NVIDIA’s recommended se
 
 ## CMake command line options to control cubin/PTX content of the OpenCV shared library
 
-Given (1)-(3) above, the command line options that you want to pass to CMake when building OpenCV will depend on your specific requirements. I have given some examples below for various scenarios given a main GPU with compute capability 6.1:
+Given (1)-(3) above, the command line options that you want to pass to CMake when building OpenCV will depend on your specific requirements. I have given some examples below for various scenarios given a main GPU with compute capability 6.1 and CUDA toolkit 12:
 
-- Firstly stick with the defaults if compile time and shared library size are not an issue. This offers the greatest amount of flexibility from a development standpoint, avoiding the possibility of needing to recompile OpenCV when you switch GPU.
-- If your programs will always be run on your main GPU, just pass **-DCUDA_ARCH_BIN=6.1** to CMake to target your architecture only. It should take around an hour to build, depending on your CPU and the resulting shared library should not be larger than 200 MB.
-- If you are going to deploy your application, but only to newer GPU’s pass **-DCUDA_ARCH_BIN=6.1,7.0,8.0,8.6** and **-DCUDA_ARCH_PTX=8.6** to CMake for maximum performance and future compatibility. This is advisable because you may not have any control over the size of the JIT cache on the target machine, therefore including cubin’s for all compute-capabilities you want to support, is the only way be sure to prevent JIT compilation delay on every invocation of your application.
-- If size is really an issue but you don’t know which GPU’s you want to run your application on then to ensure that your program will run on all current and future supported GPU’s pass **-DCUDA_ARCH_BIN=6.1** and **-DCUDA_ARCH_PTX=3.0** to CMake for maximum coverage.
+- Firstly stick with the defaults (**-DCUDA_GENERATION=Auto**) if your programs will always be run on your main GPU. It should take around an hour to build, depending on your CPU and the resulting shared library should not be larger than 200 MB.
+- If you want maximum coverage then use Nvidia's recommended settings for future compatibility.  That is compile for all supported major and minor real architectures, and the highest major virtual architecture by passing **-DCUDA_ARCH_BIN=50,52,60,61,70,75,80,86,89,90** and **-DCUDA_ARCH_PTX=90** to CMake.
+- If you are going to deploy your application, but only to newer GPU’s pass **-DCUDA_ARCH_BIN=61,70,80,86,89,90** and **-DCUDA_ARCH_PTX=90** to CMake for maximum performance and future compatibility. This is advisable because you may not have any control over the size of the JIT cache on the target machine, therefore including cubin’s for all compute-capabilities you want to support, is the only way be sure to prevent JIT compilation delay on every invocation of your application.
+- If size is really an issue but you don’t know which GPU’s you want to run your application on then to ensure that your program will run on all current and future supported GPU’s pass **-DCUDA_ARCH_BIN=61** and **-DCUDA_ARCH_PTX=30** to CMake for maximum coverage.
