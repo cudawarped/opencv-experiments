@@ -241,7 +241,6 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
   <ul class="collapse">
   <li><a href="#manually-adding-filter-entries" id="toc-manually-adding-filter-entries" class="nav-link" data-scroll-target="#manually-adding-filter-entries">Manually Adding Filter Entries</a></li>
   </ul></li>
-  <li><a href="#automatically-search-process-monitor-log-for-missing-dll" id="toc-automatically-search-process-monitor-log-for-missing-dll" class="nav-link" data-scroll-target="#automatically-search-process-monitor-log-for-missing-dll">Automatically search Process Monitor log for missing DLL</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -270,12 +269,6 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
     </div>
   </div>
   
-    <div>
-    <div class="quarto-title-meta-heading">Modified</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 14, 2024</p>
-    </div>
-  </div>
     
   </div>
   
@@ -293,28 +286,28 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 <section id="the-problem" class="level1">
 <h1>The problem</h1>
 <p>If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling <code>import cv2</code>, this short guide should help solve your problem.</p>
-<p>The guide assumes that you have either installed the python bindings during the build process (<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">not recommended</a>) or manually copied <strong>cv2.cpxx-win_amd64.pyd</strong> to your distributions <strong>site-packages</strong> directory (e.g.&nbsp;<strong>C:\Users\&lt;USER&gt;\miniforge3\Lib\site-packages</strong>).</p>
+<p>The guide assumes that you have either installed the python bindings during the build process (<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">not recommended</a>) or manually copied <strong>cv2.cpxx-win_amd64.pyd</strong> to your distributions <strong>site-packages</strong> directory (e.g.&nbsp;<strong>C:\Users\&lt;USER&gt;\mambaforge\Lib\site-packages</strong>).</p>
 <p>So what’s the issue? Although the message is quite explicit regarding the cause, it doesn’t really help with finding a solution. In a nutshell python has found <strong>cv2.cpxx-win_amd64.pyd</strong>, tried and then failed to load it because a it can’t find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the <strong>cv2.cpxx-win_amd64.pyd</strong> and see which dependencies the system can’t find.</p>
 <p>Now this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll resolution), however we are not, so even if dependency walker can’t detect any problems we may still be facing the above error.</p>
 <p>The good news is there is an easy fix if you know where the missing DLL’s are and only slightly more involved if you don’t as long as you have access to the missing DLL’s on your system.</p>
 </section>
 <section id="fix-when-path-to-missing-dlls-is-known" class="level1">
 <h1>Fix when path to missing DLL’s is known</h1>
-<p>To demonstrate the fix, I have built the OpenCV shared library and corresponding python bindings and manually copied them to the <strong>site-packages</strong> directory inside my python distribution (<strong>C:\Users\b\miniforge3\Lib\site-packages</strong>).</p>
-<p>As I have built a shared library the python bindings are dependant on <strong>opencv_world410.dll</strong> and I haven’t told python where they are I get the error shown below whenn trying to import them.</p>
-<div id="53efd81a" class="cell" data-execution_count="5">
+<p>To demonstrate the fix, I have built the OpenCV shared library and corresponding python bindings and manually copied them to the <strong>site-packages</strong> directory inside my python distribution (<strong>C:\Users\b\mambaforge\Lib\site-packages</strong>).</p>
+<p>As I have built a shared library the python bindings are dependant on <strong>opencv_world470.dll</strong> and I haven’t told python where they are I get the error shown below whenn trying to import them.</p>
+<div id="53efd81a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
-<pre><code>ImportError: DLL load failed: The specified module could not be found.</code></pre>
+<pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
 </div>
 <p>Given that I know the path to OpenCV’s shared libraries is required and I haven’t told python about it, the first thing to try is to add it to pythons DLL search path and see if that solves the problem.</p>
-<div id="ba4db59c" class="cell" data-execution_count="6">
+<div id="ba4db59c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:/build/opencv/4_10/install/x64/vc17/bin"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
-<pre><code>AttributeError: module 'os' has no attribute 'add_dll_directory'</code></pre>
+<pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
 </div>
 <p>Ahh the same error, what’s going on.</p>
@@ -524,41 +517,9 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
 </figure>
 </div>
 <p>Now process monitor shows that <strong>opencv_img_hash_470.dll</strong> and <strong>opencv_world470.dll</strong> were located successfully after a few attempts however we are missing <strong>nppc64_12.dll</strong> which is part of the CUDA SDK. As before if we add the CUDA SDK binary directory to the python DLL search path the call to <code>import cv2</code> will be successful. If however we were still seeing the same error we could simply repeat the process, that is examine the output in process monitor and add the directories containing the missing DLL’s to the python DLL search path.</p>
-</section>
-</section>
-<section id="automatically-search-process-monitor-log-for-missing-dll" class="level1">
-<h1>Automatically search Process Monitor log for missing DLL</h1>
-<p>The output from process monitor can be difficult to sift through. To help with this the output can be exported to a <em>.csv</em> file and then parsed using the below helper function.</p>
-<p>File-&gt;Save, select Format-&gt;Comma-Separeted Values (CSV), enter the location for the exported file in the under Path. Then To export</p>
-<div id="6223f2af" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> print_missing_libs(process_mon_export_file_path):</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    shared_libs <span class="op">=</span> {}</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(process_mon_export_file_path, mode<span class="op">=</span><span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        csv_reader <span class="op">=</span> csv.reader(<span class="bu">file</span>, delimiter<span class="op">=</span><span class="st">','</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> csv_reader:</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            key <span class="op">=</span> Path(row[<span class="dv">3</span>]).name.lower()</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>            val <span class="op">=</span> row[<span class="dv">4</span>]</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (key <span class="kw">not</span> <span class="kw">in</span> shared_libs <span class="kw">or</span> key <span class="kw">in</span> shared_libs <span class="kw">and</span> shared_libs[key] <span class="op">!=</span> <span class="st">'SUCCESS'</span>):</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                shared_libs[key] <span class="op">=</span> val</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    pattern <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">r"__init__"</span>)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> entry, status <span class="kw">in</span> shared_libs.items():</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(status <span class="op">==</span> <span class="st">'NAME NOT FOUND'</span> <span class="kw">and</span> <span class="kw">not</span> re.search(pattern, entry)):</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(entry)    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="79d0414c" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>print_missing_libs(<span class="st">'D:</span><span class="ch">\\</span><span class="st">bin</span><span class="ch">\\</span><span class="st">ProcessMonitor</span><span class="ch">\\</span><span class="st">Logfile.CSV'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>nppial64_12.dll
-nppc64_12.dll
-nppitc64_12.dll</code></pre>
-</div>
-</div>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
