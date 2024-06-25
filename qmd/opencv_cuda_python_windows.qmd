@@ -3,7 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
-date-modified: 01/05/24
+date-modified: 06/14/24
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -40,6 +40,7 @@ description: Guide to building OpenCV (including Python bindings) with [CUDA](ht
 
 ![](../imgs/opencv_cuda_intel.webp){fig-align="center" fig-alt="OpenCV with CUDA"}
 
+
 # Why manually build OpenCV?
 
 The pre-built [Windows libraries](https://github.com/opencv/opencv/releases) available for [OpenCV](https://opencv.org/releases) do not include the [CUDA modules](https://docs.opencv.org/4.x/d1/d1e/group__cuda.html), support for the Nvidia [Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) or [cuDNN](https://developer.nvidia.com/cudnn).
@@ -58,6 +59,7 @@ To see if building the OpenCV CUDA modules is suitable for your application you 
 
 4. If you already have the OpenCV source and the required dependencies and are just looking for the CMake flags  they can be found [here](#opencv-cuda-python-windows-cmake-flags).
 
+
 # Prerequisites
 There are a couple of components you need to download and/or install before you can get started, you first need to:
 
@@ -65,9 +67,9 @@ There are a couple of components you need to download and/or install before you 
 
     ![Visual Studio Select C++ Workload](../imgs/vs_community_c++_workload.png){fig-align="center"}
 
-[I have seen lots of guides including instructions to download and use git to get the source files, however this is a completely unnecessary step. If you are a developer and you don't already have git installed and configured then I would assume there is a good reason for this and I would not advise installing it just to build OpenCV.]{.aside}
+2. Download the source files[^clone] for OpenCV from [GitHub](https://github.com/opencv) by either cloning the repositories ([opencv](https://github.com/opencv/opencv) and [opencv_contrib](https://github.com/opencv/opencv_contrib)) or or downloading the archives containing the source files ([opencv.zip](https://github.com/opencv/opencv/archive/refs/heads/4.x.zip) and [opencv_contirib.zip](https://github.com/opencv/opencv_contrib/archive/refs/heads/4.x.zip))
 
-2. Download the source files for OpenCV from [GitHub](https://github.com/opencv) by either cloning the repositories ([opencv](https://github.com/opencv/opencv) and [opencv_contrib](https://github.com/opencv/opencv_contrib)) or or downloading the archives containing the source files ([opencv.zip](https://github.com/opencv/opencv/archive/refs/heads/4.x.zip) and [opencv_contirib.zip](https://github.com/opencv/opencv_contrib/archive/refs/heads/4.x.zip))
+[^clone]: I have seen lots of guides including instructions to download and use git to get the source files, however this is a completely unnecessary step. If you are a developer and you don't already have git installed and configured then I would assume there is a good reason for this and I would not advise installing it just to build OpenCV.
 
 3. Install the latest stable (not release candidate -rc) version of <a href="https://cmake.org/download/" target="_blank" rel="noopener noreferrer">CMake</a>.
 
@@ -77,15 +79,14 @@ There are a couple of components you need to download and/or install before you 
 If your system path is too long, CUDA will not add the path to its shared libraries **C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\vxx.x\\bin ** during installation.  If you receive a warning about this at the end of the installation process do not forget to manually add the this to your system or user path.
 :::
 
-[Before building you may want to ensure that your GPU has decoding support by referring to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>]{.aside}
+[^gpu_support_matrix]: Before building you may want to ensure that your GPU has decoding support by referring to <a href="https://developer.nvidia.com/video-encode-decode-gpu-support-matrix#Decoder" rel="noopener noreferrer" target="_blank">Nvidia Video Decoder Support Matrix</a>
 
-5. **Optional** - To **decode** video on the GPU with the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>:
+5. **Optional**[^gpu_support_matrix] - To **decode** video on the GPU with the <a href="https://developer.nvidia.com/nvidia-video-codec-sdk" target="_blank" rel="noopener noreferrer">Nvidia Video Codec SDK</a>:
     i) Register and <a href="https://developer.nvidia.com/nvidia-video-codec-sdk#Download" target="_blank" rel="noopener noreferrer">download</a> the latest version of the **Complete Video Codec SDK xx.x Package**.
     ii) Extract and copy the contents of **Interface** and **Lib**  to the **include** and **lib** directories inside your CUDA installation.
 
 6. **Optional** - To use the DNN CUDA backend:
-    i) Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> the latest version of cuDNN for the version of CUDA you have installed by clicking on **Local Installer for Windows (Zip)**.</li>
-
+    i) Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> the latest version of cuDNN for the version of CUDA you have installed by selecting the **Tarball**.</li>
     ii) Extract and copy the **bin**, **include** and **lib** directories to your CUDA installation.
 
 ::: {.callout-tip}
@@ -93,15 +94,16 @@ The installation directory for CUDA xx.x is
 **C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\vxx.x**.
 :::
 
-[All python distributions should work however I recommend building and testing against a new install of this compact distribution to avoid any problems caused by existing configurations.]{.aside}
+[^python_support]: All python distributions should work however I recommend building and testing against a new install of this compact distribution to avoid any problems caused by existing configurations.
 
-7. **Optional** – To call OpenCV CUDA routines from python, install the latest x64 bit version of [mambaforge](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe) with numpy (execute **mamba install numpy** from the miniforge prompt once mambaforge is installed.)
+7. **Optional**[^python_support] – To call OpenCV CUDA routines from python, install the latest x64 bit version of [miniforge](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe) with numpy (execute **mamba install numpy** from the miniforge prompt once miniforge is installed.)
 
 
 # Building OpenCV with CMake
 
-[If you have any build issues with OpenCV then you will need to provide the arguments passed to CMake as well as the output from the generation step when asking for assistance which is another good reason to avoid the CMake GUI if you can.]{.aside}
-Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI.  Most new users will find the GUI more accessible however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions for using the CMake GUI.
+[^no_cmake_gui]: If you have any build issues with OpenCV then you will need to provide the arguments passed to CMake as well as the output from the generation step when asking for assistance which is another good reason to avoid the CMake GUI if you can.
+
+Before you can build OpenCV you have to generate the build files with CMake. This can be done via the command line or with the CMake GUI.  Most new users will find the GUI more accessible however by far the quickest, easiest and least error prone way to proceed is to call CMake from the command line and as a result I have not included any instructions for using the CMake GUI[^no_cmake_gui].
 
 In addition there are several ways to build OpenCV using Visual Studio. For simplicity only two methods are discussed:
 
@@ -122,13 +124,13 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 :::::{#python-version-string}
 :::::
 
-2.  Paste the below into to the command prompt and press **Enter**.
+2.  Paste the below[^cuda_fast_math] into to the command prompt and press **Enter**.
 
-    [An additionally option you may want to include is **-DCUDA_FAST_MATH=ON** which compiles the CUDA kernels with the [-use_fast_math](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions) option.  This will however cause some of the accuracy and performance tests to fail as the floating point results will be slightly less accurate.]{.aside}
+    [^cuda_fast_math]: An additionally option you may want to include is **-DCUDA_FAST_MATH=ON** which compiles the CUDA kernels with the [-use_fast_math](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html?highlight=use_fast_math#intrinsic-functions) option.  This will however cause some of the accuracy and performance tests to fail as the floating point results will be slightly less accurate.
 
-    [The default installation directory for mambaforge is **%userprofile%\\mambaforge**.]{.aside}
+    [^miniforge_location]: The default installation directory for miniforge is **%userprofile%\\miniforge3**.
 
-    [If you get the following error "CUDA : OpenCV requires enabled 'cudev' module from 'opencv_contrib'" when configuring the build with CMake you have not set **OPENCV_EXTRA_MODULES_PATH** correctly, most likely you have set it to the root of the **opencv_contrib** repo and not the modules directory inside the repo.]{.aside}
+    [^set_opencv_extra]: If you get the following error "CUDA : OpenCV requires enabled 'cudev' module from 'opencv_contrib'" when configuring the build with CMake you have not set **OPENCV_EXTRA_MODULES_PATH** correctly, most likely you have set it to the root of the **opencv_contrib** repo and not the modules directory inside the repo.
 
     ::: {.panel-tabset}
 
@@ -180,9 +182,9 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     i) **\<N_THREADS\>** should be set to the number of cores/logical processors on your CPU,
     i) **\<PATH_TO_OPENCV_SOURCE\>** is the root of the OpenCV files you downloaded or cloned (the directory containing 3rdparty, apps, build, etc.), 
-    ii) **\<PATH_TO_OPENCV_CONTRIB_MODULES\>** is the path to the **modules** directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),
+    ii) **\<PATH_TO_OPENCV_CONTRIB_MODULES\>**[^set_opencv_extra] is the path to the **modules** directory inside the <a href="https://github.com/opencv/opencv_contrib/tree/master/modules" target="_blank" rel="noopener noreferrer">opencv-contrib</a> repository (the directory containing cudaarithm, cudabgsegm, etc.),
     iii) **\<PATH_TO_BUILD_DIR\>** is the path to the directory where the build files should go,
-    iv) **\<PATH_TO_PYTHON_DIST\>** is the directory where mambaforge was installed and,
+    iv) **\<PATH_TO_PYTHON_DIST\>**[^miniforge_location] is the directory where miniforge was installed and,
     v) **\<PYTHON_LIB\>** is the concatination of "python" with the major and minor version of your python install and ".lib", e.g. for Python 3.10.6 **\<PYTHON_LIB\>**==python310.lib.  You can confirm this by looking in your **\<PATH_TO_PYTHON_DIST\>**/libs directory.
 
     ::: {.callout-warning appearance="default"}
@@ -198,20 +200,20 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
     ## Example of CMake Configuration Output
     ```{.default}
 --
--- General configuration for OpenCV 4.8.0-dev =====================================
---   Version control:               4.8.0-343-ga3b3a589f9
+-- General configuration for OpenCV 4.10.0-dev =====================================
+--   Version control:               4.9.0-571-g2629688d11
 --
 --   Extra modules:
 --     Location (extra):            D:/repos/opencv/contrib/modules
---     Version control (extra):     4.8.1-33-g5b95c334
+--     Version control (extra):     4.9.0-84-gb236c71c
 --
 --   Platform:
---     Timestamp:                   2023-10-24T16:50:47Z
---     Host:                        Windows 10.0.22621 AMD64
---     CMake:                       3.25.1
---     CMake generator:             Visual Studio 17 2022
---     CMake build tool:            C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe
---     MSVC:                        1936
+--     Timestamp:                   2024-06-11T08:50:41Z
+--     Host:                        Windows 10.0.22631 AMD64
+--     CMake:                       3.29.5
+--     CMake generator:             Ninja Multi-Config
+--     CMake build tool:            D:/bin/ninja/ninja.exe
+--     MSVC:                        1940
 --     Configuration:               Debug Release
 --
 --   CPU/HW features:
@@ -229,26 +231,26 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --   C/C++:
 --     Built as dynamic libs?:      YES
 --     C++ standard:                11
---     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe  (ver 19.36.32537.0)
---     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MD /O2 /Ob2 /DNDEBUG
---     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819 /MP  /MDd /Zi /Ob0 /Od /RTC1
---     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe
---     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP   /MD /O2 /Ob2 /DNDEBUG
---     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise     /MP /MDd /Zi /Ob0 /Od /RTC1
---     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO
+--     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe  (ver 19.40.33811.0)
+--     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /O2 /Ob2 /DNDEBUG  /Zi
+--     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /Zi /Ob0 /Od /RTC1
+--     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe
+--     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /O2 /Ob2 /DNDEBUG  /Zi
+--     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /Zi /Ob0 /Od /RTC1
+--     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO  /debug
 --     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL
 --     ccache:                      NO
 --     Precompiled headers:         NO
---     Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cudnn.lib cufft.lib -LIBPATH:C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3/lib/x64
+--     Extra dependencies:          C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cudart_static.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppial.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppitc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppig.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppist.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppidei.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublas.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublasLt.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cufft.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppif.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppim.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppicc.lib
 --     3rdparty dependencies:
 --
 --   OpenCV modules:
---     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
+--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape signal stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
 --     Disabled:                    -
 --     Disabled by dependency:      -
---     Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
+--     Unavailable:                 alphamat cannops cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
 --     Applications:                tests perf_tests examples apps
---     Documentation:               NO
+--     Documentation:               doxygen
 --     Non-free algorithms:         NO
 --
 --   Windows RT support:            NO
@@ -258,13 +260,15 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --     VTK support:                 NO
 --
 --   Media I/O:
---     ZLib:                        build (ver 1.2.13)
---     JPEG:                        build-libjpeg-turbo (ver 2.1.3-62)
+--     ZLib:                        build (ver 1.3.1)
+--     JPEG:                        build-libjpeg-turbo (ver 3.0.3-70)
 --       SIMD Support Request:      YES
 --       SIMD Support:              NO
 --     WEBP:                        build (ver encoder: 0x020f)
---     PNG:                         build (ver 1.6.37)
---     TIFF:                        build (ver 42 - 4.2.0)
+--     PNG:                         build (ver 1.6.43)
+--       SIMD Support Request:      YES
+--       SIMD Support:              YES (Intel SSE)
+--     TIFF:                        build (ver 42 - 4.6.0)
 --     JPEG 2000:                   build (ver 2.5.0)
 --     OpenEXR:                     build (ver 2.3.0)
 --     HDR:                         YES
@@ -290,33 +294,34 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --   Trace:                         YES (with Intel ITT)
 --
 --   Other third-party libraries:
---     Intel IPP:                   2021.8 [2021.8.0]
---            at:                   D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/icv
---     Intel IPP IW:                sources (2021.8.0)
---               at:                D:/build/opencv/4_8_X/3rdparty/ippicv/ippicv_win/iw
+--     Intel IPP:                   2021.11.0 [2021.11.0]
+--            at:                   D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/icv
+--     Intel IPP IW:                sources (2021.11.0)
+--               at:                D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/iw
 --     Lapack:                      NO
 --     Eigen:                       NO
 --     Custom HAL:                  NO
 --     Protobuf:                    build (3.19.1)
 --     Flatbuffers:                 builtin/3rdparty (23.5.9)
 --
---   NVIDIA CUDA:                   YES (ver 12.3, CUFFT CUBLAS NVCUVID NVCUVENC)
+--   NVIDIA CUDA:                   YES (ver 12.5.40, CUFFT CUBLAS NVCUVID NVCUVENC)
 --     NVIDIA GPU arch:             50 52 60 61 70 75 80 86 89 90
 --     NVIDIA PTX archs:            90
 --
---   cuDNN:                         YES (ver 8.9.5)
+--   cuDNN:                         YES (ver 9.2.0)
 --
 --   OpenCL:                        YES (NVD3D11)
 --     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
 --     Link libraries:              Dynamic load
 --
 --   Python 3:
---     Interpreter:                 C:/Users/b/mambaforge/python.exe (ver 3.9.16)
---     Libraries:                   C:/Users/b/mambaforge/libs/python39.lib (ver 3.9.16)
---     numpy:                       C:/Users/b/mambaforge/Lib/site-packages/numpy/core/include (ver 1.23.5)
---     install path:                C:/Users/b/mambaforge/Lib/site-packages/cv2/python-3.9
+--     Interpreter:                 C:/Users/b/miniforge3/envs/py37_mini/python.exe (ver 3.7.12)
+--     Libraries:                   C:/Users/b/miniforge3/envs/py37_mini/libs/python37.lib (ver 3.7.12)
+--     Limited API:                 NO
+--     numpy:                       C:/Users/b/miniforge3/envs/py37_mini/Lib/site-packages/numpy/core/include (ver 1.21.6)
+--     install path:                C:/Users/b/miniforge3/envs/py37_mini/Lib/site-packages/cv2/python-3.7
 --
---   Python (for build):            C:/Users/b/mambaforge/python.exe
+--   Python (for build):            C:/Users/b/miniforge3/envs/py37_mini/python.exe
 --
 --   Java:
 --     ant:                         NO
@@ -325,12 +330,12 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --     Java wrappers:               NO
 --     Java tests:                  NO
 --
---   Install to:                    D:/build/opencv/4_8_X/install
+--   Install to:                    D:/build/opencv/4_10/install
 -- -----------------------------------------------------------------
 --
--- Configuring done
--- Generating done
--- Build files have been written to: D:/build/opencv/4_8_X
+-- Configuring done (63.3s)
+-- Generating done (21.4s)
+-- Build files have been written to: D:/build/opencv/4_10
     ```
     :::
 
@@ -386,8 +391,9 @@ Once the build files have been generated the build can be kicked off in the same
 for an example fo the full command line for building a Release version of OpenCV with the Ninja build system go to the [Ninja](#opencv-cuda-python-windows-cmake-flags) tab.
 
 # Verifying OpenCV is CUDA accelerated
-[The GEMM test is used in this example but any of the accuracy (**opencv_test_cuda\*.exe**) or performance (**opencv_perf_cuda\*.exe**) tests could have been chosen.]{.aside}
-The easiest way to quickly verify that everything is working is to check that one of the inbuilt CUDA tests passes.  This is demonstrated here using the GEMM acccuracy test which can be run by entering the following into the existing command prompt.
+[^confirm_cuda]: The GEMM test is used in this example but any of the accuracy (**opencv_test_cuda\*.exe**) or performance (**opencv_perf_cuda\*.exe**) tests could have been chosen.
+
+The easiest way to quickly verify that everything is working is to check that one of the inbuilt CUDA tests passes.  This is demonstrated here using the GEMM[^confirm_cuda] acccuracy test which can be run by entering the following into the existing command prompt.
 
 ```{.default .code-overflow-wrap}
 "PATH_TO_BUILD_DIR\bin\opencv_test_cudaarithm.exe" --gtest_filter=CUDA_Arithm/GEMM.Accuracy/0
@@ -421,22 +427,23 @@ import cv2 as cv
 and you should see  output similar to the below when interrogating the build information
 
 ```{.python}
-print(cv.getBuildInformation())
-General configuration for OpenCV 4.7.0-dev =====================================
-  Version control:               4.7.0-251-ge3e1f704a4-dirty
+>>> print(cv2.getBuildInformation())
+
+General configuration for OpenCV 4.10.0-dev =====================================
+  Version control:               4.9.0-571-g2629688d11
 
   Extra modules:
     Location (extra):            D:/repos/opencv/contrib/modules
-    Version control (extra):     4.7.0-38-g960b3f68
+    Version control (extra):     4.9.0-84-gb236c71c
 
   Platform:
-    Timestamp:                   2023-03-21T15:46:23Z
-    Host:                        Windows 10.0.22621 AMD64
-    CMake:                       3.25.1
-    CMake generator:             Ninja
+    Timestamp:                   2024-06-11T08:50:41Z
+    Host:                        Windows 10.0.22631 AMD64
+    CMake:                       3.29.5
+    CMake generator:             Ninja Multi-Config
     CMake build tool:            D:/bin/ninja/ninja.exe
-    MSVC:                        1934
-    Configuration:               Release
+    MSVC:                        1940
+    Configuration:               Debug Release
     ...
 ```
 
@@ -505,10 +512,19 @@ ImportError: DLL load failed: The specified procedure could not be found.
 
     BINARIES_PATHS = [
         os.path.join('D:/build/opencv/install', 'x64/vc17/bin'),
-        os.path.join(os.getenv('CUDA_PATH', 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1'), 'bin')
+        os.path.join(os.getenv('CUDA_PATH', 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5'), 'bin')
         os.path.join(`D:/ffmpeg/bin`)
     ] + BINARIES_PATHS
     ```
+
+4. ```{.python .code-overflow-wrap}
+ImportError: DLL load failed while importing cv2: A dynamic link library (DLL) initialization routine failed.
+```
+
+    The most common cause of this is out of date Visual C++ Redistributable libraries.  These can be loaded from your windows system or your python installation depending on your configuration.  The easiest thing to do is update both by
+    i) downloading and installing the latest version of the [Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) from Microsoft, and
+    ii) checking your python package manager (pip/mamba/conda/... list) for the **vc** or **vc14_runtime** packages and updating them to the latest version (e.g. `pip install vc --upgrade` or `mamba/conda upgrade vc`) and try importing OpenCV again. 
+
 
 
 ## Manually installing OpenCV Python bindings
