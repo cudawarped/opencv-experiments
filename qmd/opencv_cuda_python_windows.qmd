@@ -3,7 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
-date-modified: 06/14/24
+date-modified: 06/27/24
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -498,7 +498,7 @@ ImportError: ERROR: recursion is detected during loading of "cv2" binary extensi
     directory on installation.  This can easily be resolved by creating the **python-x.x** directory and copying the shared library accross so you have **PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/python-x.x/cv2.cpxx-win_amd64.pyd**, where **xx** is the [**PYTHON_VERSION**](#python-version-string).
 
 3. ```{.python .code-overflow-wrap}
-ImportError: DLL load failed: The specified procedure could not be found.
+ImportError: DLL load failed: The specified module could not be found.
 ```
 
     The directory of one or more of the required DLL’s has not been added with [os.add_dll_directory()](https://docs.python.org/3/library/os.html#os.add_dll_directory). Whilst the automatic installation of the bindings should have added all the directories containing the dependant DLL's to **config.py** it's possible that one has been missed or you are using a less common configuration.  In these cases you will have to
