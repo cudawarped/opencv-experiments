@@ -240,7 +240,9 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
   <li><a href="#fix-when-path-to-missing-dlls-is-not-known" id="toc-fix-when-path-to-missing-dlls-is-not-known" class="nav-link" data-scroll-target="#fix-when-path-to-missing-dlls-is-not-known">Fix when path to missing DLL’s is not known</a>
   <ul class="collapse">
   <li><a href="#manually-adding-filter-entries" id="toc-manually-adding-filter-entries" class="nav-link" data-scroll-target="#manually-adding-filter-entries">Manually Adding Filter Entries</a></li>
+  <li><a href="#using-process-monitor-to-find-the-missin-dlls" id="toc-using-process-monitor-to-find-the-missin-dlls" class="nav-link" data-scroll-target="#using-process-monitor-to-find-the-missin-dlls">Using Process Monitor to find the missin DLLs</a></li>
   </ul></li>
+  <li><a href="#automatically-search-process-monitor-log-for-missing-dll" id="toc-automatically-search-process-monitor-log-for-missing-dll" class="nav-link" data-scroll-target="#automatically-search-process-monitor-log-for-missing-dll">Automatically search Process Monitor log for missing DLL</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/cudawarped/opencv-experiments/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -269,6 +271,12 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">June 27, 2024</p>
+    </div>
+  </div>
     
   </div>
   
@@ -285,26 +293,26 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 
 <section id="the-problem" class="level1">
 <h1>The problem</h1>
-<p>If your on Windows using python &gt;= 3.8 having built OpenCV &gt;= 4.6 from source and your seeing the above error when calling <code>import cv2</code>, this short guide should help solve your problem.</p>
-<p>The guide assumes that you have either installed the python bindings during the build process (<a href="https://github.com/opencv/opencv/issues/13202#issuecomment-439730899">not recommended</a>) or manually copied <strong>cv2.cpxx-win_amd64.pyd</strong> to your distributions <strong>site-packages</strong> directory (e.g.&nbsp;<strong>C:\Users\&lt;USER&gt;\mambaforge\Lib\site-packages</strong>).</p>
-<p>So what’s the issue? Although the message is quite explicit regarding the cause, it doesn’t really help with finding a solution. In a nutshell python has found <strong>cv2.cpxx-win_amd64.pyd</strong>, tried and then failed to load it because a it can’t find a dependant shared library. Now the advice I have seen online regarding this is to dig out trusty dependancy walker, load the <strong>cv2.cpxx-win_amd64.pyd</strong> and see which dependencies the system can’t find.</p>
-<p>Now this is solid advice if we had a C++ application and/or we were using python &lt; 3.8 (which uses the system/user path for dll resolution), however we are not, so even if dependency walker can’t detect any problems we may still be facing the above error.</p>
-<p>The good news is there is an easy fix if you know where the missing DLL’s are and only slightly more involved if you don’t as long as you have access to the missing DLL’s on your system.</p>
+<p>If you’re using Windows with Python &gt;= 3.8, have built OpenCV &gt;= 4.6 from source, and are encountering the “ImportError: DLL load failed while importing cv2: The specified module could not be found” error when calling <code>import cv2</code>, this short guide should help solve your problem.</p>
+<p>This guide assumes that you have either installed the Python bindings during the build process or manually copied <strong>cv2.cpxx-win_amd64.pyd</strong> to your distribution’s <em>site-packages</em> directory (e.g., <em>C:\Users\&lt;USER&gt;\miniforge3\Lib\site-packages</em>).</p>
+<p>So, what’s the issue? Although the error message is quite explicit about the cause, it doesn’t really help with finding a solution. In a nutshell, Python has found <strong>cv2.cpxx-win_amd64.pyd</strong> tried to load it, and then failed because it can’t find a dependent shared library.</p>
+<p>The advice I’ve seen online regarding this issue is to use Dependency Walker, load the <strong>cv2.cpxx-win_amd64.pyd</strong>, and identify which dependencies the system can’t find. This is solid advice if you have a C++ application, are using Python &lt; 3.8 (which uses the system/user path for DLL resolution), or are not using a Python distribution that performs path manipulation under the hood (e.g., Anaconda). However, if the above does not apply, even if Dependency Walker doesn’t detect any problems, we may still face the above error.</p>
+<p>The good news is that there’s an easy fix if you know where the missing DLLs are, and it’s only slightly more involved if you don’t, as long as you have access to the missing DLLs on your system.</p>
 </section>
 <section id="fix-when-path-to-missing-dlls-is-known" class="level1">
 <h1>Fix when path to missing DLL’s is known</h1>
-<p>To demonstrate the fix, I have built the OpenCV shared library and corresponding python bindings and manually copied them to the <strong>site-packages</strong> directory inside my python distribution (<strong>C:\Users\b\mambaforge\Lib\site-packages</strong>).</p>
-<p>As I have built a shared library the python bindings are dependant on <strong>opencv_world470.dll</strong> and I haven’t told python where they are I get the error shown below whenn trying to import them.</p>
+<p>To demonstrate the fix, I have built OpenCV as a shared library (<strong>opencv_world410.dll</strong>) with its corresponding Python bindings (<strong>cv2.cpxx-win_amd64.pyd</strong>). To enable them to be loaded (<code>import cv2</code>) without any extra configuration, I have manually copied them to the <em>site-packages</em> directory inside my Python distribution (<em>C:\Users\b\miniforge3\Lib\site-packages</em>).</p>
+<p>As I have built a shared library, the Python bindings are dependent on <strong>opencv_world410.dll</strong>, which contains all of OpenCV’s executable code. If I had built a static library, all of OpenCV’s executable code would be contained inside <strong>cv2.cpxx-win_amd64.pyd</strong>. Since I haven’t told Python where the DLL is located, I get the following error when trying to import the bindings:</p>
 <div id="53efd81a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
 </div>
 </div>
-<p>Given that I know the path to OpenCV’s shared libraries is required and I haven’t told python about it, the first thing to try is to add it to pythons DLL search path and see if that solves the problem.</p>
+<p>Given that I know the path to OpenCV’s shared libraries is required and I haven’t told Python about it, the first thing to try is to add it to Pythons DLL search path with <code>os.add_dll_directory()</code> as we are using Python &gt;= 3.8 and see if that solves the problem.</p>
 <div id="ba4db59c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="vs">r'D:\build\opencv\4_10\install\x64\vc17\bin'</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
@@ -312,9 +320,9 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 </div>
 <p>Ahh the same error, what’s going on.</p>
 <p>In this case I also built OpenCV against the CUDA SDK so there is a good chance its missing DLL’s from there as well. I can try to fix the issue by simply adding the location of the CUDA SDK binaries to the python DLL search path as shown below.</p>
-<div id="235eb45b" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"C:</span><span class="ch">\\</span><span class="st">Program Files</span><span class="ch">\\</span><span class="st">NVIDIA GPU Computing Toolkit</span><span class="ch">\\</span><span class="st">CUDA</span><span class="ch">\\</span><span class="st">v12.0</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="235eb45b" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="vs">r'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.5\bin'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This appears to have solved the issue, but its a good idea to examine the build information by calling <code>print(cv2.getBuildInformation())</code> just to double check I have loaded the right version of OpenCV.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv2.getBuildInformation())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -330,21 +338,21 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<pre><code>General configuration for OpenCV 4.7.0-dev =====================================
-  Version control:               4.7.0-291-g47ae518c87
+<pre><code>General configuration for OpenCV 4.10.0-dev =====================================
+  Version control:               4.10.0-49-g11c69bb171
 
   Extra modules:
     Location (extra):            D:/repos/opencv/contrib/modules
-    Version control (extra):     4.7.0-42-ga42b8bef
+    Version control (extra):     4.10.0-2-ga886fa5c
 
   Platform:
-    Timestamp:                   2023-03-21T15:46:23Z
-    Host:                        Windows 10.0.22621 AMD64
-    CMake:                       3.25.1
-    CMake generator:             Ninja
+    Timestamp:                   2024-06-25T15:14:43Z
+    Host:                        Windows 10.0.22631 AMD64
+    CMake:                       3.29.5
+    CMake generator:             Ninja Multi-Config
     CMake build tool:            D:/bin/ninja/ninja.exe
-    MSVC:                        1934
-    Configuration:               Release
+    MSVC:                        1940
+    Configuration:               Debug Release
 
   CPU/HW features:
     Baseline:                    SSE SSE2 SSE3
@@ -354,51 +362,52 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
       SSE4_1 (18 files):         + SSSE3 SSE4_1
       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2
       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX
-      AVX (8 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
-      AVX2 (36 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
+      AVX (9 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
+      AVX2 (38 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX
 
   C/C++:
     Built as dynamic libs?:      YES
     C++ standard:                11
-    C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe  (ver 19.34.31937.0)
-    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /MD /O2 /Ob2 /DNDEBUG  /Zi
-    C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /MDd /Zi /Ob0 /Od /RTC1 
-    C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe
-    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /MD /O2 /Ob2 /DNDEBUG  /Zi
-    C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /MDd /Zi /Ob0 /Od /RTC1 
+    C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe  (ver 19.40.33811.0)
+    C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /O2 /Ob2 /DNDEBUG  /Zi
+    C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /Zi /Ob0 /Od /RTC1 
+    C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe
+    C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /O2 /Ob2 /DNDEBUG  /Zi
+    C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /Zi /Ob0 /Od /RTC1 
     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO  /debug
     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL 
     ccache:                      NO
     Precompiled headers:         NO
-    Extra dependencies:          cudart_static.lib nppc.lib nppial.lib nppicc.lib nppidei.lib nppif.lib nppig.lib nppim.lib nppist.lib nppisu.lib nppitc.lib npps.lib cublas.lib cudnn.lib cufft.lib -LIBPATH:"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.0/lib/x64"
+    Extra dependencies:          C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cudart_static.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppial.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppitc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppig.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppist.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppidei.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublas.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublasLt.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cufft.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppif.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppim.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppicc.lib
     3rdparty dependencies:
 
   OpenCV modules:
-    To be built:                 aruco barcode bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode xfeatures2d ximgproc xobjdetect xphoto
-    Disabled:                    world
+    To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape signal stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
+    Disabled:                    -
     Disabled by dependency:      -
-    Unavailable:                 alphamat cvv freetype hdf java julia matlab ovis python2 sfm viz
+    Unavailable:                 alphamat cannops cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
     Applications:                tests perf_tests examples apps
     Documentation:               doxygen python
-    Non-free algorithms:         YES
+    Non-free algorithms:         NO
 
   Windows RT support:            NO
 
-  GUI:                           WIN32UI
+  GUI: 
     Win32 UI:                    YES
-    OpenGL support:              YES (opengl32 glu32)
     VTK support:                 NO
 
   Media I/O: 
-    ZLib:                        build (ver 1.2.13)
-    JPEG:                        build-libjpeg-turbo (ver 2.1.3-62)
+    ZLib:                        build (ver 1.3.1)
+    JPEG:                        build-libjpeg-turbo (ver 3.0.3-70)
       SIMD Support Request:      YES
       SIMD Support:              NO
     WEBP:                        build (ver encoder: 0x020f)
-    PNG:                         build (ver 1.6.37)
-    TIFF:                        build (ver 42 - 4.2.0)
-    JPEG 2000:                   build (ver 2.4.0)
+    PNG:                         build (ver 1.6.43)
+      SIMD Support Request:      YES
+      SIMD Support:              YES (Intel SSE)
+    TIFF:                        build (ver 42 - 4.6.0)
+    JPEG 2000:                   build (ver 2.5.0)
     OpenEXR:                     build (ver 2.3.0)
     HDR:                         YES
     SUNRASTER:                   YES
@@ -407,12 +416,12 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
 
   Video I/O:
     DC1394:                      NO
-    FFMPEG:                      YES (find_package)
-      avcodec:                   YES (59.18.100)
-      avformat:                  YES (59.16.100)
-      avutil:                    YES (57.17.100)
-      swscale:                   YES (6.4.100)
-      avresample:                NO
+    FFMPEG:                      YES (prebuilt binaries)
+      avcodec:                   YES (58.134.100)
+      avformat:                  YES (58.76.100)
+      avutil:                    YES (56.70.100)
+      swscale:                   YES (5.9.100)
+      avresample:                YES (4.0.0)
     GStreamer:                   NO
     DirectShow:                  YES
     Media Foundation:            YES
@@ -423,71 +432,86 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
   Trace:                         YES (with Intel ITT)
 
   Other third-party libraries:
-    Intel IPP:                   2021.8 [2021.8.0]
-           at:                   D:/build/opencv/4_7_0/cuda_12_D/3rdparty/ippicv/ippicv_win/icv
-    Intel IPP IW:                sources (2021.8.0)
-              at:                D:/build/opencv/4_7_0/cuda_12_D/3rdparty/ippicv/ippicv_win/iw
+    Intel IPP:                   2021.11.0 [2021.11.0]
+           at:                   D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/icv
+    Intel IPP IW:                sources (2021.11.0)
+              at:                D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/iw
     Lapack:                      NO
     Eigen:                       NO
     Custom HAL:                  NO
     Protobuf:                    build (3.19.1)
     Flatbuffers:                 builtin/3rdparty (23.5.9)
 
-  NVIDIA CUDA:                   YES (ver 12.0, CUFFT CUBLAS NVCUVID NVCUVENC)
-    NVIDIA GPU arch:             61 86
-    NVIDIA PTX archs:            86
+  NVIDIA CUDA:                   YES (ver 12.5.40, CUFFT CUBLAS NVCUVID NVCUVENC)
+    NVIDIA GPU arch:             86
+    NVIDIA PTX archs:
 
-  cuDNN:                         YES (ver 8.8.1)
+  cuDNN:                         YES (ver 9.2.0)
 
   OpenCL:                        YES (NVD3D11)
     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
     Link libraries:              Dynamic load
 
   Python 3:
-    Interpreter:                 C:/Users/b/mambaforge//python.exe (ver 3.9.16)
-    Libraries:                   C:/Users/b/mambaforge//libs/python39.lib (ver 3.9.16)
-    numpy:                       C:/Users/b/mambaforge//lib/site-packages/numpy/core/include (ver 1.23.5)
-    install path:                C:/Users/b/mambaforge//Lib/site-packages//cv2/python-3.9
+    Interpreter:                 C:/Users/b/miniforge3/python.exe (ver 3.10.14)
+    Libraries:                   C:/Users/b/miniforge3/libs/python310.lib (ver 3.10.14)
+    Limited API:                 NO
+    numpy:                       C:/Users/b/miniforge3/Lib/site-packages/numpy/core/include (ver 1.26.4)
+    install path:                C:/Users/b/miniforge3/Lib/site-packages//cv2/python-3.10
 
-  Python (for build):            C:/Users/b/mambaforge//python.exe
+  Python (for build):            C:/Users/b/miniforge3/python.exe
 
   Java:                          
     ant:                         NO
+    Java:                        NO
     JNI:                         NO
     Java wrappers:               NO
     Java tests:                  NO
 
-  Install to:                    D:/build/opencv/4_7_0/cuda_12_D/install
+  Install to:                    D:/build/opencv/4_10/install
 -----------------------------------------------------------------</code></pre>
 </div>
 </div>
 </div>
-<p>That was easy but what can I do if I’m not as good at guessing what’s missing. Next I will use the same example again to demonstrate how to find out which DLL’s python is searching for.</p>
+<p>That was easy but what can I do if I’m not as good at guessing what’s missing. Next I will use the same example again to demonstrate how to find out which DLLs Python is searching for.</p>
 </section>
 <section id="fix-when-path-to-missing-dlls-is-not-known" class="level1">
 <h1>Fix when path to missing DLL’s is not known</h1>
-<p>To find which DLL’s are missing we can use <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/procmon">process monitor</a> which will enable us to see the names of the DLL’s which python is trying to load.</p>
-<p>Process monitor by default has produces a significant amount of output so it is a good idea to filter out as much of this noise as you can. To do this you can either load <a href="https://github.com/cudawarped/opencv-experiments/raw/master/nbs/misc/ProcmonConfiguration.pmc">this filter</a> (as <a href="https://github.com/opencv/opencv/issues/23372#issuecomment-1476180498">suggested by LaurentBerger</a>) with <strong>“File-&gt;Import Configuration”</strong>, or manually add the filter entries on the <strong>“Process Monitor Filter”</strong> window, which is opened by default every time you launch the application, details below.</p>
+<p>To find which DLLs are missing, we can use <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/procmon">Process Monitor</a>, a process monitoring tool for Windows. This tool enables us to see the names of the DLLs that Python is trying to load and the locations it’s searching at runtime.</p>
+<p>Process Monitor produces a significant amount of output by default, so it’s a good idea to filter out as much of this noise as you can. To do this, you can either:</p>
+<ol type="1">
+<li>Load this pre-configured <a href="https://github.com/cudawarped/opencv-experiments/raw/master/nbs/misc/ProcmonConfiguration.pmc">filter</a> (as <a href="https://github.com/opencv/opencv/issues/23372#issuecomment-1476180498">suggested by LaurentBerger</a>) using <strong>“File -&gt; Import Configuration”</strong>, or</li>
+<li>Manually add filter entries in the <strong>“Process Monitor Filter”</strong> window, which opens by default every time you launch the application.</li>
+</ol>
 <section id="manually-adding-filter-entries" class="level2">
 <h2 class="anchored" data-anchor-id="manually-adding-filter-entries">Manually Adding Filter Entries</h2>
-<p>Since we only want to view shared libaries which are accessed by the python.exe process, we can add the following filters to make our lives easier:</p>
+<p>Since we only want to view shared libraries accessed by the python.exe process, we can add the following filters to make our task easier:</p>
 <ol type="1">
 <li>Process Name -&gt; is -&gt; python.exe</li>
 <li>Operation -&gt; is -&gt; CreateFile</li>
 <li>Result -&gt; is -&gt; NAME NOT FOUND</li>
 <li>Result -&gt; is -&gt; SUCCESS</li>
 <li>Path -&gt; contains -&gt; .dll</li>
-<li>Path -&gt; contains -&gt; .pyd (not striclty necessary, if this was missing the error would be “ModuleNotFoundError: No module named ‘cv2’” but its a shared library so why not)</li>
+<li>Path -&gt; contains -&gt; .pyd (not striclty necessary, if this was missing the error would be “ModuleNotFoundError: No module named ‘cv2’” however for completeness we’ll include it)</li>
 </ol>
-<p>Your filter should now resemble the below.</p>
+<p>Your filter should now resemble the one in the screenshot below:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="imgs/proc_mon_filter.png" class="img-fluid figure-img"></p>
 <figcaption>Process Monitor Filter</figcaption>
 </figure>
 </div>
-<p>Before continuing it is advisable to close any other python proceses as the output from these will pollute the main window.</p>
-<p>Now start python and before typing <code>import cv2</code>, press the clear button (red trash can) in process monitor to clear any output generated during python’s initialization.</p>
+</section>
+<section id="using-process-monitor-to-find-the-missin-dlls" class="level2">
+<h2 class="anchored" data-anchor-id="using-process-monitor-to-find-the-missin-dlls">Using Process Monitor to find the missin DLLs</h2>
+<p>Before continuing, it is advisable to close any other Python processes, as the output from these will pollute the main window of Process Monitor.</p>
+<p>Now, follow these steps:</p>
+<ol type="1">
+<li>Start Python.</li>
+<li>Press the clear button (red trash can icon) in Process Monitor to clear any output generated during Python’s initialization.</li>
+<li>Import OpenCV (<code>import cv2</code>)</li>
+</ol>
+<p>To demonstrate how this works I have restarted Pyton to reset the paths we manually added with the above calls to <code>os.add_dll_directory()</code> and again run <code>import cv2</code>, resulting in the same error with the additional output from Process Monitor shown in the screen shot below:</p>
 <div id="11dae139" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
@@ -497,14 +521,30 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="imgs/proc_mon_failed_search_opencv.png" class="img-fluid figure-img"></p>
-<figcaption>Process Monitor failed to locate <strong>cv2.cp39-win_amd64.pyd</strong></figcaption>
+<figcaption>Process Monitor failed to locate <strong>opencv_world4100.dll</strong> and <strong>opencv_img_hash_4100.dll</strong></figcaption>
 </figure>
 </div>
-<p>Because I have reset the python DLL search path on running <code>import cv2</code> I get the above output in process monitor which shows that we successfully found <strong>cv2.cp39-win_amd64.pyd</strong> (otherwise we would see the “ModuleNotFoundError: No module named ‘cv2’” error) however it also shows several attempts have been made to locate <strong>opencv_img_hash_470.dll</strong> and <strong>opencv_world470.dll</strong> without success.</p>
-<p>As before we add the directory containing these to the python DLL search path.</p>
-<div id="db489147-2ea4-438e-bfeb-8faafabbdc92" class="cell" data-execution_count="3">
+<p>This output shows that we successfully found <strong>cv2.cp310-win_amd64.pyd</strong> (otherwise we would see the “ModuleNotFoundError: No module named ‘cv2’” error). However, it also reveals several unsuccessful attempts to locate <strong>opencv_world4100.dll</strong> and <strong>opencv_img_hash_4100.dll</strong> in different directories.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>Because there is a lot of output to sift through, if you can’t immediately see which DLLs are missing, I recommend exporting and parsing the output from Process Monitor as described in the “<a href="#automatically-search-process-monitor-log-for-missing-dll">Automatically search Process Monitor log for missing DLL</a>” section below.</p>
+</div>
+</div>
+</div>
+<p>As before, we need to add the directory containing these missing DLLs to the Python DLL search path shown below:</p>
+<div id="db489147-2ea4-438e-bfeb-8faafabbdc92" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="st">"D:</span><span class="ch">\\</span><span class="st">build</span><span class="ch">\\</span><span class="st">opencv</span><span class="ch">\\</span><span class="st">4_7_0</span><span class="ch">\\</span><span class="st">cuda_12_D</span><span class="ch">\\</span><span class="st">bin"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>os.add_dll_directory(<span class="vs">r'D:\build\opencv\4_10\install\x64\vc17\bin'</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ImportError: DLL load failed while importing cv2: The specified module could not be found.</code></pre>
@@ -513,13 +553,59 @@ Expand to see an example of the output from <code>print(cv2.getBuildInformation(
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="imgs/proc_mon_failed_search_nvidia.png" class="img-fluid figure-img"></p>
-<figcaption>Process Monitor failed to locate <strong>nppc64_12.dll</strong></figcaption>
+<figcaption>Process Monitor failed to locate <strong>nppial64_12.dll</strong> and <strong>nppc64_12.dll</strong></figcaption>
 </figure>
 </div>
-<p>Now process monitor shows that <strong>opencv_img_hash_470.dll</strong> and <strong>opencv_world470.dll</strong> were located successfully after a few attempts however we are missing <strong>nppc64_12.dll</strong> which is part of the CUDA SDK. As before if we add the CUDA SDK binary directory to the python DLL search path the call to <code>import cv2</code> will be successful. If however we were still seeing the same error we could simply repeat the process, that is examine the output in process monitor and add the directories containing the missing DLL’s to the python DLL search path.</p>
-
-
+<p>After adding the previously missing DLLs to the search path, Process Monitor now shows that <strong>opencv_world4100.dll</strong> and <strong>opencv_img_hash_4100.dll</strong> were located successfully after a few attempts. However, we’re now missing <strong>nppial64_12.dll</strong> and <strong>nppc64_12.dll</strong>, which are part of the CUDA SDK. To resolve this, we need to add the CUDA SDK binary directory to the Python DLL search path. Once we do this, the call to <code>import cv2</code> will be successful.</p>
+<p>If we were still seeing the same error after this step, we would simply repeat the process:</p>
+<ol type="1">
+<li>Examine the output in Process Monitor</li>
+<li>Identify any remaining missing DLLs</li>
+<li>Add the directories containing these missing DLLs to the Python DLL search path</li>
+</ol>
 </section>
+</section>
+<section id="automatically-search-process-monitor-log-for-missing-dll" class="level1">
+<h1>Automatically search Process Monitor log for missing DLL</h1>
+<p>The output from Process Monitor can be difficult to sift through. To help with this, we can export the output to a .csv file and then parse it using the helper function below.</p>
+<p>To export the log:</p>
+<ol type="1">
+<li>Go to File -&gt; Save</li>
+<li>Select Format -&gt; Comma-Separated Values (CSV)</li>
+<li>Enter the desired location for the exported file under Path</li>
+<li>Click Save</li>
+</ol>
+<p>Below is an examaple of a Python function which will parse the exported CSV and print the names of missing DLLs:</p>
+<div id="6223f2af" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> print_missing_libs(process_mon_export_file_path):</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    shared_libs <span class="op">=</span> {}</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(process_mon_export_file_path, mode<span class="op">=</span><span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        csv_reader <span class="op">=</span> csv.reader(<span class="bu">file</span>, delimiter<span class="op">=</span><span class="st">','</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> csv_reader:</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>            key <span class="op">=</span> Path(row[<span class="dv">3</span>]).name.lower()</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>            val <span class="op">=</span> row[<span class="dv">4</span>]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (key <span class="kw">not</span> <span class="kw">in</span> shared_libs <span class="kw">or</span> key <span class="kw">in</span> shared_libs <span class="kw">and</span> shared_libs[key] <span class="op">!=</span> <span class="st">'SUCCESS'</span>):</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                shared_libs[key] <span class="op">=</span> val</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    pattern <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">r"__init__"</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> entry, status <span class="kw">in</span> shared_libs.items():</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(status <span class="op">==</span> <span class="st">'NAME NOT FOUND'</span> <span class="kw">and</span> <span class="kw">not</span> re.search(pattern, entry)):</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(entry)    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Example usage and output when Python cannot locate the CUDA SDK :</p>
+<div id="2b34d3f1-2ceb-44b8-93ec-f301342d9e5c" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>print_missing_libs(<span class="vs">r'D:\bin\ProcessMonitor\Logfile.CSV'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>nppial64_12.dll
+nppc64_12.dll</code></pre>
+</div>
+</div>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->

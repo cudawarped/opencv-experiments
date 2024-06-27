@@ -285,7 +285,7 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 14, 2024</p>
+      <p class="date-modified">June 27, 2024</p>
     </div>
   </div>
     
@@ -762,7 +762,7 @@ Important
 <li><p>You have built a <strong>Debug</strong> configuration. Currently (https://github.com/opencv/opencv/issues/23568) when building this configuration the cv2.cpxx-win_amd64.pyd shared library is not copied into site-packages-x.x<br>
 directory on installation. This can easily be resolved by creating the <strong>python-x.x</strong> directory and copying the shared library accross so you have <strong>PATH_TO_PYTHON_DIST/Lib/site-packages/cv2/python-x.x/cv2.cpxx-win_amd64.pyd</strong>, where <strong>xx</strong> is the <a href="#python-version-string"><strong>PYTHON_VERSION</strong></a>.</p></li>
 </ol></li>
-<li><div class="sourceCode" id="cb21"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="pp">ImportError</span>: DLL load failed: The specified procedure could <span class="kw">not</span> be found.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<li><div class="sourceCode" id="cb21"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="pp">ImportError</span>: DLL load failed: The specified module could <span class="kw">not</span> be found.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The directory of one or more of the required DLL’s has not been added with <a href="https://docs.python.org/3/library/os.html#os.add_dll_directory">os.add_dll_directory()</a>. Whilst the automatic installation of the bindings should have added all the directories containing the dependant DLL’s to <strong>config.py</strong> it’s possible that one has been missed or you are using a less common configuration. In these cases you will have to</p>
 <ol type="i">
 <li>first track down which DLL’s are missing (<a href="../nbs/ImportError_dll_load_failed_while_importing_cv2.html">see this guide for assistance</a>) and then</li>
