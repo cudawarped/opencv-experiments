@@ -2,34 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.jamesbowley.co.uk/qmd/opencv_cuda_python_windows.html</loc>
-    <lastmod>2024-06-27T08:23:16.463Z</lastmod>
+    <lastmod>2024-06-27T08:36:28.198Z</lastmod>
   </url>
   <url>
     <loc>https://www.jamesbowley.co.uk/qmd/downloads.html</loc>
     <lastmod>2023-06-27T08:07:43.926Z</lastmod>
   </url>
   <url>
-    <loc>https://www.jamesbowley.co.uk/qmd/about.html</loc>
-    <lastmod>2024-06-14T12:37:55.568Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jamesbowley.co.uk/nbs/ImportError_dll_load_failed_while_importing_cv2.html</loc>
-    <lastmod>2024-06-27T08:27:57.644Z</lastmod>
+    <loc>https://www.jamesbowley.co.uk/index.html</loc>
+    <lastmod>2024-06-27T08:36:28.192Z</lastmod>
   </url>
   <url>
     <loc>https://www.jamesbowley.co.uk/nbs/opencv_cuda_streams_performance_python.html</loc>
     <lastmod>2024-06-25T15:23:39.125Z</lastmod>
   </url>
   <url>
-    <loc>https://www.jamesbowley.co.uk/index.html</loc>
-    <lastmod>2024-06-14T12:37:55.512Z</lastmod>
+    <loc>https://www.jamesbowley.co.uk/nbs/ImportError_dll_load_failed_while_importing_cv2.html</loc>
+    <lastmod>2024-06-27T08:36:28.193Z</lastmod>
   </url>
   <url>
-    <loc>https://www.jamesbowley.co.uk/qmd/accelerate_opencv_cuda_python.html</loc>
-    <lastmod>2024-06-14T12:40:14.932Z</lastmod>
+    <loc>https://www.jamesbowley.co.uk/qmd/about.html</loc>
+    <lastmod>2024-06-14T12:37:55.568Z</lastmod>
   </url>
   <url>
     <loc>https://www.jamesbowley.co.uk/qmd/opencv_cuda_performance.html</loc>
-    <lastmod>2024-06-14T12:37:55.581Z</lastmod>
+    <lastmod>2024-06-27T08:36:28.198Z</lastmod>
   </url>
 </urlset>
