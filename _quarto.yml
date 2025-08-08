@@ -41,7 +41,7 @@ website:
           - text: OpenCV Python CUDA wheels
             href: https://github.com/cudawarped/opencv-python-cuda-wheels/releases
           - text: OpenCV C++ CUDA builds 
-            href: https://github.com/cudawarped/opencv-python-cuda-wheels/releases
+            href: https://github.com/cudawarped/opencv_contrib/releases
       #    - https://github.com/cudawarped/opencv-python-cuda-wheels/releases
       #- text: "How-To"
       #  file: howto.qmd

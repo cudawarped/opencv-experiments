@@ -3,7 +3,7 @@ title: "Build OpenCV (including Python) with CUDA on Windows"
 #subtitle: Comprehensive Guide including Python Bindings, cuDNN, and Nvidia Video Codec SDK
 toc: true
 date: 05/12/23
-date-modified: 06/27/24
+date-modified: 08/08/25
 aliases:
   - ../accelerate-opencv-4-5-0-on-windows-build-with-cuda-and-python-bindings
   - ../build-opencv-with-cuda-in-windows
@@ -73,7 +73,7 @@ There are a couple of components you need to download and/or install before you 
 
 3. Install the latest stable (not release candidate -rc) version of <a href="https://cmake.org/download/" target="_blank" rel="noopener noreferrer">CMake</a>.
 
-4. Install the latest version of the <a href="https://developer.nvidia.com/cuda-downloads" target="_blank" rel="noopener noreferrer">CUDA Toolkit</a>.
+4. Install both the latest version of the <a href="https://developer.nvidia.com/cuda-downloads" target="_blank" rel="noopener noreferrer">CUDA Toolkit</a> and <a href="https://www.nvidia.com/en-us/drivers/">drivers</a> for your GPU as these are no longer bundled with the Toolkit.
 
 ::: {.callout-important .callout-note appearance="simple"}
 If your system path is too long, CUDA will not add the path to its shared libraries **C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\vxx.x\\bin ** during installation.  If you receive a warning about this at the end of the installation process do not forget to manually add the this to your system or user path.
@@ -138,7 +138,7 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     ```{.default .code-overflow-wrap #opencv-cuda-python-windows-cmake-flags}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/_core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages
     ```
 
     ## cuDNN only
@@ -146,7 +146,7 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     ```{.default .code-overflow-wrap}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_cudaarithm=OFF -DBUILD_opencv_cudabgsegm=OFF -DBUILD_opencv_cudafeatures2d=OFF -DBUILD_opencv_cudafilters=OFF -DBUILD_opencv_cudaimgproc=OFF -DBUILD_opencv_cudalegacy=OFF -DBUILD_opencv_cudaobjdetect=OFF -DBUILD_opencv_cudaoptflow=OFF -DBUILD_opencv_cudastereo=OFF -DBUILD_opencv_cudawarping=OFF -DBUILD_opencv_cudacodec=OFF -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/_core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages
     ```
 
     ## Without Python bindings
@@ -161,7 +161,7 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     ```{.default .code-overflow-wrap}
     set CMAKE_BUILD_PARALLEL_LEVEL=<N_THREADS>
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Visual Studio 17 2022" -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/_core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages
     ```
 
     ## Ninja
@@ -169,7 +169,7 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     ```{.default .code-overflow-wrap}
     "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Ninja Multi-Config"" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages/
+    "C:\Program Files\CMake\bin\cmake.exe" -H"<PATH_TO_OPENCV_SOURCE>" -DOPENCV_EXTRA_MODULES_PATH="<PATH_TO_OPENCV_CONTRIB_MODULES>" -B"<PATH_TO_BUILD_DIR>" -G"Ninja Multi-Config"" -DCMAKE_BUILD_TYPE=Release -DINSTALL_TESTS=ON -DINSTALL_C_EXAMPLES=ON -DBUILD_EXAMPLES=ON -DBUILD_opencv_world=ON -DENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON -DWITH_CUDA=ON -DCUDA_GENERATION=Auto -DBUILD_opencv_python3=ON -DPYTHON3_INCLUDE_DIR=<PATH_TO_PYTHON_DIST>/include -DPYTHON3_LIBRARY=<PATH_TO_PYTHON_DIST>/libs/<PYTHON_Lib> -DPYTHON3_EXECUTABLE=<PATH_TO_PYTHON_DIST>/python.exe -DPYTHON3_NUMPY_INCLUDE_DIRS=<PATH_TO_PYTHON_DIST>/lib/site-packages/numpy/_core/include -DPYTHON3_PACKAGES_PATH=<PATH_TO_PYTHON_DIST>/Lib/site-packages
     ```
 
     Following the configuration step the build is started with
@@ -199,91 +199,92 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 
     ## Example of CMake Configuration Output
     ```{.default}
---
--- General configuration for OpenCV 4.10.0-dev =====================================
---   Version control:               4.9.0-571-g2629688d11
+-- General configuration for OpenCV 4.13.0-dev =====================================
+--   Version control:               4.12.0-63-g3278820f5d
 --
 --   Extra modules:
 --     Location (extra):            D:/repos/opencv/contrib/modules
---     Version control (extra):     4.9.0-84-gb236c71c
+--     Version control (extra):     4.12.0-7-g9a9b173c
 --
 --   Platform:
---     Timestamp:                   2024-06-11T08:50:41Z
---     Host:                        Windows 10.0.22631 AMD64
---     CMake:                       3.29.5
+--     Timestamp:                   2025-08-07T14:26:42Z
+--     Host:                        Windows 10.0.26100 AMD64
+--     CMake:                       4.0.1
 --     CMake generator:             Ninja Multi-Config
 --     CMake build tool:            D:/bin/ninja/ninja.exe
---     MSVC:                        1940
+--     MSVC:                        1944
 --     Configuration:               Debug Release
+--     Algorithm Hint:              ALGO_HINT_ACCURATE
 --
 --   CPU/HW features:
 --     Baseline:                    SSE SSE2 SSE3
 --       requested:                 SSE3
---     Dispatched code generation:  SSE4_1 SSE4_2 FP16 AVX AVX2 AVX512_SKX
---       requested:                 SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX
---       SSE4_1 (18 files):         + SSSE3 SSE4_1
+--     Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX
+--       SSE4_1 (19 files):         + SSSE3 SSE4_1
 --       SSE4_2 (2 files):          + SSSE3 SSE4_1 POPCNT SSE4_2
---       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 AVX
---       AVX (9 files):             + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
---       AVX2 (38 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2
---       AVX512_SKX (8 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 FP16 FMA3 AVX AVX2 AVX_512F AVX512_COMMON AVX512_SKX
+--       AVX (10 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX
+--       FP16 (1 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16
+--       AVX2 (39 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3
+--       AVX512_SKX (9 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3 AVX_512F AVX512_COMMON AVX512_SKX
 --
 --   C/C++:
 --     Built as dynamic libs?:      YES
 --     C++ standard:                11
---     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe  (ver 19.40.33811.0)
---     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /O2 /Ob2 /DNDEBUG  /Zi
---     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /Zi /Ob0 /Od /RTC1
---     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe
---     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS       /O2 /Ob2 /DNDEBUG  /Zi
---     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS     /Zi /Ob0 /Od /RTC1
+--     C++ Compiler:                C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe  (ver 19.44.35213.0)
+--     C++ flags (Release):         /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /O2 /Ob2 /DNDEBUG  /Zi
+--     C++ flags (Debug):           /DWIN32 /D_WINDOWS /W4 /GR  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS    /EHa /wd4127 /wd4251 /wd4324 /wd4275 /wd4512 /wd4589 /wd4819  /Zi /Ob0 /Od /RTC1
+--     C Compiler:                  C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe
+--     C flags (Release):           /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS      /O2 /Ob2 /DNDEBUG  /Zi
+--     C flags (Debug):             /DWIN32 /D_WINDOWS /W3  /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D _SCL_SECURE_NO_WARNINGS /Gy /bigobj /Oi  /fp:precise /FS    /Zi /Ob0 /Od /RTC1
 --     Linker flags (Release):      /machine:x64  /INCREMENTAL:NO  /debug
 --     Linker flags (Debug):        /machine:x64  /debug /INCREMENTAL
 --     ccache:                      NO
 --     Precompiled headers:         NO
---     Extra dependencies:          C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cudart_static.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppial.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppitc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppig.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppist.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppidei.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublas.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cublasLt.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/cufft.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppif.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppim.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/lib/x64/nppicc.lib
+--     Extra dependencies:          C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/cudart_static.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppial.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppitc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppig.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppist.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppidei.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/cublas.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/cublasLt.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/cufft.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppicc.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppif.lib C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/lib/x64/nppim.lib
 --     3rdparty dependencies:
 --
 --   OpenCV modules:
---     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape signal stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode world xfeatures2d ximgproc xobjdetect xphoto
---     Disabled:                    -
+--     To be built:                 aruco bgsegm bioinspired calib3d ccalib core cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev datasets dnn dnn_objdetect dnn_superres dpm face features2d flann fuzzy gapi hfs highgui img_hash imgcodecs imgproc intensity_transform line_descriptor mcc ml objdetect optflow phase_unwrapping photo plot python3 quality rapid reg rgbd saliency shape signal stereo stitching structured_light superres surface_matching text tracking ts video videoio videostab wechat_qrcode xfeatures2d ximgproc xobjdetect xphoto
+--     Disabled:                    world
 --     Disabled by dependency:      -
---     Unavailable:                 alphamat cannops cvv freetype hdf java julia matlab ovis python2 python2 sfm viz
+--     Unavailable:                 alphamat cannops cvv fastcv freetype hdf java julia matlab ovis python2 sfm viz
 --     Applications:                tests perf_tests examples apps
---     Documentation:               doxygen
+--     Documentation:               doxygen python
 --     Non-free algorithms:         NO
 --
 --   Windows RT support:            NO
 --
---   GUI:
+--   GUI:                           WIN32UI
 --     Win32 UI:                    YES
+--     OpenGL support:              YES (opengl32 glu32)
 --     VTK support:                 NO
 --
 --   Media I/O:
 --     ZLib:                        build (ver 1.3.1)
---     JPEG:                        build-libjpeg-turbo (ver 3.0.3-70)
+--     JPEG:                        build-libjpeg-turbo (ver 3.1.0-70)
 --       SIMD Support Request:      YES
 --       SIMD Support:              NO
---     WEBP:                        build (ver encoder: 0x020f)
+--     WEBP:                        build (ver decoder: 0x0209, encoder: 0x020f, demux: 0x0107)
+--     AVIF:                        NO
 --     PNG:                         build (ver 1.6.43)
 --       SIMD Support Request:      YES
 --       SIMD Support:              YES (Intel SSE)
 --     TIFF:                        build (ver 42 - 4.6.0)
---     JPEG 2000:                   build (ver 2.5.0)
+--     JPEG 2000:                   build (ver 2.5.3)
 --     OpenEXR:                     build (ver 2.3.0)
+--     GIF:                         YES
 --     HDR:                         YES
 --     SUNRASTER:                   YES
 --     PXM:                         YES
 --     PFM:                         YES
 --
 --   Video I/O:
---     DC1394:                      NO
---     FFMPEG:                      YES (prebuilt binaries)
---       avcodec:                   YES (58.134.100)
---       avformat:                  YES (58.76.100)
---       avutil:                    YES (56.70.100)
---       swscale:                   YES (5.9.100)
---       avresample:                YES (4.0.0)
+--     FFMPEG:                      YES (find_package)
+--       avcodec:                   YES (59.18.100)
+--       avformat:                  YES (59.16.100)
+--       avutil:                    YES (57.17.100)
+--       swscale:                   YES (6.4.100)
+--       avresample:                NO
 --     GStreamer:                   NO
 --     DirectShow:                  YES
 --     Media Foundation:            YES
@@ -291,37 +292,37 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --
 --   Parallel framework:            Concurrency
 --
---   Trace:                         YES (with Intel ITT)
+--   Trace:                         YES (with Intel ITT(3.25.4))
 --
 --   Other third-party libraries:
---     Intel IPP:                   2021.11.0 [2021.11.0]
---            at:                   D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/icv
---     Intel IPP IW:                sources (2021.11.0)
---               at:                D:/build/opencv/4_10/3rdparty/ippicv/ippicv_win/iw
+--     Intel IPP:                   2022.1.0 [2022.1.0]
+--            at:                   D:/build/opencv/cuda_13/3rdparty/ippicv/ippicv_win/icv
+--     Intel IPP IW:                sources (2022.1.0)
+--               at:                D:/build/opencv/cuda_13/3rdparty/ippicv/ippicv_win/iw
 --     Lapack:                      NO
 --     Eigen:                       NO
---     Custom HAL:                  NO
+--     Custom HAL:                  YES (ipp (ver 0.0.1))
 --     Protobuf:                    build (3.19.1)
 --     Flatbuffers:                 builtin/3rdparty (23.5.9)
 --
---   NVIDIA CUDA:                   YES (ver 12.5.40, CUFFT CUBLAS NVCUVID NVCUVENC)
---     NVIDIA GPU arch:             50 52 60 61 70 75 80 86 89 90
---     NVIDIA PTX archs:            90
+--   NVIDIA CUDA:                   YES (ver 13.0.48, CUFFT CUBLAS NVCUVID NVCUVENC)
+--     NVIDIA GPU arch:             86
+--     NVIDIA PTX archs:
 --
---   cuDNN:                         YES (ver 9.2.0)
+--   cuDNN:                         YES (ver 9.11.0)
 --
 --   OpenCL:                        YES (NVD3D11)
 --     Include path:                D:/repos/opencv/opencv/3rdparty/include/opencl/1.2
 --     Link libraries:              Dynamic load
 --
 --   Python 3:
---     Interpreter:                 C:/Users/b/miniforge3/envs/py37_mini/python.exe (ver 3.7.12)
---     Libraries:                   C:/Users/b/miniforge3/envs/py37_mini/libs/python37.lib (ver 3.7.12)
+--     Interpreter:                 C:/Users/b/miniforge3/python.exe (ver 3.10.14)
+--     Libraries:                   C:/Users/b/miniforge3/libs/python310.lib (ver 3.10.14)
 --     Limited API:                 NO
---     numpy:                       C:/Users/b/miniforge3/envs/py37_mini/Lib/site-packages/numpy/core/include (ver 1.21.6)
---     install path:                C:/Users/b/miniforge3/envs/py37_mini/Lib/site-packages/cv2/python-3.7
+--     numpy:                       C:/Users/b/miniforge3/lib/site-packages/numpy/_core/include (ver 2.2.6)
+--     install path:                C:/Users/b/miniforge3/Lib/site-packages/cv2/python-3.10
 --
---   Python (for build):            C:/Users/b/miniforge3/envs/py37_mini/python.exe
+--   Python (for build):            C:/Users/b/miniforge3/python.exe
 --
 --   Java:
 --     ant:                         NO
@@ -330,12 +331,12 @@ Visual Studio is painfully slow when compiling OpenCV with CUDA, to reduce the b
 --     Java wrappers:               NO
 --     Java tests:                  NO
 --
---   Install to:                    D:/build/opencv/4_10/install
+--   Install to:                    D:/build/opencv/cuda_13/install
 -- -----------------------------------------------------------------
 --
--- Configuring done (63.3s)
--- Generating done (21.4s)
--- Build files have been written to: D:/build/opencv/4_10
+-- Configuring done (28.9s)
+-- Generating done (5.9s)
+-- Build files have been written to: D:/build/opencv/cuda_13
     ```
     :::
 
