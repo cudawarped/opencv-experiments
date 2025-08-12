@@ -526,10 +526,16 @@ gtag('config', 'G-69X21EFRB2', { 'anonymize_ip': true});
 </ol></li>
 <li><strong>Optional</strong> - To use the DNN CUDA backend:
 <ol type="i">
-<li>Register and <a href="https://developer.nvidia.com/rdp/form/cudnn-download-survey" target="_blank" rel="noopener noreferrer">download</a> the latest version of cuDNN for the version of CUDA you have installed by selecting the <strong>Tarball</strong>.
+<li><a href="https://developer.nvidia.com/cudnn-downloads" target="_blank" rel="noopener noreferrer">Download</a> the latest version of cuDNN for the version of CUDA you have installed by selecting the <strong>Tarball</strong>.
 </li>
-<li>Extract and copy the <strong>bin</strong>, <strong>include</strong> and <strong>lib</strong> directories to your CUDA installation.</li>
-</ol></li>
+<li>Extract and copy the contents of following directories from the archive,
+<ul>
+<li><strong>bin</strong> to <strong>CUDA_INSTALL/bin/x64</strong>,</li>
+<li><strong>include</strong> to <strong>CUDA_INSTALL/include</strong>, and</li>
+<li><strong>lib</strong> to <strong>CUDA_INSTALL/lib</strong>.</li>
+</ul></li>
+</ol>
+Make sure to copy the contents of the <strong>bin</strong> directory to <strong>bin/x64</strong> not <strong>bin</strong>.</li>
 </ol>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
